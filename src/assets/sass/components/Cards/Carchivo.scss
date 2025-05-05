@@ -1,0 +1,65 @@
+.Archivos__Botones {
+display: flex;
+gap: 10px;
+justify-content: center;
+}
+
+.Archivos__Boton {
+width: 50px;
+height: 50px;
+min-width: 50px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+background-color: #FF6D00;
+}
+
+.Archivos__TituloContenedor {
+padding-right: 10px;
+}
+
+.Archivo__Titulo {
+flex-grow: 1;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+
+
+.Archivo__Tipo {
+padding: 4px 8px;
+border-radius: 4px;
+font-size: 0.8rem;
+font-weight: bold;
+text-transform: uppercase;
+min-width: 70px;
+text-align: center;
+}
+  
+
+.Archivo___PDF {
+background-color: #ff3434; 
+color: white;
+}
+
+.Archivo___Word {
+background-color: #3087df; 
+color: white;
+}
+
+.Archivo___Imagen {
+background-color: #0eaf16; 
+color: white;
+}
+
+.Archivo___Video {
+background-color: #cf29e6;
+color: white;
+}
+
+.Archivo___Otro {
+background-color: #ff8018; 
+color: white;
+}

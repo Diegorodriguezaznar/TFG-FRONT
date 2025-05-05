@@ -1,0 +1,72 @@
+.ArchivosyTestPage__Breadcrumb {
+margin-left: 15px;
+margin-top: 60px;
+}
+
+.ArchivosyTestPage__Contenido {
+flex: 1;
+padding: 15px;
+margin-left: 0;
+margin-top: 0;
+}
+
+.ArchivosyTestPage__Contenedor {
+display: flex;
+flex-direction: column;
+gap: 15px;
+min-height: 100vh;  
+padding-top: 56px;
+}
+
+.ArchivosyTestPage__Tab {
+width: 100%;
+min-height: auto;
+padding: 15px;
+}
+
+/* ipad*/
+@media (min-width: 576px) {
+.ArchivosyTestPage__Breadcrumb {
+    margin-left: 3%;
+    margin-top: 5%;
+}
+
+.ArchivosyTestPage__Contenido {
+    padding: 18px;
+}
+
+.ArchivosyTestPage__Contenedor {
+    gap: 18px;
+    padding-top: 60px;
+}
+
+.ArchivosyTestPage__Tab {
+    padding: 18px;
+    min-height: 60vh;
+}
+}
+
+/* Ordenadores */
+@media (min-width: 768px) {
+.ArchivosyTestPage__Breadcrumb {
+    margin-left: 5%;
+    margin-top: 6%;
+}
+
+.ArchivosyTestPage__Contenido {
+    padding: 20px;
+    margin-left: 1%;
+    margin-top: -4%; 
+}
+
+.ArchivosyTestPage__Contenedor {
+    flex-direction: row; 
+    gap: 20px;
+    padding-top: 64px;
+}
+
+.ArchivosyTestPage__Tab {
+    min-height: 80vh;
+    padding: 20px;
+}
+}

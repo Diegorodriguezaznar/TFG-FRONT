@@ -1,0 +1,36 @@
+// Base
+@import "base/reset"; 
+@import "base/typography"; 
+
+// Components
+@import "components/Cards/Carchivo";
+@import "components/Cards/Ccomentario";
+@import "components/Cards/Ccurso";
+@import "components/Cards/Ctest";
+
+@import "components/Lists/Lcomentarios";
+@import "components/Lists/Lcursos";
+@import "components/Lists/Ltemarios";
+
+@import "components/Mis/MisArchivos";
+@import "components/Mis/MisCursos";
+@import "components/Mis/UserTab";
+
+@import "components/Models/M_ArchivoComentarios";
+@import "components/Models/Carrusel";
+@import "components/Models/InfoSection";
+
+// Layout
+@import "layout/Footer";
+@import "layout/Header";
+@import "layout/Login";
+@import "layout/SideBar";
+
+// Pages
+@import "pages/ArchivosyTest";
+@import "pages/Asignaturas";
+@import "pages/Cursos";
+@import "pages/Home";
+@import "pages/MisCursos";
+@import "pages/Perfil";
+@import "pages/Temarios";
