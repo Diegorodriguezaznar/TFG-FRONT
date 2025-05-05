@@ -1,0 +1,153 @@
+// Variables de colores
+$color-primary: #FF7424;
+$color-secondary: #FB7C3C;
+$color-background: #f5f5f5;
+$color-text: #333333;
+$color-card: #ffffff;
+$color-border: rgba(0, 0, 0, 0.12);
+
+.PerfilPage__Breadcrumb {
+  margin-top: 5%;
+  margin-left: 5%;
+  z-index: 1;
+  background-color: transparent;
+  padding: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.perfil-container {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 160px);
+  padding: 16px;
+  background-color: $color-background;
+}
+
+.perfil-content {
+  flex: 1;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.perfil-card {
+  width: 100%;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.perfil-row {
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.perfil-col-izquierda {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.perfil-avatar-container {
+  margin-bottom: 24px;
+}
+
+.perfil-avatar {
+  border: 3px solid $color-primary;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.perfil-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.perfil-nombre, .perfil-email, .perfil-frase {
+  border-radius: 8px;
+  
+  :deep(.v-field__outline) {
+    color: $color-primary;
+  }
+  
+  :deep(.v-field__input) {
+    color: $color-text;
+    font-weight: 500;
+  }
+  
+  :deep(.v-label) {
+    color: $color-secondary;
+  }
+}
+
+.perfil-col-derecha {
+  display: flex;
+  padding: 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .PerfilPage__Breadcrumb {
+    margin-top: 5%;
+  }
+  
+  .perfil-card {
+    padding: 12px;
+  }
+  
+  .perfil-row {
+    gap: 12px;
+  }
+  
+  .perfil-avatar-container {
+    margin-bottom: 16px;
+  }
+  
+  .perfil-avatar {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .perfil-info-row, .perfil-tab-row {
+    padding: 0 8px;
+  }
+}
+
+@media (min-width: 769px) {
+  .perfil-container {
+    flex-direction: row;
+    padding: 16px;
+  }
+  
+  .perfil-content {
+    margin-left: 16px;
+  }
+  
+  .perfil-avatar-container {
+    padding: 0;
+  }
+  
+  .perfil-info {
+    padding: 0 8px;
+  }
+  
+  .perfil-info-row {
+    margin-bottom: 20px;
+  }
+}
+
+/* Desktop (992px y superior) */
+@media (min-width: 992px) {
+  .PerfilPage__Breadcrumb {
+    margin-left: 5%;
+  }
+  
+  .perfil-container {
+    padding: 24px;
+  }
+  
+  .perfil-content {
+    margin-left: 20px;
+  }
+}

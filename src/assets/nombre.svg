@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100">
+  <!-- Letras estáticas -->
+  <text x="10" y="70" font-family="serif" font-style="italic" font-size="55" fill="black">A</text>
+  <text x="45" y="70" font-family="serif" font-style="italic" font-size="40" fill="black">cadem</text>
+  
+  <!-- Letra I animada -->
+  <text x="155" y="70" font-family="serif" font-style="italic" font-size="55" fill="#FF8000">
+    I
+    <animate 
+      attributeName="y" 
+      values="70; 30; 75; 65; 70" 
+      dur="1.8s" 
+      keyTimes="0; 0.3; 0.5; 0.8; 1"
+      keySplines="0.5 0 0.5 1; 0.3 0 0.7 1; 0.25 0.1 0.25 1; 0.5 0 0.5 1"
+      calcMode="spline"
+      repeatCount="indefinite" />
+    <animate 
+      attributeName="fill" 
+      values=" #FF8000" 
+      dur="0.8s" 
+      keyTimes="0; 0.5; 1"
+      repeatCount="indefinite" />
+  </text>
+  
+  <!-- Letra Q animada -->
+  <text x="175" y="70" font-family="serif" font-style="italic" font-size="55" fill="#FF8000">
+    Q
+    <animate 
+      attributeName="y" 
+      values="70; 30; 75; 65; 70" 
+      dur="1.8s" 
+      begin="0.2s"
+      keyTimes="0; 0.3; 0.5; 0.8; 1"
+      keySplines="0.5 0 0.5 1; 0.3 0 0.7 1; 0.25 0.1 0.25 1; 0.5 0 0.5 1"
+      calcMode="spline"
+      repeatCount="indefinite" />
+    <animate 
+      attributeName="fill" 
+      values=" #FF8000" 
+      dur="0.8s" 
+      begin="0.2s"
+      keyTimes="0; 0.5; 1"
+      repeatCount="indefinite" />
+  </text>
+</svg>

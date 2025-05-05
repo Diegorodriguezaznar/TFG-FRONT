@@ -1,0 +1,35 @@
+.ArchivoComentario__Contenedor {
+display: flex;
+flex-direction: column;
+height: 80vh;
+}
+
+.ArchivoComentario__Contenido {
+display: flex;
+flex-direction: column;
+gap: 20px;
+overflow-y: auto;
+max-height: 600px;
+padding: 20px;
+}
+
+.ArchivoComentario__VerArchivo {
+width: 100%;
+min-height: 400px;
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+}
+
+.ArchivoComentario__ErrorVerArchivo {
+text-align: center;
+color: #888;
+font-style: italic;
+}
+
+.ArchivoComentario__ContadorComentarios {
+font-size: 0.8em;
+margin-left: 10px;
+color: #ff8a04;
+}
