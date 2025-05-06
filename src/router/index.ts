@@ -7,7 +7,7 @@ import PerfilPage from "@/views/PerfilPage.vue";
 import MisCursosPage from "@/views/MisCursosPage.vue";
 import MisArchivosPage from "@/views/MisArchivosPage.vue";
 import ArchivosyTestPage from "@/views/ArchivosyTestPage.vue";
-import HomePage from "@/views/HomePage.vue";
+import HomePage from "@/views/Home.vue";
 import AdminPage from "@/views/AdminPage.vue";
 
 // Importar store de usuario para proteger rutas

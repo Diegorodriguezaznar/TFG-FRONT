@@ -1,84 +1,99 @@
-<script setup lang="ts">
+<script setup>
 // --------------------------- Imports ---------------------------
-import { ref, computed, defineEmits } from "vue";
-import { useDisplay } from "vuetify";
-import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
-import { useRouter } from "vue-router";
+import { ref, computed } from 'vue';
+import { useDisplay } from 'vuetify';
 
 // --------------------------- Variables ---------------------------
-const router = useRouter();
-const usuarioLogeadoStore = useUsuarioLogeadoStore();
-const emit = defineEmits(["mostrar-login"]);
-const drawer = ref(true);
-const isExpanded = ref(false);
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false
+  }
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const isExpanded = ref(true);
 const { mobile } = useDisplay();
 const isMobile = computed(() => mobile.value);
-const usuarioActual = computed(() => usuarioLogeadoStore.usuarioActual);
 
-// --------------------------- Menú unificado ---------------------------
-const menu = [
-  { text: "Inicio", route: "/", icon: "mdi-home" },
-  { text: "Cursos", route: "/cursos", icon: "mdi-school" },
-  { text: "Mis Archivos", route: "/mis-archivos", icon: "mdi-file" },
-  { text: "Mis Cursos", route: "/mis-cursos", icon: "mdi-heart" },
-  { text: "Perfil", route: "/perfil", icon: "mdi-account" }
+// --------------------------- Menú ---------------------------
+const menuItems = [
+  { title: 'Inicio', icon: 'mdi-home', route: '/' },
+  { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
+  { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
+  { title: 'Historial', icon: 'mdi-history', route: '/historial' },
+  { title: 'Mis videos', icon: 'mdi-play-box-multiple', route: '/mis-videos' },
+  { title: 'Ver más tarde', icon: 'mdi-clock', route: '/ver-mas-tarde' },
+  { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' }
 ];
 
-// --------------------------- Funciones ---------------------------
-const logout = () => {
-  usuarioLogeadoStore.usuarioActual = null;
-  usuarioLogeadoStore.estaAutenticado = false;
-  localStorage.removeItem("usuario");
-  router.push("/");
+// --------------------------- Métodos ---------------------------
+const toggleSidebar = () => {
+  isExpanded.value = !isExpanded.value;
 };
 
-const toggleSidebar = () => (isExpanded.value = false);
-const expandSidebar = () => (isExpanded.value = true);
+const drawer = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value)
+});
 </script>
 
 <template>
-  <!-- --------------------------- Sidebar --------------------------- -->
-  <v-navigation-drawer v-model="drawer" :width="isExpanded ? 250 : 80" :rail="!isExpanded" app class="SideBar">
-    <!-- --------------------------- Información de usuario --------------------------- -->
-    <v-list>
-      <v-list-item
-        :prepend-avatar="usuarioActual?.avatar || 'https://randomuser.mehttp://localhost:5687/api/portraits/women/85.jpg'"
-        :subtitle="usuarioActual?.email || 'Usuario'"
-        :title="usuarioActual?.nombre || 'Usuario'"
-        @click="expandSidebar">
-        
-        <template v-slot:append>
-          <v-btn v-if="isExpanded" icon variant="text" @click.stop="toggleSidebar">
-            <v-icon>mdi-chevron-left</v-icon>
-          </v-btn>
-        </template>
-      </v-list-item>
-    </v-list>
-
-    <v-divider class="border-opacity-100"></v-divider>
-
-    <!-- --------------------------- Menú de navegación --------------------------- -->
+  <v-navigation-drawer
+    v-model="drawer"
+    :rail="!isExpanded && !isMobile"
+    :permanent="!isMobile"
+    :width="isExpanded ? 240 : 80"
+    class="Sidebar"
+  >
+    <!-- Cabecera del sidebar -->
+    <div class="d-flex align-center justify-space-between pa-2">
+      <v-btn v-if="!isMobile" icon @click="toggleSidebar" size="small">
+        <v-icon>{{ isExpanded ? 'mdi-chevron-left' : 'mdi-chevron-right' }}</v-icon>
+      </v-btn>
+    </div>
+    
+    <v-divider></v-divider>
+    
+    <!-- Menú de navegación -->
     <v-list density="compact" nav>
-      <template v-for="(item, index) in menu" :key="item.text">
-        <v-list-item link :to="item.route" :prepend-icon="item.icon">
-          <v-list-item-title v-if="isExpanded">{{ item.text }}</v-list-item-title>
-        </v-list-item>
-        <v-divider class="border-opacity-100" :thickness="1" v-if="index < menu.length - 1"></v-divider>
-      </template>
-      
-      <!-- --------------------------- Cerrar sesión --------------------------- -->
-      <v-list-item @click="logout" prepend-icon="mdi-logout">
-        <v-list-item-title v-if="isExpanded">Cerrar sesión</v-list-item-title>
-      </v-list-item>
+      <v-list-item
+        v-for="item in menuItems"
+        :key="item.title"
+        :value="item.title"
+        :to="item.route"
+        :title="isExpanded ? item.title : ''"
+        :prepend-icon="item.icon"
+        class="Sidebar__MenuItem"
+      ></v-list-item>
     </v-list>
+    
+    <v-divider class="my-2"></v-divider>
+    
+    <!-- Sección de canales suscritos (simplificado) -->
+    <div v-if="isExpanded" class="px-3 py-2">
+      <div class="text-subtitle-2 font-weight-medium mb-2">Canales suscritos</div>
+      <v-list density="compact" nav>
+        <v-list-item
+          v-for="i in 5"
+          :key="i"
+          :title="`Canal ${i}`"
+          prepend-avatar="https://picsum.photos/seed/picsum/40/40"
+        ></v-list-item>
+      </v-list>
+    </div>
   </v-navigation-drawer>
-
-  <!-- --------------------------- Botón para abrir el drawer en móvil --------------------------- -->
-  <v-btn v-if="isMobile" icon @click="drawer = !drawer" class="SideBar__Boton">
-    <v-icon>mdi-menu</v-icon>
-  </v-btn>
 </template>
 
-<style lang="scss" scoped>
-  @import "@/assets/sass/layout/SideBar.scss";
+<style scoped>
+.Sidebar {
+  background-color: white;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.Sidebar__MenuItem {
+  margin-bottom: 4px;
+  border-radius: 0;
+}
 </style>
