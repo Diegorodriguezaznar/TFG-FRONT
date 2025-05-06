@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // --------------------------- Props ---------------------------
 const props = defineProps({
   videos: {
@@ -6,6 +6,24 @@ const props = defineProps({
     default: () => []
   }
 });
+
+// --------------------------- Colores para asignaturas ---------------------------
+function getColorForAsignatura(asignatura: string): string {
+  const colores: Record<string, string> = {
+    'Mates': 'blue',
+    'Lengua': 'deep-purple',
+    'Historia': 'brown',
+    'Física': 'indigo',
+    'Química': 'green',
+    'Biología': 'teal',
+    'Inglés': 'red',
+    'Arte': 'pink',
+    'Informática': 'orange',
+    'Música': 'cyan'
+  };
+  
+  return colores[asignatura] || 'grey';
+}
 </script>
 
 <template>
@@ -72,31 +90,6 @@ const props = defineProps({
     </v-row>
   </div>
 </template>
-
-<script>
-// --------------------------- Colores para asignaturas ---------------------------
-// Agregamos script normal para el método de colores
-export default {
-  methods: {
-    getColorForAsignatura(asignatura) {
-      const colores = {
-        'Mates': 'blue',
-        'Lengua': 'deep-purple',
-        'Historia': 'brown',
-        'Física': 'indigo',
-        'Química': 'green',
-        'Biología': 'teal',
-        'Inglés': 'red',
-        'Arte': 'pink',
-        'Informática': 'orange',
-        'Música': 'cyan'
-      };
-      
-      return colores[asignatura] || 'grey';
-    }
-  }
-}
-</script>
 
 <style scoped>
 .ListaVideos__Card {

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref } from 'vue';
 
@@ -39,9 +39,9 @@ const seleccionarFiltro = (filtro) => {
       <v-slide-group show-arrows>
         <v-slide-group-item v-for="asignatura in asignaturas" :key="asignatura">
           <v-chip
-            class="ma-2"
-            :color="filtroActual === asignatura ? 'primary' : 'grey-lighten-3'"
-            :text-color="filtroActual === asignatura ? 'white' : 'default'"
+            class="ma-2 Filtros__Chip"
+            :class="{ 'Filtros__Chip--activo': filtroActual === asignatura }"
+            variant="outlined"
             @click="seleccionarFiltro(asignatura)"
           >
             {{ asignatura }}
@@ -60,5 +60,16 @@ const seleccionarFiltro = (filtro) => {
 .Filtros__Contenedor {
   border-radius: 8px;
   padding: 8px 0;
+}
+
+.Filtros__Chip {
+  border: 2px solid #FF9800 !important;
+  background-color: white !important;
+  color: #FF9800 !important;
+}
+
+.Filtros__Chip--activo {
+  background-color: #FF9800 !important;
+  color: white !important;
 }
 </style>

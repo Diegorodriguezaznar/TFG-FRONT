@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref } from 'vue';
 
@@ -27,8 +27,8 @@ const updateSearch = () => {
     
     <!-- Logo -->
     <div class="Header__Logo">
-      <v-icon color="red" size="x-large" class="mr-2">mdi-play-box</v-icon>
-      <span class="text-h6 font-weight-bold">EduTube</span>
+      <v-icon color="orange" size="x-large" class="mr-2">mdi-play-box</v-icon>
+      <span class="text-h6 font-weight-bold">AcademIQ Play</span>
     </div>
     
     <!-- Buscador -->
@@ -46,7 +46,7 @@ const updateSearch = () => {
     ></v-text-field>
     
     <!-- Icono de usuario -->
-    <v-btn icon class="Header__BtnUsuario">
+    <v-btn icon class="Header__BtnUsuario" to="/perfil">
       <v-avatar color="primary" size="32">
         <v-icon color="white">mdi-account</v-icon>
       </v-avatar>

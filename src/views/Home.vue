@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref, computed, onMounted } from 'vue';
 import Header from '@/components/Header.vue';
