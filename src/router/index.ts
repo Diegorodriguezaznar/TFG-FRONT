@@ -9,12 +9,14 @@ import MisArchivosPage from "@/views/MisArchivosPage.vue";
 import ArchivosyTestPage from "@/views/ArchivosyTestPage.vue";
 import HomePage from "@/views/Home.vue";
 import AdminPage from "@/views/AdminPage.vue";
+import Quizzes from "@/views/Quizzes.vue";
+import QuizDetalle from "@/views/QuizDetalle.vue";
 
 // Importar store de usuario para proteger rutas
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 const routes = [
-  { path: "/", component: HomePage },
+  { path: "/", component: QuizDetalle },
   { path: "/asignaturas/:idCurso", component: AsignaturasPage, props: true },
   { path: "/temarios/:idAsignatura", component: TemariosPage, props: true },
   { path: "/temarios/:idTemario/archivos-test", component: ArchivosyTestPage, props: true },
@@ -22,6 +24,8 @@ const routes = [
   { path: "/perfil", component: PerfilPage },
   { path: "/mis-cursos", component: MisCursosPage },
   { path: "/mis-archivos", component: MisArchivosPage },
+  { path: "/quizz-time!", component: Quizzes},
+  { path: "/quizz-detail", component: QuizDetalle},
   { 
     path: "/admin", component: AdminPage,
     //nos aseguramos de que solo los usuarios admin puedan 
