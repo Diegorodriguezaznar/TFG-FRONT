@@ -115,7 +115,7 @@ async function createAsignatura() {
     
     // Probar cada formato hasta que uno funcione
     for (let i = 0; i < payloads.length && !success; i++) {
-      response = await fetch("http://localhost:5687/api/Asignatura", {
+      response = await fetch("http://localhost:5190/api/Asignatura", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payloads[i]),
@@ -169,7 +169,7 @@ async function updateAsignatura() {
       }
     };
     
-    const response = await fetch(`http://localhost:5687/api/Asignatura/${selectedAsignatura.value.idAsignatura}`, {
+    const response = await fetch(`http://localhost:5190/api/Asignatura/${selectedAsignatura.value.idAsignatura}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -206,7 +206,7 @@ async function confirmDeleteAsignatura() {
   errorMessage.value = '';
   
   try {
-    const response = await fetch(`http://localhost:5687/api/Asignatura/${idToDelete.value}`, {
+    const response = await fetch(`http://localhost:5190/api/Asignatura/${idToDelete.value}`, {
       method: "DELETE",
     });
     

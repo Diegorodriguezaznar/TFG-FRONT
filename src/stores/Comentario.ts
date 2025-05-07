@@ -8,7 +8,7 @@ export const useComentarioStore = defineStore("comentario", () => {
   // --------------------------- Obtener comentarios por ID de archivo ---------------------------
   async function fetchComentariosByArchivoId(idArchivo: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Comentario/archivo/${idArchivo}`);
+      const response = await fetch(`http://localhost:5190/api/Comentario/archivo/${idArchivo}`);
       if (!response.ok) return []; // Si no hay comentarios, retorna un array vacío
       return await response.json();
     } catch (error) {
@@ -35,7 +35,7 @@ export const useComentarioStore = defineStore("comentario", () => {
       
       console.log("Enviando comentario:", JSON.stringify(comentarioData));
 
-      const response = await fetch("http://localhost:5687/api/Comentario/publicar", {
+      const response = await fetch("http://localhost:5190/api/Comentario/publicar", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(comentarioData),

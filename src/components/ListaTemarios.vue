@@ -7,7 +7,7 @@ import CardTemario from "@/components/CardTemario.vue";
 async function fetchTemarios() {
   if (!props.idAsignatura || props.idAsignatura === "undefined") return;
   try {
-    const response = await fetch(`http://localhost:5687/api/Temario/asignatura/${props.idAsignatura}`);
+    const response = await fetch(`http://localhost:5190/api/Temario/asignatura/${props.idAsignatura}`);
     if (!response.ok) throw new Error("Error al obtener los temarios");
 
     const data = await response.json();

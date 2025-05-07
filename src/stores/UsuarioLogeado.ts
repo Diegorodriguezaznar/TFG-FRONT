@@ -26,7 +26,7 @@ export const useUsuarioLogeadoStore = defineStore("usuarioLogeado", () => {
   // Guardar usuario en localStorage al iniciar sesión
   async function login(email: string, password: string): Promise<boolean> {
     try {
-      const response = await fetch("http://localhost:5687/api/Usuario/login", {
+      const response = await fetch("http://localhost:5190/api/Usuario/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

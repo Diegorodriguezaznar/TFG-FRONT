@@ -14,7 +14,7 @@ const items = ref([{ title: 'Cursos', disabled: true, href: '/cursos' }]);
 // --------------------------- Fetch de cursos ---------------------------
 const fetchCursos = async () => {
   try {
-    const response = await fetch("http://localhost:5687/api/Curso", {
+    const response = await fetch("http://localhost:5190/api/Curso", {
       headers: usuarioLogeadoStore.usuarioActual 
         ? { 'Authorization': `Bearer ${usuarioLogeadoStore.usuarioActual.token}` }
         : {}

@@ -1,107 +1,75 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { useCursoStore } from '@/stores/Curso';
+import { useVideoStore } from '@/stores/Video';
 import Header from '@/components/Header.vue';
 import Sidebar from '@/components/Sidebar.vue';
 import Filtros from '@/components/Filtros.vue';
 import Sugerencias from '@/components/Sugerencias.vue';
 import ListaVideos from '@/components/ListaVideos.vue';
 
+// --------------------------- Route ---------------------------
+const route = useRoute();
+
+// --------------------------- Stores ---------------------------
+const cursoStore = useCursoStore();
+const videoStore = useVideoStore();
+
 // --------------------------- Variables ---------------------------
 const drawer = ref(false);
 const searchQuery = ref('');
-const filtroSeleccionado = ref('Todos');
+const filtroSeleccionado = ref('Todos'); // Comienza con 'Todos'
+const loading = computed(() => videoStore.loading || cursoStore.loading);
+const curso = computed(() => cursoStore.curso);
 
-// --------------------------- Videos ---------------------------
-const videos = ref([]);
+// Verificar si estamos viendo videos de un curso específico
+const cursoId = computed(() => {
+  if (route.path.startsWith('/curso/')) {
+    const id = Number(route.params.id);
+    return isNaN(id) ? null : id;
+  }
+  return null;
+});
 
-// --------------------------- Fetch de videos ---------------------------
-const fetchVideos = async () => {
+// Generar imagen de fondo para el banner (placeholder)
+const bannerImage = computed(() => {
+  // Si hay un curso y tiene imagen, usar esa
+  if (curso.value?.imagen) {
+    return curso.value.imagen;
+  }
+  
+  // De lo contrario, generar una imagen aleatoria basada en el ID del curso
+  if (cursoId.value) {
+    return `https://picsum.photos/seed/${cursoId.value}/1600/400`;
+  }
+  
+  // Imagen por defecto para la página principal
+  return 'https://picsum.photos/seed/home/1600/400';
+});
+
+// --------------------------- Cargar videos ---------------------------
+const cargarVideos = async () => {
   try {
-    // En un caso real, esta sería una llamada a tu API
-    // Simulamos una respuesta con datos de ejemplo
-    videos.value = [
-      {
-        id: 1,
-        titulo: 'Introducción a las ecuaciones',
-        asignatura: 'Mates',
-        thumbnail: 'https://picsum.photos/id/10/300/200',
-        autor: 'Profesor García',
-        vistas: '10K',
-        fecha: 'Hace 2 días'
-      },
-      {
-        id: 2,
-        titulo: 'Análisis de "Don Quijote"',
-        asignatura: 'Lengua',
-        thumbnail: 'https://picsum.photos/id/20/300/200',
-        autor: 'Profesora Martínez',
-        vistas: '5.2K',
-        fecha: 'Hace 1 semana'
-      },
-      {
-        id: 3,
-        titulo: 'La Segunda Guerra Mundial',
-        asignatura: 'Historia',
-        thumbnail: 'https://picsum.photos/id/30/300/200',
-        autor: 'Profesor López',
-        vistas: '8.7K',
-        fecha: 'Hace 3 días'
-      },
-      {
-        id: 4,
-        titulo: 'Elementos químicos básicos',
-        asignatura: 'Química',
-        thumbnail: 'https://picsum.photos/id/40/300/200',
-        autor: 'Profesora Sánchez',
-        vistas: '3.9K',
-        fecha: 'Hace 5 días'
-      },
-      {
-        id: 5,
-        titulo: 'La célula y sus partes',
-        asignatura: 'Biología',
-        thumbnail: 'https://picsum.photos/id/50/300/200',
-        autor: 'Profesor Rodríguez',
-        vistas: '7.3K',
-        fecha: 'Hace 1 día'
-      },
-      {
-        id: 6,
-        titulo: 'Presente simple en inglés',
-        asignatura: 'Inglés',
-        thumbnail: 'https://picsum.photos/id/60/300/200',
-        autor: 'Profesora Wilson',
-        vistas: '6.5K',
-        fecha: 'Hace 4 días'
-      },
-      {
-        id: 7,
-        titulo: 'Fuerzas y movimiento',
-        asignatura: 'Física',
-        thumbnail: 'https://picsum.photos/id/70/300/200',
-        autor: 'Profesor Hernández',
-        vistas: '4.2K',
-        fecha: 'Hace 2 semanas'
-      },
-      {
-        id: 8,
-        titulo: 'Perspectiva en el dibujo',
-        asignatura: 'Arte',
-        thumbnail: 'https://picsum.photos/id/80/300/200',
-        autor: 'Profesora Gómez',
-        vistas: '2.8K',
-        fecha: 'Hace 6 días'
-      }
-    ];
+    if (cursoId.value) {
+      // Cargar el curso específico y sus videos
+      await cursoStore.fetchCursoById(cursoId.value);
+      await videoStore.fetchVideosByCurso(cursoId.value);
+    } else {
+      // Cargar todos los videos
+      await videoStore.fetchAllVideos();
+    }
   } catch (error) {
-    console.error("Error al obtener los videos:", error);
+    console.error("Error al cargar videos:", error);
   }
 };
 
 // --------------------------- Filtrar videos ---------------------------
 const videosFiltrados = computed(() => {
-  let resultado = videos.value;
+  // Usamos los videos filtrados por curso o todos los videos según corresponda
+  const videosBase = cursoId.value ? videoStore.videosFiltradosPorCurso : videoStore.videos;
+  let resultado = videosBase;
   
   // Filtrar por término de búsqueda
   if (searchQuery.value) {
@@ -110,10 +78,10 @@ const videosFiltrados = computed(() => {
     );
   }
   
-  // Filtrar por asignatura seleccionada
+  // Filtrar por asignatura seleccionada (ahora usando idAsignatura)
   if (filtroSeleccionado.value !== 'Todos') {
     resultado = resultado.filter(video => 
-      video.asignatura === filtroSeleccionado.value
+      video.idAsignatura === filtroSeleccionado.value
     );
   }
   
@@ -122,23 +90,34 @@ const videosFiltrados = computed(() => {
 
 // --------------------------- Sugerencias de videos ---------------------------
 const videosSugeridos = computed(() => {
-  // Simplemente muestra los 4 más recientes (en una aplicación real podría ser basado en algoritmos)
-  return videos.value.slice(0, 4);
+  // Usamos los videos filtrados actuales para las sugerencias
+  // Esto asegura que las sugerencias también respeten el filtro de asignatura
+  if (videosFiltrados.value.length <= 4) {
+    return videosFiltrados.value;
+  }
+  return videosFiltrados.value.slice(0, 4);
 });
 
 // --------------------------- Actualizar búsqueda ---------------------------
-const actualizarBusqueda = (query) => {
+const actualizarBusqueda = (query: string) => {
   searchQuery.value = query;
 };
 
 // --------------------------- Actualizar filtro ---------------------------
-const actualizarFiltro = (filtro) => {
+const actualizarFiltro = (filtro: string | number) => {
   filtroSeleccionado.value = filtro;
 };
 
+// --------------------------- Observar cambios en la ruta ---------------------------
+watch(() => route.params.id, () => {
+  // Resetear el filtro cuando cambiamos de curso
+  filtroSeleccionado.value = 'Todos';
+  cargarVideos();
+});
+
 // --------------------------- Cargar datos al montar ---------------------------
 onMounted(() => {
-  fetchVideos();
+  cargarVideos();
 });
 </script>
 
@@ -156,23 +135,79 @@ onMounted(() => {
       <Sidebar v-model="drawer" />
       
       <!-- --------------------------- Contenido principal --------------------------- -->
-      <v-container class="HomePage__Contenedor">
-        <!-- --------------------------- Filtros por asignatura --------------------------- -->
-        <Filtros 
-          @filtro-seleccionado="actualizarFiltro" 
-          :filtro-actual="filtroSeleccionado"
-        />
+      <div>
+        <!-- Banner del curso (solo si estamos viendo un curso específico) -->
+        <div v-if="cursoId && curso" class="HomePage__Banner" :style="{ backgroundImage: `url(${bannerImage})` }">
+          <div class="HomePage__BannerOverlay">
+            <v-container class="HomePage__BannerContent">
+              <v-breadcrumbs :items="[
+                { title: 'Cursos', href: '/cursos' },
+                { title: curso.nombre, disabled: true }
+              ]" class="HomePage__Breadcrumbs px-0">
+                <template v-slot:prepend>
+                  <v-icon icon="mdi-book-open-variant" size="small" color="white"></v-icon>
+                </template>
+                <template v-slot:divider>
+                  <v-icon icon="mdi-chevron-right" size="small" color="white"></v-icon>
+                </template>
+              </v-breadcrumbs>
+              
+              <h1 class="text-h3 font-weight-bold text-white mb-2">{{ curso.nombre }}</h1>
+              <p v-if="curso.descripcion" class="text-h6 text-white mb-4 HomePage__Description">
+                {{ curso.descripcion }}
+              </p>
+              
+              <div class="d-flex align-center">
+                <v-chip 
+                  color="orange" 
+                  variant="elevated" 
+                  class="mr-2" 
+                  size="large"
+                >
+                  <v-icon start icon="mdi-play-circle" class="mr-1"></v-icon>
+                  {{ videosFiltrados.length }} videos
+                </v-chip>
+                
+                <!-- Aquí podrías agregar más chips o info del curso si lo deseas -->
+              </div>
+            </v-container>
+          </div>
+        </div>
         
-        <v-divider class="my-2"></v-divider>
-        
-        <!-- --------------------------- Sugerencias --------------------------- -->
-        <Sugerencias :videos="videosSugeridos" />
-        
-        <v-divider class="my-4"></v-divider>
-        
-        <!-- --------------------------- Lista de videos --------------------------- -->
-        <ListaVideos :videos="videosFiltrados" />
-      </v-container>
+        <v-container class="HomePage__Contenedor">
+          <!-- Estado de carga -->
+          <div v-if="loading" class="d-flex justify-center my-8">
+            <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+          </div>
+          
+          <template v-else>
+            <!-- --------------------------- Filtros por asignatura --------------------------- -->
+            <Filtros 
+              @filtro-seleccionado="actualizarFiltro" 
+              :filtro-actual="filtroSeleccionado"
+              :curso-id="cursoId"
+            />
+            
+            <v-divider class="my-2"></v-divider>
+            
+            <!-- --------------------------- Sugerencias --------------------------- -->
+            <Sugerencias :videos="videosSugeridos" />
+            
+            <v-divider class="my-4"></v-divider>
+            
+            <!-- --------------------------- Lista de videos --------------------------- -->
+            <ListaVideos :videos="videosFiltrados" />
+            
+            <!-- Mensaje si no hay videos -->
+            <v-alert
+              v-if="videosFiltrados.length === 0"
+              type="info"
+              text="No se encontraron videos con los filtros actuales."
+              class="mt-4"
+            ></v-alert>
+          </template>
+        </v-container>
+      </div>
     </v-main>
   </v-app>
 </template>
@@ -188,7 +223,57 @@ onMounted(() => {
   max-width: 1800px;
 }
 
+.HomePage__Banner {
+  position: relative;
+  height: 300px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.HomePage__BannerOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.HomePage__BannerContent {
+  padding-bottom: 32px;
+}
+
+.HomePage__Breadcrumbs {
+  color: white !important;
+}
+
+.HomePage__Breadcrumbs :deep(.v-breadcrumbs-item--disabled) {
+  opacity: 0.8;
+  color: white !important;
+}
+
+.HomePage__Breadcrumbs :deep(.v-breadcrumbs-item) {
+  color: white !important;
+}
+
+.HomePage__Description {
+  max-width: 800px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
 @media (max-width: 600px) {
+  .HomePage__Banner {
+    height: 220px;
+  }
+  
+  .HomePage__BannerContent {
+    padding-bottom: 16px;
+  }
+  
   .HomePage__Contenedor {
     padding: 8px;
   }

@@ -26,21 +26,21 @@ const mostrarMensaje = (mensaje, tipo = 'success') => {
   }, 3000);
 };
 
-// Evento para ir a la página de asignaturas
-const seleccionarCurso = () => {
-  if (curso.id) {
-    router.push(`/asignaturas/${curso.id}`);
-  }
-};
-
 // Propiedades del curso
-const curso = defineProps({
+const props = defineProps({
   id: Number, 
   titulo: String,
-  subtitulo: String,
   descripcion: String,
   imagen: String
 });
+
+// Evento para ir a la página de videos del curso
+const seleccionarCurso = () => {
+  if (props.id) {
+    // Redirigimos a la página Home con el ID del curso
+    router.push(`/curso/${props.id}`);
+  }
+};
 
 const show = ref(false);
 
@@ -55,7 +55,7 @@ const estaInscrito = ref(false);
 
 // Verificar si el usuario está inscrito en este curso al cargar el componente
 onMounted(async () => {
-  if (usuarioId.value && curso.id) {
+  if (usuarioId.value && props.id) {
     await verificarInscripcion();
   }
 });
@@ -63,11 +63,11 @@ onMounted(async () => {
 // Verificar si el usuario está inscrito en este curso
 async function verificarInscripcion() {
   try {
-    const response = await fetch(`http://localhost:5687/api/UsuarioCurso/usuario/${usuarioId.value}`);
+    const response = await fetch(`http://localhost:5190/api/UsuarioCurso/usuario/${usuarioId.value}`);
     
     if (response.ok) {
       const inscripciones = await response.json();
-      estaInscrito.value = inscripciones.some(i => i.idCurso === curso.id);
+      estaInscrito.value = inscripciones.some(i => i.idCurso === props.id);
     }
   } catch (error) {
     console.error("Error al verificar inscripción:", error);
@@ -81,7 +81,7 @@ const toggleInscripcion = async (event) => {
   
   // Verificar login
   if (!usuarioId.value) {
-    mostrarMensaje('Debes iniciar sesión para inscribirte en cursos', 'error');
+    mostrarMensaje('Debes iniciar sesión para marcar como favorito', 'error');
     router.push('/login');
     return;
   }
@@ -89,7 +89,7 @@ const toggleInscripcion = async (event) => {
   try {
     if (estaInscrito.value) {
       // ELIMINAR inscripción (usando query parameters)
-      const url = `http://localhost:5687/api/UsuarioCurso?idUsuario=${usuarioId.value}&idCurso=${curso.id}`;
+      const url = `http://localhost:5190/api/UsuarioCurso?idUsuario=${usuarioId.value}&idCurso=${props.id}`;
       console.log("Eliminando inscripción:", url);
       
       const response = await fetch(url, {
@@ -102,19 +102,18 @@ const toggleInscripcion = async (event) => {
       } else {
         const errorText = await response.text();
         console.error("Error al eliminar inscripción:", errorText);
-        mostrarMensaje('Error al desinscribirte del curso', 'error');
+        mostrarMensaje('Error al quitar favorito', 'error');
       }
     } else {
       // CREAR inscripción - SIMPLIFICADO AL MÁXIMO
-      // Basado en los errores, parece que UsuarioCurso constructor espera IdUsuario e IdCurso
       const datos = {
         IdUsuario: usuarioId.value,
-        IdCurso: curso.id
+        IdCurso: props.id
       };
       
       console.log("Creando inscripción con datos:", datos);
       
-      const response = await fetch("http://localhost:5687/api/UsuarioCurso", {
+      const response = await fetch("http://localhost:5190/api/UsuarioCurso", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(datos)
@@ -126,7 +125,7 @@ const toggleInscripcion = async (event) => {
       } else {
         const errorText = await response.text();
         console.error("Error al crear inscripción:", errorText);
-        mostrarMensaje('Error al inscribirte en el curso', 'error');
+        mostrarMensaje('Error al marcar como favorito', 'error');
       }
     }
   } catch (error) {
@@ -139,30 +138,45 @@ const toggleInscripcion = async (event) => {
 <template>
   <div>
     <v-card class="curso-card" @click="seleccionarCurso">
-      <v-img :src="imagen" height="200px" cover></v-img>
+      <!-- Usamos una imagen por defecto si no hay imagen proporcionada -->
+      <v-img 
+        :src="imagen || 'https://picsum.photos/300/200'" 
+        height="200px" 
+        cover
+        class="curso-card-imagen"
+      ></v-img>
       
-      <v-card-title>
+      <v-card-title class="text-subtitle-1 font-weight-bold">
         {{ titulo }}
       </v-card-title>
       
-      <v-card-subtitle>
-        {{ subtitulo }}
-      </v-card-subtitle>
+      <v-card-text v-if="descripcion" class="curso-card-descripcion text-caption">
+        {{ descripcion }}
+      </v-card-text>
       
       <v-card-actions>
-        <v-btn variant="flat" :color="estaInscrito ? 'orange' : 'white'" class="CardCurso__BotonLike" @click.stop="toggleInscripcion($event)">
+        <v-btn 
+          variant="flat" 
+          :color="estaInscrito ? 'orange' : 'white'" 
+          class="curso-card-boton" 
+          @click.stop="toggleInscripcion($event)"
+        >
           <v-icon :color="estaInscrito ? 'white' : 'orange'">
             {{ estaInscrito ? 'mdi-heart' : 'mdi-heart-outline' }}
           </v-icon>
         </v-btn>
+        
+        <v-spacer></v-spacer>
+        
+        <v-btn 
+          variant="text" 
+          color="primary" 
+          size="small"
+          @click.stop="seleccionarCurso"
+        >
+          Ver videos
+        </v-btn>
       </v-card-actions>
-      
-      <v-expand-transition>
-        <div v-show="show">
-          <v-divider></v-divider>
-          <v-card-text>{{ descripcion }}</v-card-text>
-        </div>
-      </v-expand-transition>
     </v-card>
     
     <!-- Alerta de acción completada (solo para errores) -->
@@ -187,5 +201,33 @@ const toggleInscripcion = async (event) => {
 </template>
 
 <style scoped>
-  @import "@/assets/sass/components/Cards/Ccurso.scss";
+.curso-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.curso-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.curso-card-imagen {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.curso-card-descripcion {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  flex-grow: 1;
+}
+
+.curso-card-boton {
+  min-width: 36px !important;
+  border-radius: 50% !important;
+}
 </style>

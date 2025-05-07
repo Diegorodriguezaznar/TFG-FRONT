@@ -31,7 +31,7 @@ const obtenerCursos = async () => {
   try {
     // Obtener las inscripciones del usuario 
 
-    const response = await fetch(`http://localhost:5687/api/UsuarioCurso/usuario/${usuarioId.value}`);
+    const response = await fetch(`http://localhost:5190/api/UsuarioCurso/usuario/${usuarioId.value}`);
     
     if (!response.ok) {
       throw new Error(`Error al obtener inscripciones (${response.status})`);
@@ -63,7 +63,7 @@ const obtenerCursos = async () => {
       // Pero parece que la ruta /api/Curso/{id} no funciona
       // Intentemos obtener todos los cursos y filtrar
       
-      const cursosResponse = await fetch("http://localhost:5687/api/Curso");
+      const cursosResponse = await fetch("http://localhost:5190/api/Curso");
       
       if (!cursosResponse.ok) {
         throw new Error(`Error al obtener cursos (${cursosResponse.status})`);

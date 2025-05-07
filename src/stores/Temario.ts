@@ -9,7 +9,7 @@ export const useTemarioStore = defineStore("temario", () => {
   //Find All Classic!
   async function fetchAllTemarios() {
     try {
-      const response = await fetch("http://localhost:5687/api/Temario");
+      const response = await fetch("http://localhost:5190/api/Temario");
       if (!response.ok) throw new Error("Error al obtener todos los temarios");
 
       temarios.value = await response.json();
@@ -22,7 +22,7 @@ export const useTemarioStore = defineStore("temario", () => {
   // filtro por ID
   async function fetchTemarioById(idTemario: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Temario/${idTemario}`);
+      const response = await fetch(`http://localhost:5190/api/Temario/${idTemario}`);
       if (!response.ok) throw new Error("Error al obtener el temario");
 
       return await response.json();
@@ -36,7 +36,7 @@ export const useTemarioStore = defineStore("temario", () => {
   // filtro por id de ASIGNATURAS
   async function fetchTemariosByAsignatura(idAsignatura: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Temario/asignatura/${idAsignatura}`);
+      const response = await fetch(`http://localhost:5190/api/Temario/asignatura/${idAsignatura}`);
       if (!response.ok) throw new Error("Error al obtener los temarios de la asignatura");
 
       temarios.value = await response.json();

@@ -12,7 +12,7 @@ export const usePreguntaStore = defineStore("pregunta", () => {
   // Obtener preguntas por ID de test
   async function fetchPreguntasByTestId(testId: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Pregunta/test/${testId}`);
+      const response = await fetch(`http://localhost:5190/api/Pregunta/test/${testId}`);
       if (!response.ok) throw new Error("Error al obtener las preguntas del test");
       
       preguntas.value = await response.json();
@@ -26,7 +26,7 @@ export const usePreguntaStore = defineStore("pregunta", () => {
   // Obtener una pregunta específica por ID
   async function fetchPreguntaById(preguntaId: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Pregunta/${preguntaId}`);
+      const response = await fetch(`http://localhost:5190/api/Pregunta/${preguntaId}`);
       if (!response.ok) throw new Error("Error al obtener la pregunta");
       
       return await response.json();
