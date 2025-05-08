@@ -1,4 +1,10 @@
 <script setup lang="ts">
+// --------------------------- Imports ---------------------------
+import { useRouter } from 'vue-router';
+
+// --------------------------- Router ---------------------------
+const router = useRouter();
+
 // --------------------------- Props ---------------------------
 const props = defineProps({
   videos: {
@@ -6,6 +12,15 @@ const props = defineProps({
     default: () => []
   }
 });
+
+// --------------------------- Métodos ---------------------------
+// Navegar a la página de reproducción del video
+const verVideo = (video: any) => {
+  router.push({
+    path: '/reproductor-video',
+    query: { id: video.idVideo }
+  });
+};
 
 // --------------------------- Colores para asignaturas ---------------------------
 function getColorForAsignatura(asignatura: string): string {
@@ -31,9 +46,9 @@ function getColorForAsignatura(asignatura: string): string {
     <div class="text-h6 font-weight-bold mb-4">Videos</div>
     
     <v-row v-if="videos.length > 0">
-      <v-col v-for="video in videos" :key="video.id" cols="12" sm="6" md="4" lg="3">
-        <v-card class="ListaVideos__Card" elevation="1" rounded="lg">
-          <v-img :src="video.thumbnail" height="180" cover>
+      <v-col v-for="video in videos" :key="video.idVideo || video.id" cols="12" sm="6" md="4" lg="3">
+        <v-card class="ListaVideos__Card" elevation="1" rounded="lg" @click="verVideo(video)">
+          <v-img :src="video.miniatura || video.thumbnail" height="180" cover>
             <!-- Duración (se podría agregar en un caso real) -->
             <template v-slot:placeholder>
               <v-row class="fill-height ma-0" align="center" justify="center">

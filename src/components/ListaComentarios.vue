@@ -2,7 +2,7 @@
 // --------------------------- Imports ---------------------------
 import { ref, onMounted, computed } from "vue";
 import CardComentario from "@/components/CardComentario.vue";
-import { useComentarioStore } from "@/stores/Comentario";
+// import { useComentarioStore } from "@/stores/Comentario";
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 // --------------------------- Propiedades del componente ---------------------------

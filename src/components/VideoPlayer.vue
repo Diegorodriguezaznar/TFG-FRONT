@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // --------------------------- Props ---------------------------
 const props = defineProps({
   video: {
@@ -33,7 +33,7 @@ const props = defineProps({
             <v-icon>mdi-volume-high</v-icon>
           </v-btn>
           
-          <span class="VideoPlayer__Time">{{ props.video.duration }}</span>
+          <span class="VideoPlayer__Time">{{ props.video.duracion }}</span>
           
           <v-spacer></v-spacer>
           
@@ -49,7 +49,7 @@ const props = defineProps({
       
       <!-- Duración del video -->
       <div class="VideoPlayer__Duration">
-        {{ props.video.duration }}
+        {{ props.video.duracion }}
       </div>
     </div>
   </div>
