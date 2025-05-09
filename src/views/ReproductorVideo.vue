@@ -1,139 +1,110 @@
-<script setup>
+<script setup lang="ts">
 // --------------------------- Imports ---------------------------
-import { ref, onMounted } from 'vue';
-import VideoPlayer from '../components/VideoPlayer.vue';
-import VideoInfo from '../components/VideoInfo.vue';
-import VideoSuggestions from '../components/VideoSuggestions.vue';
-import VideoComments from '../components/VideoComments.vue';
-import Header from '../components/Header.vue';
-import Sidebar from '../components/Sidebar.vue';
+import { ref, onMounted, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import { useVideoStore } from '@/stores/Video';
+import VideoPlayer from '@/components/VideoPlayer.vue';
+import VideoInfo from '@/components/VideoInfo.vue';
+import VideoSuggestions from '@/components/VideoSuggestions.vue';
+import VideoComments from '@/components/VideoComments.vue';
+import Header from '@/components/Header.vue';
+import Sidebar from '@/components/Sidebar.vue';
+import type { VideoDTO } from '@/stores/dtos/VideoDTO';
+
+// --------------------------- Route ---------------------------
+const route = useRoute();
+
+// --------------------------- Store ---------------------------
+const videoStore = useVideoStore();
 
 // --------------------------- Variables ---------------------------
 const sidebarOpen = ref(true);
 const searchQuery = ref('');
-const currentVideo = ref({
-  id: 'video1',
-  title: '¿Te Arriesgarías A Ahogarte Por $500,000?',
-  channel: 'MrBeast',
-  views: '2.3M',
-  publishedDate: 'Hace 2 días',
-  likes: '156K',
-  description: 'En este desafío extremo, los participantes compiten por un premio de $500,000 en una serie de pruebas acuáticas que pondrán a prueba sus límites. ¿Qué harías tú por esta cantidad de dinero?',
-  duration: '24:45',
-  avatar: 'https://picsum.photos/seed/mrbeast/40/40',
-  videoUrl: 'https://example.com/video1.mp4',
-  subscribers: '201M'
+const loading = ref(true);
+const error = ref('');
+
+// Inicializar currentVideo con valores por defecto para evitar errores durante la carga
+const currentVideo = ref<VideoDTO>({
+  idVideo: 0,
+  titulo: 'Cargando...',
+  descripcion: 'Cargando descripción...',
+  url: '',
+  miniatura: 'https://picsum.photos/seed/loading/300/200',
+  fechaSubida: '',
+  idAsignatura: 0,
+  asignatura: 'Cargando...',
+  idUsuario: 0,
+  autor: 'Cargando...',
+  idCurso: 0,
+  vistas: '0',
+  fecha: 'Cargando...',
+  duracion: '00:00' 
 });
 
 // Lista de videos sugeridos
-const suggestedVideos = ref([
-  {
-    id: 'video2',
-    title: 'Sobreviví A Los 5 Lugares Más Mortales En La Tierra',
-    channel: 'MrBeast',
-    views: '11M',
-    publishedDate: 'Hace 1 semana',
-    duration: '17:23',
-    thumbnail: 'https://picsum.photos/seed/video2/320/180',
-    avatar: 'https://picsum.photos/seed/mrbeast/40/40'
-  },
-  {
-    id: 'video3',
-    title: '100 Personas, 100 Círculos, 1 Ganador de $500,000',
-    channel: 'MrBeast',
-    views: '17M',
-    publishedDate: 'Hace 2 semanas',
-    duration: '38:38',
-    thumbnail: 'https://picsum.photos/seed/video3/320/180',
-    avatar: 'https://picsum.photos/seed/mrbeast/40/40'
-  },
-  {
-    id: 'video4',
-    title: 'Vencí A Ronaldo, Gané $1,000,000',
-    channel: 'MrBeast',
-    views: '25M',
-    publishedDate: 'Hace 5 días',
-    duration: '22:42',
-    thumbnail: 'https://picsum.photos/seed/video4/320/180',
-    avatar: 'https://picsum.photos/seed/mrbeast/40/40'
-  },
-  {
-    id: 'video5',
-    title: 'Láser vs Rayo - ¿Cuál es más poderoso?',
-    channel: 'Mark Rober',
-    views: '7M',
-    publishedDate: 'Hace 3 días',
-    duration: '23:15',
-    thumbnail: 'https://picsum.photos/seed/video5/320/180',
-    avatar: 'https://picsum.photos/seed/markrober/40/40'
-  }
-]);
+const suggestedVideos = ref<VideoDTO[]>([]);
 
-// Lista de comentarios
-const comments = ref([
-  {
-    id: 'comment1',
-    user: 'Laura García',
-    avatar: 'https://picsum.photos/seed/user1/40/40',
-    content: 'Increíble video, definitivamente yo no me arriesgaría por esa cantidad. ¡La salud es primero!',
-    likes: 1204,
-    time: 'hace 1 día'
-  },
-  {
-    id: 'comment2',
-    user: 'Carlos Mendoza',
-    avatar: 'https://picsum.photos/seed/user2/40/40',
-    content: 'MrBeast siempre superándose. Cada reto es más extremo que el anterior.',
-    likes: 856,
-    time: 'hace 12 horas'
-  },
-  {
-    id: 'comment3',
-    user: 'Ana Torres',
-    avatar: 'https://picsum.photos/seed/user3/40/40',
-    content: 'Yo participaría sin dudarlo. La recompensa vale totalmente la pena por ese desafío.',
-    likes: 432,
-    time: 'hace 6 horas'
-  }
-]);
+// ID del video desde la URL
+const videoId = computed(() => {
+  return route.query.id ? Number(route.query.id) : 1; // Default a 1 para evitar problemas
+});
 
 // --------------------------- Métodos ---------------------------
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value;
 };
 
-const updateSearch = (query) => {
+const updateSearch = (query: string) => {
   searchQuery.value = query;
-  console.log('Buscando:', query);
-  // Aquí iría la lógica de búsqueda
 };
 
-const handleVideoSelect = (videoId) => {
-  // Aquí iría la lógica para cambiar el video actual
-  console.log('Video seleccionado:', videoId);
+const handleVideoSelect = (videoId: number) => {
+  // Utilizamos el router para navegar al nuevo video
+  window.location.href = `/reproductor-video?id=${videoId}`;
+};
+
+// Cargar el video actual
+const loadCurrentVideo = async () => {
+  loading.value = true;
+  error.value = '';
   
-  // Simulación de cambio de video (en una app real, haríamos una petición al backend)
-  const selectedVideo = suggestedVideos.value.find(v => v.id === videoId);
-  if (selectedVideo) {
-    currentVideo.value = {
-      ...selectedVideo,
-      description: 'Descripción del nuevo video seleccionado. En una aplicación real, esto vendría del backend.',
-      likes: Math.floor(Math.random() * 100) + 'K',
-      videoUrl: `https://example.com/${videoId}.mp4`
-    };
+  try {
+    const video = await videoStore.fetchVideoById(videoId.value);
+    if (video) {
+      currentVideo.value = video;
+      // Si no tiene duración, asignar un valor por defecto
+      if (!currentVideo.value.duracion) {
+        currentVideo.value.duracion = '00:00';
+      }
+    } else {
+      error.value = 'No se encontró el video solicitado';
+    }
+  } catch (err: any) {
+    error.value = err.message || 'Error al cargar el video';
+    console.error('Error al cargar el video:', err);
+  } finally {
+    loading.value = false;
   }
 };
 
-const addComment = (newComment) => {
-  comments.value.unshift({
-    id: `comment${comments.value.length + 1}`,
-    user: 'Usuario actual',
-    avatar: 'https://picsum.photos/seed/currentuser/40/40',
-    content: newComment,
-    likes: 0,
-    time: 'ahora mismo'
-  });
+// Cargar videos sugeridos
+const loadSuggestedVideos = async () => {
+  try {
+    const videos = await videoStore.fetchAllVideos();
+    // Filtrar para excluir el video actual y limitar a 8 videos
+    suggestedVideos.value = videos
+      .filter(v => v.idVideo !== videoId.value)
+      .slice(0, 8);
+  } catch (err: any) {
+    console.error('Error al cargar videos sugeridos:', err);
+  }
 };
+
+// --------------------------- Cargar datos iniciales ---------------------------
+onMounted(async () => {
+  await loadCurrentVideo();
+  await loadSuggestedVideos();
+});
 </script>
 
 <template>
@@ -146,21 +117,27 @@ const addComment = (newComment) => {
     
     <!-- Contenido principal -->
     <v-main :class="{ 'ml-240': sidebarOpen, 'ml-80': !sidebarOpen }">
-      <v-container fluid class="pa-0 pa-sm-4">
+      <div v-if="loading" class="d-flex justify-center align-center" style="height: 50vh;">
+        <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+      </div>
+      
+      <div v-else-if="error" class="d-flex justify-center align-center flex-column" style="height: 50vh;">
+        <v-icon color="error" size="64" class="mb-4">mdi-alert-circle</v-icon>
+        <h2 class="text-h5 text-center mb-2">No se pudo cargar el video</h2>
+        <p class="text-body-1 text-center">{{ error }}</p>
+        <v-btn color="primary" class="mt-4" to="/cursos">
+          Volver a cursos
+        </v-btn>
+      </div>
+      
+      <v-container v-else fluid class="pa-0 pa-sm-4">
         <v-row>
-          <!-- Columna del reproductor y la información -->
           <v-col cols="12" md="8" lg="9">
-            <!-- Reproductor de video -->
             <VideoPlayer :video="currentVideo" />
             
-            <!-- Información del video -->
             <VideoInfo :video="currentVideo" />
             
-            <!-- Comentarios -->
-            <VideoComments 
-              :comments="comments" 
-              @add-comment="addComment" 
-            />
+            <VideoComments :video-id="videoId" />
           </v-col>
           
           <!-- Columna de videos sugeridos -->

@@ -49,8 +49,9 @@ export const useVideoStore = defineStore("video", () => {
         idUsuario: v.idUsuario,
         autor: v.usuario?.nombre || 'Profesor',
         idCurso: v.idCurso,
-        vistas: Math.floor(Math.random() * 10) + 'K', // Simulación
-        fecha: 'Hace ' + Math.floor(Math.random() * 10) + ' días' // Simulación
+        duracion: v.duracion,
+        vistas: Math.floor(Math.random() * 10) + 'K',
+        fecha: 'Hace ' + Math.floor(Math.random() * 10) + ' días'
       }));
       
       return videos.value;
@@ -113,8 +114,9 @@ export const useVideoStore = defineStore("video", () => {
         idUsuario: v.idUsuario,
         autor: v.usuario?.nombre || 'Profesor',
         idCurso: v.idCurso,
-        vistas: Math.floor(Math.random() * 10) + 'K', // Simulación
-        fecha: 'Hace ' + Math.floor(Math.random() * 10) + ' días' // Simulación
+        duracion: v.duracion,
+        vistas: Math.floor(Math.random() * 10) + 'K',
+        fecha: 'Hace ' + Math.floor(Math.random() * 10) + ' días'
       }));
       
       return videosFiltradosPorCurso.value;
@@ -177,8 +179,9 @@ export const useVideoStore = defineStore("video", () => {
         idUsuario: v.idUsuario,
         autor: v.usuario?.nombre || 'Profesor',
         idCurso: v.idCurso,
-        vistas: Math.floor(Math.random() * 10) + 'K', // Simulación
-        fecha: 'Hace ' + Math.floor(Math.random() * 10) + ' días' // Simulación
+        duracion: v.duracion,
+        vistas: Math.floor(Math.random() * 10) + 'K',
+        fecha: 'Hace ' + Math.floor(Math.random() * 10) + ' días'
       };
       
       return video.value;
@@ -210,123 +213,19 @@ export const useVideoStore = defineStore("video", () => {
     return [
       {
         idVideo: 1,
-        titulo: 'Introducción a las ecuaciones',
-        descripcion: 'En este video aprenderemos los conceptos básicos de ecuaciones.',
-        url: 'https://www.youtube.com/watch?v=ejemplo1',
-        miniatura: 'https://picsum.photos/id/10/300/200',
+        titulo: 'NO HAY VIDEOS',
+        descripcion: '',
+        url: '',
+        miniatura: '',
         fechaSubida: '2023-05-15T10:00:00',
         idAsignatura: 1,
-        asignatura: 'Mates',
+        asignatura: 'ERROR',
         idUsuario: 1,
-        autor: 'Profesor García',
+        autor: 'ERROR',
         vistas: '10K',
-        fecha: 'Hace 2 días',
-        idCurso: 1
-      },
-      {
-        idVideo: 2,
-        titulo: 'Análisis de "Don Quijote"',
-        descripcion: 'Un análisis profundo de la obra maestra de Cervantes.',
-        url: 'https://www.youtube.com/watch?v=ejemplo2',
-        miniatura: 'https://picsum.photos/id/20/300/200',
-        fechaSubida: '2023-05-10T14:30:00',
-        idAsignatura: 2,
-        asignatura: 'Lengua',
-        idUsuario: 2,
-        autor: 'Profesora Martínez',
-        vistas: '5.2K',
-        fecha: 'Hace 1 semana',
-        idCurso: 2
-      },
-      {
-        idVideo: 3,
-        titulo: 'La Segunda Guerra Mundial',
-        descripcion: 'Repaso de los eventos principales de la Segunda Guerra Mundial.',
-        url: 'https://www.youtube.com/watch?v=ejemplo3',
-        miniatura: 'https://picsum.photos/id/30/300/200',
-        fechaSubida: '2023-05-12T09:15:00',
-        idAsignatura: 3,
-        asignatura: 'Historia',
-        idUsuario: 3,
-        autor: 'Profesor López',
-        vistas: '8.7K',
-        fecha: 'Hace 3 días',
-        idCurso: 3
-      },
-      {
-        idVideo: 4,
-        titulo: 'Elementos químicos básicos',
-        descripcion: 'Aprende los elementos químicos fundamentales de la tabla periódica.',
-        url: 'https://www.youtube.com/watch?v=ejemplo4',
-        miniatura: 'https://picsum.photos/id/40/300/200',
-        fechaSubida: '2023-05-08T11:45:00',
-        idAsignatura: 4,
-        asignatura: 'Química',
-        idUsuario: 4,
-        autor: 'Profesora Sánchez',
-        vistas: '3.9K',
-        fecha: 'Hace 5 días',
-        idCurso: 1
-      },
-      {
-        idVideo: 5,
-        titulo: 'La célula y sus partes',
-        descripcion: 'Todo lo que necesitas saber sobre la célula y su estructura.',
-        url: 'https://www.youtube.com/watch?v=ejemplo5',
-        miniatura: 'https://picsum.photos/id/50/300/200',
-        fechaSubida: '2023-05-14T13:20:00',
-        idAsignatura: 5,
-        asignatura: 'Biología',
-        idUsuario: 5,
-        autor: 'Profesor Rodríguez',
-        vistas: '7.3K',
-        fecha: 'Hace 1 día',
-        idCurso: 2
-      },
-      {
-        idVideo: 6,
-        titulo: 'Presente simple en inglés',
-        descripcion: 'Aprende a usar correctamente el presente simple en inglés.',
-        url: 'https://www.youtube.com/watch?v=ejemplo6',
-        miniatura: 'https://picsum.photos/id/60/300/200',
-        fechaSubida: '2023-05-11T16:00:00',
-        idAsignatura: 6,
-        asignatura: 'Inglés',
-        idUsuario: 6,
-        autor: 'Profesora Wilson',
-        vistas: '6.5K',
-        fecha: 'Hace 4 días',
-        idCurso: 3
-      },
-      {
-        idVideo: 7,
-        titulo: 'Fuerzas y movimiento',
-        descripcion: 'Principios básicos de la física mecánica.',
-        url: 'https://www.youtube.com/watch?v=ejemplo7',
-        miniatura: 'https://picsum.photos/id/70/300/200',
-        fechaSubida: '2023-05-01T08:30:00',
-        idAsignatura: 7,
-        asignatura: 'Física',
-        idUsuario: 7,
-        autor: 'Profesor Hernández',
-        vistas: '4.2K',
-        fecha: 'Hace 2 semanas',
-        idCurso: 1
-      },
-      {
-        idVideo: 8,
-        titulo: 'Perspectiva en el dibujo',
-        descripcion: 'Técnicas para lograr una buena perspectiva en tus dibujos.',
-        url: 'https://www.youtube.com/watch?v=ejemplo8',
-        miniatura: 'https://picsum.photos/id/80/300/200',
-        fechaSubida: '2023-05-07T10:15:00',
-        idAsignatura: 8,
-        asignatura: 'Arte',
-        idUsuario: 8,
-        autor: 'Profesora Gómez',
-        vistas: '2.8K',
-        fecha: 'Hace 6 días',
-        idCurso: 2
+        fecha: 'ERROR',
+        idCurso: 1,
+        duracion: '00:00'
       }
     ];
   }
