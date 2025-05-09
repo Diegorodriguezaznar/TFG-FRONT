@@ -1,13 +1,15 @@
-export interface ComentarioVideoDTO {
-  idComentarioVideo: number;
-  contenido: string;
-  fechaCreacion: string;
+export interface ComentarioDTO {
+  idComentario: number;
+  texto: string;
+  fecha: string;
   idUsuario: number;
   idVideo: number;
   usuario?: {
     idUsuario: number;
     nombre: string;
-    email?: string;
+    apellidos?: string;
+    gmail?: string;
+    telefono?: string;
   };
 }
 

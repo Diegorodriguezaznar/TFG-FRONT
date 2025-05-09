@@ -1,19 +1,24 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { ComentarioVideoDTO } from "@/stores/dtos/ComentarioVideoDTO";
+import type { ComentarioDTO, ComentarioUI } from "@/stores/dtos/ComentarioDTO";
+import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
-export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
+export const useComentarioStore = defineStore("comentario", () => {
   // --------------------------- Estado ---------------------------
   const errorMessage = ref("");
   const loading = ref(false);
+  const usuarioLogeadoStore = useUsuarioLogeadoStore();
 
   // --------------------------- Obtener comentarios por ID de video ---------------------------
-  async function fetchComentariosByVideoId(idVideo: number) {
+  async function fetchComentariosByVideoId(idVideo: number): Promise<ComentarioUI[]> {
     loading.value = true;
+    errorMessage.value = "";
+    
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
+      console.log(`Obteniendo comentarios para el video ID: ${idVideo}`);
       const response = await fetch(`http://localhost:5190/api/ComentarioVideo/video/${idVideo}`, {
         signal: controller.signal,
         headers: {
@@ -26,7 +31,7 @@ export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
       
       if (!response.ok) {
         if (response.status === 404) {
-          // Si no hay comentarios, retorna un array vacío
+          console.log("No se encontraron comentarios para este video");
           return [];
         }
         const errorText = await response.text();
@@ -34,6 +39,7 @@ export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
       }
       
       const comentarios = await response.json();
+      console.log("Comentarios recibidos de la API:", comentarios);
       
       // Transformar fechas y formatear datos para la interfaz de usuario
       return comentarios.map((c: any) => transformarComentario(c));
@@ -50,9 +56,7 @@ export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
       
       errorMessage.value = message;
       console.error(message, error);
-      
-      // Fallback con datos de ejemplo en caso de error
-      return simularComentarios();
+      return [];
     } finally {
       loading.value = false;
     }
@@ -63,13 +67,15 @@ export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
     contenido: string;
     idUsuario: number;
     idVideo: number;
-  }) {
+  }): Promise<ComentarioUI | null> {
     loading.value = true;
+    errorMessage.value = "";
+    
     try {
       const comentarioData = {
-        idComentarioVideo: 0,  // El ID será asignado por el backend
-        contenido: nuevoComentario.contenido,
-        fechaCreacion: new Date().toISOString(),
+        idComentario: 0,  // El ID será asignado por el backend
+        texto: nuevoComentario.contenido,
+        fecha: new Date().toISOString(),
         idUsuario: nuevoComentario.idUsuario,
         idVideo: nuevoComentario.idVideo
       };
@@ -97,6 +103,7 @@ export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
       }
       
       const comentarioCreado = await response.json();
+      console.log("Comentario creado:", comentarioCreado);
       
       // Transformar para la interfaz de usuario
       return transformarComentario(comentarioCreado);
@@ -113,9 +120,7 @@ export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
       
       errorMessage.value = message;
       console.error(message, error);
-      
-      // Fallback, simulamos que se creó
-      return simularComentarioCreado(nuevoComentario.contenido, nuevoComentario.idUsuario);
+      return null;
     } finally {
       loading.value = false;
     }
@@ -124,9 +129,9 @@ export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
   // --------------------------- Funciones auxiliares ---------------------------
   
   // Transformar comentario del API a formato amigable para UI
-  function transformarComentario(c: any) {
+  function transformarComentario(c: any): ComentarioUI {
     // Formatear la fecha
-    const fecha = new Date(c.fechaCreacion);
+    const fecha = new Date(c.fecha);
     const ahora = new Date();
     
     let tiempoTexto = '';
@@ -146,65 +151,19 @@ export const useComentarioVideoStore = defineStore("comentarioVideo", () => {
       tiempoTexto = 'ahora mismo';
     }
     
+    const nombreCompleto = c.usuario?.apellidos 
+      ? `${c.usuario.nombre} ${c.usuario.apellidos}` 
+      : c.usuario?.nombre || 'Usuario';
+    
     return {
-      id: c.idComentarioVideo,
-      user: c.usuario?.nombre || 'Usuario',
+      id: c.idComentario,
+      user: nombreCompleto,
       avatar: `https://picsum.photos/seed/user${c.idUsuario}/40/40`,
-      content: c.contenido,
-      likes: Math.floor(Math.random() * 100),  // Simulado
+      content: c.texto,
+      likes: 0,  // Este valor vendrá de la API en el futuro
       time: tiempoTexto,
       idUsuario: c.idUsuario,
-      fechaCreacion: c.fechaCreacion
-    };
-  }
-  
-  // Simular comentarios para desarrollo
-  function simularComentarios() {
-    return [
-      {
-        id: 1,
-        user: 'Laura García',
-        avatar: 'https://picsum.photos/seed/user1/40/40',
-        content: 'Excelente video, me ha sido muy útil para entender este tema.',
-        likes: 24,
-        time: 'hace 2 días',
-        idUsuario: 1,
-        fechaCreacion: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        id: 2,
-        user: 'Carlos Mendoza',
-        avatar: 'https://picsum.photos/seed/user2/40/40',
-        content: 'Me encantaría ver más contenido como este. ¡Gracias por compartir!',
-        likes: 18,
-        time: 'hace 1 día',
-        idUsuario: 2,
-        fechaCreacion: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString()
-      },
-      {
-        id: 3,
-        user: 'Ana Torres',
-        avatar: 'https://picsum.photos/seed/user3/40/40',
-        content: '¿Alguien sabe dónde puedo encontrar más información sobre este tema?',
-        likes: 7,
-        time: 'hace 12 horas',
-        idUsuario: 3,
-        fechaCreacion: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString()
-      }
-    ];
-  }
-  
-  // Simular creación de comentario
-  function simularComentarioCreado(contenido: string, idUsuario: number) {
-    return {
-      id: Date.now(),  // ID único basado en timestamp
-      user: 'Usuario actual',
-      avatar: `https://picsum.photos/seed/userCurrent/40/40`,
-      content: contenido,
-      likes: 0,
-      time: 'ahora mismo',
-      idUsuario,
-      fechaCreacion: new Date().toISOString()
+      fechaCreacion: c.fecha
     };
   }
 
