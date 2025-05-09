@@ -2,6 +2,7 @@
 // --------------------------- Imports ---------------------------
 import { ref, onMounted, provide, watch } from 'vue';
 import { useDisplay } from 'vuetify';
+import { useQuizStore } from '../stores/Quiz';
 import Header from '../components/Header.vue';
 import Sidebar from '../components/Sidebar.vue';
 import FiltrosQuizzes from '../components/FiltrosQuizzes.vue';
@@ -15,6 +16,7 @@ const error = ref(null);
 const categorias = ref([]);
 const filtroActual = ref('Recientes');
 const { mobile } = useDisplay();
+const quizStore = useQuizStore();
 
 // --------------------------- Inyección en el contexto ---------------------------
 provide('searchQuery', searchQuery);
@@ -41,20 +43,13 @@ const cambiarFiltro = (filtro) => {
   cargarQuizzes();
 };
 
-// Cargar las categorías desde la API (simulado)
+// Cargar las categorías desde la API
 const cargarCategorias = async () => {
   try {
     isLoading.value = true;
     
-    // AQUÍ ES DONDE HARÍAS LA PETICIÓN REAL A LA API
-    // const response = await fetch('/api/categorias');
-    // const data = await response.json();
-    // categorias.value = data;
-    
-    // Simulación de delay de red
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Datos simulados
+    // En una implementación real, podrías obtener las categorías de una API
+    // Por ahora, usamos datos estáticos o generados a partir de las asignaturas
     categorias.value = [
       'Recientes', 'Populares', 'Por dificultad', 'Matemáticas', 
       'Ciencias', 'Historia', 'Literatura', 'Geografía', 'Arte', 
@@ -68,17 +63,15 @@ const cargarCategorias = async () => {
   }
 };
 
-// Iniciar carga de quizzes (función principal)
+// Iniciar carga de quizzes
 const cargarQuizzes = async () => {
   isLoading.value = true;
   error.value = null;
   
   try {
-    // AQUÍ ES DONDE COORDINARÍAS CON LA API
-    // Por ahora solo simulamos un delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
     // La carga real ocurre en el componente hijo SugerenciasQuizzes
+    // Si necesitamos hacer operaciones adicionales, las haríamos aquí
+    await new Promise(resolve => setTimeout(resolve, 300));
   } catch (err) {
     console.error('Error al cargar quizzes:', err);
     error.value = 'Ocurrió un error al cargar los quizzes';
@@ -88,10 +81,23 @@ const cargarQuizzes = async () => {
 };
 
 // Ver detalle de un quiz
-const verDetalleQuiz = (quizId) => {
-  // En producción, esto navegaría a la página del quiz:
-  // router.push({ name: 'quiz-detail', params: { id: quizId }});
-  console.log(`Navegando al quiz ${quizId}`);
+const verDetalleQuiz = async (quizId) => {
+  try {
+    // Obtener los detalles del quiz
+    const quizDetails = await quizStore.fetchQuizById(quizId);
+    
+    if (!quizDetails) {
+      error.value = 'No se pudo cargar el detalle del quiz';
+      return;
+    }
+    
+    // En producción, esto navegaría a la página del quiz:
+    // router.push({ name: 'quiz-detail', params: { id: quizId }});
+    console.log(`Navegando al quiz ${quizId}:`, quizDetails);
+  } catch (err) {
+    console.error(`Error al navegar al quiz ${quizId}:`, err);
+    error.value = 'Error al cargar los detalles del quiz';
+  }
 };
 
 // Inicializar componente
@@ -156,6 +162,26 @@ watch(searchQuery, () => {
             class="mb-4"
           >
             {{ error }}
+            <template v-slot:append>
+              <v-btn
+                variant="text"
+                @click="cargarQuizzes"
+                :loading="isLoading"
+              >
+                Reintentar
+              </v-btn>
+            </template>
+          </v-alert>
+          
+          <!-- Mostrar error del store si existe -->
+          <v-alert
+            v-if="quizStore.errorMessage"
+            type="error"
+            variant="tonal"
+            closable
+            class="mb-4"
+          >
+            {{ quizStore.errorMessage }}
             <template v-slot:append>
               <v-btn
                 variant="text"

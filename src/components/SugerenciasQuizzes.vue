@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
+import { useQuizStore } from '../stores/Quiz';
 
 // Propiedades de entrada
 const props = defineProps({
@@ -26,135 +27,14 @@ const totalItems = ref(0);
 const filtroActual = ref(props.initialFilter);
 const searchQuery = ref(props.query);
 
-// Datos de ejemplo (en producción estos datos vendrían de la API)
-const mockQuizzes = [
-  {
-    id: 1,
-    titulo: 'Capitales del mundo',
-    creador: 'GeoExpert',
-    dificultad: 'Media',
-    categoria: 'Geografía',
-    tiempo: '10 min',
-    preguntas: 20,
-    imagen: 'https://picsum.photos/id/1/480/270',
-    vistas: '45K',
-    fechaPublicacion: '2 semanas'
-  },
-  {
-    id: 2,
-    titulo: 'Historia de España: Edad Media',
-    creador: 'HistoriaTotal',
-    dificultad: 'Difícil',
-    categoria: 'Historia',
-    tiempo: '15 min',
-    preguntas: 25,
-    imagen: 'https://picsum.photos/id/2/480/270',
-    vistas: '32K',
-    fechaPublicacion: '3 días'
-  },
-  {
-    id: 3,
-    titulo: 'Matemáticas básicas',
-    creador: 'MathGenius',
-    dificultad: 'Fácil',
-    categoria: 'Matemáticas',
-    tiempo: '8 min',
-    preguntas: 15,
-    imagen: 'https://picsum.photos/id/3/480/270',
-    vistas: '128K',
-    fechaPublicacion: '1 mes'
-  },
-  {
-    id: 4,
-    titulo: 'Literatura universal',
-    creador: 'Bookworm',
-    dificultad: 'Media',
-    categoria: 'Literatura',
-    tiempo: '12 min',
-    preguntas: 18,
-    imagen: 'https://picsum.photos/id/4/480/270',
-    vistas: '67K',
-    fechaPublicacion: '5 días'
-  },
-  {
-    id: 5,
-    titulo: 'Ciencias naturales avanzado',
-    creador: 'SciencePro',
-    dificultad: 'Difícil',
-    categoria: 'Ciencias',
-    tiempo: '20 min',
-    preguntas: 30,
-    imagen: 'https://picsum.photos/id/5/480/270',
-    vistas: '89K',
-    fechaPublicacion: '1 semana'
-  },
-  {
-    id: 6,
-    titulo: 'Arte contemporáneo',
-    creador: 'ArtLover',
-    dificultad: 'Media',
-    categoria: 'Arte',
-    tiempo: '15 min',
-    preguntas: 22,
-    imagen: 'https://picsum.photos/id/6/480/270',
-    vistas: '41K',
-    fechaPublicacion: '2 días'
-  },
-  {
-    id: 7,
-    titulo: 'Deportes olímpicos',
-    creador: 'OlympicFan',
-    dificultad: 'Fácil',
-    categoria: 'Deportes',
-    tiempo: '10 min',
-    preguntas: 20,
-    imagen: 'https://picsum.photos/id/7/480/270',
-    vistas: '76K',
-    fechaPublicacion: '4 días'
-  },
-  {
-    id: 8,
-    titulo: 'Gastronomía internacional',
-    creador: 'FoodExplorer',
-    dificultad: 'Media',
-    categoria: 'Gastronomía',
-    tiempo: '12 min',
-    preguntas: 18,
-    imagen: 'https://picsum.photos/id/8/480/270',
-    vistas: '54K',
-    fechaPublicacion: '6 días'
-  },
-  {
-    id: 9,
-    titulo: 'Redes sociales y marketing',
-    creador: 'SocialGuru',
-    dificultad: 'Media',
-    categoria: 'Marketing',
-    tiempo: '15 min',
-    preguntas: 25,
-    imagen: 'https://picsum.photos/id/9/480/270',
-    vistas: '38K',
-    fechaPublicacion: '1 semana'
-  },
-  {
-    id: 10,
-    titulo: 'Física cuántica para principiantes',
-    creador: 'QuantumExplorer',
-    dificultad: 'Difícil',
-    categoria: 'Ciencias',
-    tiempo: '25 min',
-    preguntas: 30,
-    imagen: 'https://picsum.photos/id/10/480/270',
-    vistas: '29K',
-    fechaPublicacion: '2 semanas'
-  }
-];
+// Inicializamos el store de quizzes
+const quizStore = useQuizStore();
 
 // Inicializar componente
-onMounted(() => {
+onMounted(async () => {
   filtroActual.value = props.initialFilter;
   searchQuery.value = props.query;
-  fetchQuizzes();
+  await fetchQuizzes();
 });
 
 // Observar cambios en props para actualizar el componente
@@ -171,88 +51,92 @@ watch(() => props.initialFilter, (newFilter) => {
 });
 
 // Función para obtener quizzes desde la API
-// En producción, esta función haría una petición real a la API
 const fetchQuizzes = async () => {
   isLoading.value = true;
   error.value = null;
   
   try {
-    // Simulación de delay de red para mostrar el estado de carga
-    await new Promise(resolve => setTimeout(resolve, 800));
+    // Usamos el store para obtener todos los quizzes
+    await quizStore.fetchAllQuizzes();
     
-    // AQUÍ ES DONDE HARÍAS LA PETICIÓN REAL A LA API
-    // const response = await fetch(`/api/quizzes?page=${currentPage.value}&limit=${itemsPerPage.value}&filter=${filtroActual.value}&search=${searchQuery.value}`);
-    // const data = await response.json();
-    // quizzes.value = data.items;
-    // totalItems.value = data.total;
+    // Filtrar según filtroActual y searchQuery
+    let filteredQuizzes = filterAndSortQuizzes(quizStore.quizzes);
     
-    // Simulación de la petición a la API
-    let filteredQuizzes = [...mockQuizzes];
-    
-    // Simulación de filtrado por categoría
-    if (filtroActual.value && filtroActual.value !== 'Recientes' && filtroActual.value !== 'Populares' && filtroActual.value !== 'Por dificultad') {
-      filteredQuizzes = filteredQuizzes.filter(q => q.categoria === filtroActual.value);
-    }
-    
-    // Simulación de ordenamiento
-    if (filtroActual.value === 'Populares') {
-      filteredQuizzes = [...filteredQuizzes].sort((a, b) => {
-        const vistasA = parseInt(a.vistas.replace('K', '000'));
-        const vistasB = parseInt(b.vistas.replace('K', '000'));
-        return vistasB - vistasA;
-      });
-    } else if (filtroActual.value === 'Recientes') {
-      // Ordenar por fecha de publicación (más reciente primero)
-      const fechaValor = (fecha) => {
-        if (fecha.includes('día')) {
-          return parseInt(fecha.split(' ')[0]) || 1;
-        } else if (fecha.includes('semana')) {
-          return parseInt(fecha.split(' ')[0]) * 7 || 7;
-        } else if (fecha.includes('mes')) {
-          return parseInt(fecha.split(' ')[0]) * 30 || 30;
-        }
-        return 100; // Por defecto, valor alto
-      };
-      
-      filteredQuizzes = [...filteredQuizzes].sort((a, b) => {
-        return fechaValor(a.fechaPublicacion) - fechaValor(b.fechaPublicacion);
-      });
-    } else if (filtroActual.value === 'Por dificultad') {
-      // Ordenar por dificultad (fácil a difícil)
-      const dificultadValor = {
-        'Fácil': 1,
-        'Media': 2,
-        'Difícil': 3
-      };
-      
-      filteredQuizzes = [...filteredQuizzes].sort((a, b) => {
-        return dificultadValor[a.dificultad] - dificultadValor[b.dificultad];
-      });
-    }
-    
-    // Simulación de búsqueda
-    if (searchQuery.value) {
-      const query = searchQuery.value.toLowerCase();
-      filteredQuizzes = filteredQuizzes.filter(q => 
-        q.titulo.toLowerCase().includes(query) || 
-        q.creador.toLowerCase().includes(query) ||
-        q.categoria.toLowerCase().includes(query)
-      );
-    }
-    
-    // Simulación de paginación
+    // Actualizar el total de items para la paginación
     totalItems.value = filteredQuizzes.length;
+    
+    // Aplicar paginación
     const startIndex = (currentPage.value - 1) * itemsPerPage.value;
     const endIndex = startIndex + itemsPerPage.value;
     quizzes.value = filteredQuizzes.slice(startIndex, endIndex);
     
   } catch (err) {
     console.error('Error al cargar quizzes:', err);
-    error.value = 'No se pudieron cargar los quizzes. Por favor, intenta de nuevo más tarde.';
+    error.value = quizStore.errorMessage || 'No se pudieron cargar los quizzes. Por favor, intenta de nuevo más tarde.';
     quizzes.value = [];
   } finally {
     isLoading.value = false;
   }
+};
+
+// Función para filtrar y ordenar quizzes según el filtro activo y la búsqueda
+const filterAndSortQuizzes = (quizzesData) => {
+  // Transformamos los QuizDTO a un formato compatible con la interfaz
+  let adaptedQuizzes = quizzesData.map(q => ({
+    id: q.idQuiz,
+    titulo: q.nombre,
+    creador: `Usuario ${q.idUsuario}`, // Podríamos obtener el nombre real del usuario en una implementación completa
+    descripcion: q.descripcion,
+    dificultad: obtenerDificultad(q), // Necesitaríamos calcular la dificultad de alguna manera
+    categoria: obtenerCategoria(q.idAsignatura), // Mapear idAsignatura a una categoría
+    tiempo: "10 min", // Valor por defecto, podría ser calculado en base a la cantidad de preguntas
+    preguntas: 20, // Valor por defecto, podría obtenerse de otra API
+    imagen: `https://picsum.photos/id/${q.idQuiz % 30}/480/270`, // Imagen de placeholder
+    vistas: Math.floor(Math.random() * 100) + "K", // Valor aleatorio para ejemplo
+    fechaPublicacion: "2 semanas" // Valor por defecto
+  }));
+  
+  // Filtros por categoría
+  if (filtroActual.value && !['Recientes', 'Populares', 'Por dificultad'].includes(filtroActual.value)) {
+    adaptedQuizzes = adaptedQuizzes.filter(q => q.categoria === filtroActual.value);
+  }
+  
+  // Ordenamientos
+  if (filtroActual.value === 'Recientes') {
+    // En una implementación real, ordenaríamos por fecha
+    adaptedQuizzes = [...adaptedQuizzes].sort((a, b) => b.id - a.id); // Ordenar por ID de forma descendente como aproximación
+  } else if (filtroActual.value === 'Populares') {
+    // En una implementación real, ordenaríamos por popularidad
+    adaptedQuizzes = [...adaptedQuizzes].sort((a, b) => {
+      const vistasA = parseInt(a.vistas.replace('K', '000'));
+      const vistasB = parseInt(b.vistas.replace('K', '000'));
+      return vistasB - vistasA;
+    });
+  } else if (filtroActual.value === 'Por dificultad') {
+    // Ordenar por dificultad
+    const dificultadValor = {
+      'Fácil': 1,
+      'Media': 2,
+      'Difícil': 3
+    };
+    
+    adaptedQuizzes = [...adaptedQuizzes].sort((a, b) => {
+      return dificultadValor[a.dificultad] - dificultadValor[b.dificultad];
+    });
+  }
+  
+  // Filtrar por búsqueda
+  if (searchQuery.value) {
+    const query = searchQuery.value.toLowerCase();
+    adaptedQuizzes = adaptedQuizzes.filter(q => 
+      q.titulo.toLowerCase().includes(query) || 
+      q.creador.toLowerCase().includes(query) ||
+      q.categoria.toLowerCase().includes(query) ||
+      q.descripcion.toLowerCase().includes(query)
+    );
+  }
+  
+  return adaptedQuizzes;
 };
 
 // Función para cambiar página
@@ -264,8 +148,6 @@ const cambiarPagina = (pagina) => {
 // Función para navegar al detalle de un quiz
 const irAlQuiz = (quizId) => {
   emit('quiz-selected', quizId);
-  // En producción, esto navegaría a la página del quiz, por ejemplo:
-  // router.push({ name: 'quiz-detail', params: { id: quizId }});
 };
 
 // Mapeo de dificultad a colores de Vuetify
@@ -280,6 +162,32 @@ const colorDificultad = (dificultad) => {
 
 // Calcular número total de páginas
 const totalPaginas = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
+
+// Funciones auxiliares para mapear datos
+function obtenerDificultad(quiz) {
+  // En una implementación real, esto podría basarse en alguna propiedad del quiz
+  // Por ahora asignamos valores aleatorios
+  const dificultades = ['Fácil', 'Media', 'Difícil'];
+  return dificultades[quiz.idQuiz % 3];
+}
+
+function obtenerCategoria(idAsignatura) {
+  // Mapa de idAsignatura a categorías
+  const categorias = {
+    1: 'Matemáticas',
+    2: 'Ciencias',
+    3: 'Historia',
+    4: 'Literatura',
+    5: 'Geografía',
+    6: 'Arte',
+    7: 'Deportes',
+    8: 'Programación',
+    9: 'Idiomas',
+    10: 'Marketing'
+  };
+  
+  return categorias[idAsignatura] || 'Otras';
+}
 </script>
 
 <template>

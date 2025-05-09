@@ -16,7 +16,7 @@ import QuizDetalle from "@/views/QuizDetalle.vue";
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 const routes = [
-  { path: "/", component: QuizDetalle },
+  { path: "/", component: Quizzes },
   { path: "/asignaturas/:idCurso", component: AsignaturasPage, props: true },
   { path: "/temarios/:idAsignatura", component: TemariosPage, props: true },
   { path: "/temarios/:idTemario/archivos-test", component: ArchivosyTestPage, props: true },
