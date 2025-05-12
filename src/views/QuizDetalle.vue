@@ -1,7 +1,10 @@
+// src/views/QuizDetalle.vue
+// Versión corregida para obtener ID desde query params
+
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useQuizStore } from '../stores/Quiz';
-import { useRoute, useRouter } from 'vue-router'; // Asume que se está usando vue-router
+import { useRoute, useRouter } from 'vue-router';
 
 // Refs para gestionar el estado
 const quiz = ref(null);
@@ -13,15 +16,25 @@ const quizStore = useQuizStore();
 const route = useRoute();
 const router = useRouter();
 
-// Obtener el ID del quiz de los parámetros de la ruta
+// Obtener el ID del quiz desde los query params (como está configurado en Quizzes.vue)
 const quizId = computed(() => {
-  return parseInt(route.params.id);
+  if (route.query.id) {
+    return parseInt(route.query.id);
+  }
+  return null;
 });
 
 // Función para cargar los datos del quiz
 const loadQuizData = async () => {
   isLoading.value = true;
   error.value = null;
+  
+  // Verificar si hay un ID válido
+  if (!quizId.value) {
+    error.value = 'No se ha especificado un ID de quiz válido';
+    isLoading.value = false;
+    return;
+  }
   
   try {
     // Usar el store para obtener los detalles del quiz
@@ -103,6 +116,13 @@ const colorDificultad = (dificultad) => {
 onMounted(() => {
   loadQuizData();
 });
+
+// Observar cambios en la ruta para recargar datos cuando cambia el ID
+watch(() => route.query.id, () => {
+  if (quizId.value) {
+    loadQuizData();
+  }
+}, { immediate: false });
 </script>
 
 <template>

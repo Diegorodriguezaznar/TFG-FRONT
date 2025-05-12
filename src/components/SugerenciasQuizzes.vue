@@ -1,6 +1,10 @@
+// src/components/SugerenciasQuizzes.vue
+// Actualizado para soportar filtrado por asignaturas sin modificar FiltrosQuizzes.vue
+
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { useQuizStore } from '../stores/Quiz';
+import { useAsignaturaStore } from '../stores/Asignaturas';
 
 // Propiedades de entrada
 const props = defineProps({
@@ -11,6 +15,10 @@ const props = defineProps({
   query: {
     type: String,
     default: ''
+  },
+  idAsignatura: {
+    type: Number,
+    default: null
   }
 });
 
@@ -26,14 +34,23 @@ const itemsPerPage = ref(8);
 const totalItems = ref(0);
 const filtroActual = ref(props.initialFilter);
 const searchQuery = ref(props.query);
+const asignaturaId = ref(props.idAsignatura);
 
-// Inicializamos el store de quizzes
+// Inicializamos el store
 const quizStore = useQuizStore();
+const asignaturaStore = useAsignaturaStore();
 
 // Inicializar componente
 onMounted(async () => {
   filtroActual.value = props.initialFilter;
   searchQuery.value = props.query;
+  asignaturaId.value = props.idAsignatura;
+  
+  // Si no hay asignaturas cargadas, las cargamos
+  if (asignaturaStore.asignaturas.length === 0) {
+    await asignaturaStore.fetchAllAsignaturas();
+  }
+  
   await fetchQuizzes();
 });
 
@@ -46,6 +63,12 @@ watch(() => props.query, (newQuery) => {
 
 watch(() => props.initialFilter, (newFilter) => {
   filtroActual.value = newFilter;
+  currentPage.value = 1; // Reiniciar paginación
+  fetchQuizzes();
+});
+
+watch(() => props.idAsignatura, (newId) => {
+  asignaturaId.value = newId;
   currentPage.value = 1; // Reiniciar paginación
   fetchQuizzes();
 });
@@ -89,6 +112,7 @@ const filterAndSortQuizzes = (quizzesData) => {
     descripcion: q.descripcion,
     dificultad: obtenerDificultad(q), // Necesitaríamos calcular la dificultad de alguna manera
     categoria: obtenerCategoria(q.idAsignatura), // Mapear idAsignatura a una categoría
+    idAsignatura: q.idAsignatura,
     tiempo: "10 min", // Valor por defecto, podría ser calculado en base a la cantidad de preguntas
     preguntas: 20, // Valor por defecto, podría obtenerse de otra API
     imagen: `https://picsum.photos/id/${q.idQuiz % 30}/480/270`, // Imagen de placeholder
@@ -96,9 +120,23 @@ const filterAndSortQuizzes = (quizzesData) => {
     fechaPublicacion: "2 semanas" // Valor por defecto
   }));
   
-  // Filtros por categoría
-  if (filtroActual.value && !['Recientes', 'Populares', 'Por dificultad'].includes(filtroActual.value)) {
-    adaptedQuizzes = adaptedQuizzes.filter(q => q.categoria === filtroActual.value);
+  // Filtrado por asignatura en dos posibles formas:
+  // 1. Si se proporcionó idAsignatura explícitamente
+  if (asignaturaId.value) {
+    adaptedQuizzes = adaptedQuizzes.filter(q => q.idAsignatura === asignaturaId.value);
+  }
+  // 2. Si el filtro actual corresponde a una asignatura 
+  else if (filtroActual.value && !['Recientes', 'Populares', 'Por dificultad'].includes(filtroActual.value)) {
+    // Buscar si existe una asignatura con ese nombre
+    const asignatura = asignaturaStore.asignaturas.find(a => a.nombre === filtroActual.value);
+    
+    if (asignatura) {
+      // Si se encuentra, filtrar por su ID
+      adaptedQuizzes = adaptedQuizzes.filter(q => q.idAsignatura === asignatura.idAsignatura);
+    } else {
+      // Si no, filtrar por el nombre de la categoría (compatibilidad con implementación anterior)
+      adaptedQuizzes = adaptedQuizzes.filter(q => q.categoria === filtroActual.value);
+    }
   }
   
   // Ordenamientos
@@ -150,16 +188,6 @@ const irAlQuiz = (quizId) => {
   emit('quiz-selected', quizId);
 };
 
-// Mapeo de dificultad a colores de Vuetify
-const colorDificultad = (dificultad) => {
-  const colores = {
-    'Fácil': 'success',
-    'Media': 'warning',
-    'Difícil': 'error'
-  };
-  return colores[dificultad] || 'grey';
-};
-
 // Calcular número total de páginas
 const totalPaginas = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 
@@ -172,8 +200,16 @@ function obtenerDificultad(quiz) {
 }
 
 function obtenerCategoria(idAsignatura) {
-  // Mapa de idAsignatura a categorías
-  const categorias = {
+  // Intentar obtener el nombre de la asignatura desde el store
+  if (asignaturaStore.asignaturas.length > 0) {
+    const asignatura = asignaturaStore.asignaturas.find(a => a.idAsignatura === idAsignatura);
+    if (asignatura) {
+      return asignatura.nombre;
+    }
+  }
+  
+  // Si no se encuentra, usar el mapa de respaldo
+  const categoriasRespaldo = {
     1: 'Matemáticas',
     2: 'Ciencias',
     3: 'Historia',
@@ -186,7 +222,7 @@ function obtenerCategoria(idAsignatura) {
     10: 'Marketing'
   };
   
-  return categorias[idAsignatura] || 'Otras';
+  return categoriasRespaldo[idAsignatura] || 'Otras';
 }
 </script>
 
@@ -346,3 +382,19 @@ function obtenerCategoria(idAsignatura) {
   left: 8px;
 }
 </style>
+
+<script>
+// Exponer la función colorDificultad para usarla en el template
+export default {
+  methods: {
+    colorDificultad(dificultad) {
+      const colores = {
+        'Fácil': 'success',
+        'Media': 'warning',
+        'Difícil': 'error'
+      };
+      return colores[dificultad] || 'grey';
+    }
+  }
+}
+</script>

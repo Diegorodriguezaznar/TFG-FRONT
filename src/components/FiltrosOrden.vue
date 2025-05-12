@@ -1,15 +1,14 @@
-// src/components/Filtros.vue
-// Modificado para mostrar solo asignaturas
+// src/components/FiltrosOrden.vue
+// Componente simple para los filtros de ordenamiento
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
-import { useAsignaturaStore } from '../stores/Asignaturas';
+import { ref, onMounted, watch } from 'vue';
 
 // Propiedades de entrada
 const props = defineProps({
   initialFilter: {
     type: String,
-    default: null
+    default: 'Recientes'
   },
   loading: {
     type: Boolean,
@@ -22,23 +21,13 @@ const emit = defineEmits(['filtro-cambiado']);
 
 // Estado local
 const filtroSeleccionado = ref(props.initialFilter);
-const asignaturaStore = useAsignaturaStore();
-const isLoadingAsignaturas = ref(false);
 
-// Solo asignaturas disponibles
-const filtrosDisponibles = computed(() => {
-  const nombreAsignaturas = asignaturaStore.asignaturas.map(asignatura => asignatura.nombre);
-  return nombreAsignaturas;
-});
+// Filtros estáticos de ordenamiento
+const filtrosOrdenamiento = ref(['Recientes', 'Populares', 'Por dificultad']);
 
-// Inicializar para cargar asignaturas
-onMounted(async () => {
+// Inicializar componente
+onMounted(() => {
   filtroSeleccionado.value = props.initialFilter;
-  
-  // Cargar asignaturas
-  isLoadingAsignaturas.value = true;
-  await asignaturaStore.fetchAllAsignaturas();
-  isLoadingAsignaturas.value = false;
 });
 
 // Observar cambios en filtro inicial
@@ -48,12 +37,7 @@ watch(() => props.initialFilter, (nuevoFiltro) => {
 
 // Función para cambiar el filtro
 const seleccionarFiltro = (filtro) => {
-  if (filtroSeleccionado.value === filtro) {
-    // Si ya está seleccionado, deseleccionar
-    filtroSeleccionado.value = null;
-    emit('filtro-cambiado', null);
-    return;
-  }
+  if (filtroSeleccionado.value === filtro) return;
   
   filtroSeleccionado.value = filtro;
   emit('filtro-cambiado', filtro);
@@ -61,34 +45,35 @@ const seleccionarFiltro = (filtro) => {
 </script>
 
 <template>
-  <div class="filtros-container">
-    <div class="d-flex align-center mb-4">
-      <h2 class="text-h5 font-weight-medium">Explora por Asignaturas</h2>
+  <div class="filtros-ordenamiento">
+    <div class="d-flex align-center mb-2">
+      <h3 class="text-subtitle-1 font-weight-medium">Ordenar por</h3>
       
       <!-- Indicador de carga -->
       <v-progress-circular
-        v-if="props.loading || isLoadingAsignaturas"
+        v-if="props.loading"
         indeterminate
         color="primary"
-        size="20"
-        class="ml-4"
+        size="16"
+        class="ml-2"
       ></v-progress-circular>
     </div>
     
-    <!-- Chips de filtros (solo asignaturas) -->
+    <!-- Chips de filtros -->
     <div class="filtros-chips">
       <v-chip-group
         v-model="filtroSeleccionado"
+        mandatory
+        selected-class="primary"
         class="filtros-chip-group"
       >
         <v-chip
-          v-for="filtro in filtrosDisponibles"
+          v-for="filtro in filtrosOrdenamiento"
           :key="filtro"
           :value="filtro"
           @click="seleccionarFiltro(filtro)"
           class="mr-2 mb-2"
           variant="elevated"
-          :color="filtroSeleccionado === filtro ? 'primary' : undefined"
         >
           {{ filtro }}
         </v-chip>
@@ -98,9 +83,9 @@ const seleccionarFiltro = (filtro) => {
 </template>
 
 <style scoped>
-.filtros-container {
+.filtros-ordenamiento {
   width: 100%;
-  padding-top: 16px;
+  margin-top: 8px;
 }
 
 .filtros-chips {

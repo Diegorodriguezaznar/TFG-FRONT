@@ -1,20 +1,20 @@
 import { createRouter, createWebHistory } from "vue-router";
 // import HomeView from "@/views/HomePage.vue";
-import AsignaturasPage from "@/views/AsignaturasPage.vue";
-import TemariosPage from "@/views/TemariosPage.vue";
-import CursosPage from "@/views/CursosPage.vue";
-import PerfilPage from "@/views/PerfilPage.vue";
-import MisCursosPage from "@/views/MisCursosPage.vue";
-import MisArchivosPage from "@/views/MisArchivosPage.vue";
-import ArchivosyTestPage from "@/views/ArchivosyTestPage.vue";
-import HomePage from "@/views/Home.vue";
-import AdminPage from "@/views/AdminPage.vue";
-import Quizzes from "@/views/Quizzes.vue";
-import QuizDetalle from "@/views/QuizDetalle.vue";
+import AsignaturasPage from "../views/AsignaturasPage.vue";
+import TemariosPage from "../views/TemariosPage.vue";
+import CursosPage from "../views/CursosPage.vue";
+import PerfilPage from "../views/PerfilPage.vue";
+import MisCursosPage from "../views/MisCursosPage.vue";
+import MisArchivosPage from "../views/MisArchivosPage.vue";
+import ArchivosyTestPage from "../views/ArchivosyTestPage.vue";
+import HomePage from "../views/Home.vue";
+import AdminPage from "../views/AdminPage.vue";
+import Quizzes from "../views/Quizzes.vue";
+import QuizDetalle from "../views/QuizDetalle.vue";
 
 // Importar store de usuario para proteger rutas
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
-
+ 
 const routes = [
   { path: "/", component: Quizzes },
   { path: "/asignaturas/:idCurso", component: AsignaturasPage, props: true },
@@ -25,7 +25,10 @@ const routes = [
   { path: "/mis-cursos", component: MisCursosPage },
   { path: "/mis-archivos", component: MisArchivosPage },
   { path: "/quizz-time!", component: Quizzes},
+  // Mantenemos la ruta actual para no romper nada
   { path: "/quizz-detail", component: QuizDetalle},
+  // Agregamos una ruta opcional con ID en los parámetros (para futura implementación)
+  { path: "/quizz-detail/:id", component: QuizDetalle, props: true},
   { 
     path: "/admin", component: AdminPage,
     //nos aseguramos de que solo los usuarios admin puedan 

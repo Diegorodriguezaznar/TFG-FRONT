@@ -1,11 +1,17 @@
+// src/views/Quizzes.vue
+// Versión corregida para la navegación a QuizDetalle
+
 <script setup>
 // --------------------------- Imports ---------------------------
 import { ref, onMounted, provide, watch } from 'vue';
 import { useDisplay } from 'vuetify';
+import { useRouter } from 'vue-router';
 import { useQuizStore } from '../stores/Quiz';
+import { useAsignaturaStore } from '../stores/Asignaturas';
 import Header from '../components/Header.vue';
 import Sidebar from '../components/Sidebar.vue';
-import FiltrosQuizzes from '../components/FiltrosQuizzes.vue';
+import Filtros from '../components/Filtros.vue'; // Componente para asignaturas
+import FiltrosOrden from '../components/FiltrosOrden.vue'; // Nuevo componente para ordenamiento
 import SugerenciasQuizzes from '../components/SugerenciasQuizzes.vue';
 
 // --------------------------- Variables ---------------------------
@@ -13,14 +19,18 @@ const sidebarOpen = ref(false);
 const searchQuery = ref('');
 const isLoading = ref(false);
 const error = ref(null);
-const categorias = ref([]);
-const filtroActual = ref('Recientes');
+const filtroOrden = ref('Recientes');
+const asignaturaSeleccionada = ref(null);
+const idAsignaturaFiltro = ref(null);
 const { mobile } = useDisplay();
 const quizStore = useQuizStore();
+const asignaturaStore = useAsignaturaStore();
+const router = useRouter();
 
 // --------------------------- Inyección en el contexto ---------------------------
 provide('searchQuery', searchQuery);
-provide('filtroActual', filtroActual);
+provide('filtroOrden', filtroOrden);
+provide('asignaturaSeleccionada', asignaturaSeleccionada);
 
 // --------------------------- Métodos ---------------------------
 const toggleSidebar = () => {
@@ -37,40 +47,38 @@ const updateSearch = (query) => {
   }, 500);
 };
 
-// Cambiar el filtro activo
-const cambiarFiltro = (filtro) => {
-  filtroActual.value = filtro;
+// Cambiar el filtro de ordenamiento
+const cambiarFiltroOrden = (filtro) => {
+  filtroOrden.value = filtro;
   cargarQuizzes();
 };
 
-// Cargar las categorías desde la API
-const cargarCategorias = async () => {
-  try {
-    isLoading.value = true;
-    
-    // En una implementación real, podrías obtener las categorías de una API
-    // Por ahora, usamos datos estáticos o generados a partir de las asignaturas
-    categorias.value = [
-      'Recientes', 'Populares', 'Por dificultad', 'Matemáticas', 
-      'Ciencias', 'Historia', 'Literatura', 'Geografía', 'Arte', 
-      'Deportes', 'Programación', 'Idiomas', 'Marketing'
-    ];
-  } catch (err) {
-    console.error('Error al cargar categorías:', err);
-    error.value = 'No se pudieron cargar las categorías de quizzes';
-  } finally {
-    isLoading.value = false;
+// Cambiar la asignatura seleccionada
+const cambiarAsignatura = (nombre) => {
+  asignaturaSeleccionada.value = nombre;
+  
+  // Buscar el ID de la asignatura si se ha seleccionado una
+  if (nombre) {
+    const asignatura = asignaturaStore.asignaturas.find(a => a.nombre === nombre);
+    if (asignatura) {
+      idAsignaturaFiltro.value = asignatura.idAsignatura;
+    } else {
+      idAsignaturaFiltro.value = null;
+    }
+  } else {
+    idAsignaturaFiltro.value = null;
   }
+  
+  cargarQuizzes();
 };
 
-// Iniciar carga de quizzes
+// Cargar quizzes
 const cargarQuizzes = async () => {
   isLoading.value = true;
   error.value = null;
   
   try {
     // La carga real ocurre en el componente hijo SugerenciasQuizzes
-    // Si necesitamos hacer operaciones adicionales, las haríamos aquí
     await new Promise(resolve => setTimeout(resolve, 300));
   } catch (err) {
     console.error('Error al cargar quizzes:', err);
@@ -80,7 +88,7 @@ const cargarQuizzes = async () => {
   }
 };
 
-// Ver detalle de un quiz
+// Ver detalle de un quiz - MÉTODO CORREGIDO
 const verDetalleQuiz = async (quizId) => {
   try {
     // Obtener los detalles del quiz
@@ -91,9 +99,11 @@ const verDetalleQuiz = async (quizId) => {
       return;
     }
     
-    // En producción, esto navegaría a la página del quiz:
-    // router.push({ name: 'quiz-detail', params: { id: quizId }});
-    console.log(`Navegando al quiz ${quizId}:`, quizDetails);
+    // Navegar a la página de detalle usando QUERY parameters (como está configurado actualmente)
+    router.push({ 
+      path: '/quizz-detail',
+      query: { id: quizId } 
+    });
   } catch (err) {
     console.error(`Error al navegar al quiz ${quizId}:`, err);
     error.value = 'Error al cargar los detalles del quiz';
@@ -113,8 +123,7 @@ onMounted(async () => {
   // Escuchar cambios de tamaño de ventana
   window.addEventListener('resize', handleResize);
   
-  // Cargar datos iniciales
-  await cargarCategorias();
+  // Cargar quizzes iniciales
   await cargarQuizzes();
   
   // Limpiar evento al desmontar
@@ -124,7 +133,7 @@ onMounted(async () => {
 });
 
 // Observers para recargar datos
-watch(filtroActual, () => {
+watch([filtroOrden, asignaturaSeleccionada], () => {
   cargarQuizzes();
 });
 
@@ -193,12 +202,21 @@ watch(searchQuery, () => {
             </template>
           </v-alert>
           
-          <!-- Componente de filtros en la parte superior -->
-          <FiltrosQuizzes 
-            :filtrosDisponibles="categorias"
-            :initialFilter="filtroActual"
+          <!-- Filtros componente (solo asignaturas) -->
+          <Filtros 
+            :initialFilter="asignaturaSeleccionada"
             :loading="isLoading"
-            @filtro-cambiado="cambiarFiltro"
+            @filtro-cambiado="cambiarAsignatura"
+          />
+          
+          <!-- Separador visual -->
+          <v-divider class="my-4"></v-divider>
+          
+          <!-- Filtros de Ordenamiento (abajo de las asignaturas) -->
+          <FiltrosOrden 
+            :initialFilter="filtroOrden"
+            :loading="isLoading"
+            @filtro-cambiado="cambiarFiltroOrden"
           />
           
           <!-- Separador visual -->
@@ -207,7 +225,8 @@ watch(searchQuery, () => {
           <!-- Componente de sugerencias de quizzes -->
           <SugerenciasQuizzes
             :query="searchQuery"
-            :initialFilter="filtroActual"
+            :initialFilter="filtroOrden"
+            :idAsignatura="idAsignaturaFiltro"
             @quiz-selected="verDetalleQuiz"
           />
         </v-container>

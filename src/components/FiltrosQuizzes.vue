@@ -1,5 +1,9 @@
+// src/components/FiltrosQuizzes.vue
+// Implementación para obtener asignaturas dinámicamente
+
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
+import { useAsignaturaStore } from '../stores/Asignaturas'; // Corregida la ruta de importación
 
 // Propiedades de entrada
 const props = defineProps({
@@ -7,14 +11,7 @@ const props = defineProps({
     type: String,
     default: 'Recientes'
   },
-  // Recibir lista de filtros desde componente padre
-  filtrosDisponibles: {
-    type: Array,
-    default: () => [
-      'Recientes', 'Populares', 'Por dificultad', 'Matemáticas', 
-      'Ciencias', 'Historia', 'Literatura', 'Geografía', 'Arte', 'Deportes'
-    ]
-  },
+  // No necesitamos recibir filtrosDisponibles, los generaremos dinámicamente
   loading: {
     type: Boolean,
     default: false
@@ -26,10 +23,26 @@ const emit = defineEmits(['filtro-cambiado']);
 
 // Estado local
 const filtroSeleccionado = ref(props.initialFilter);
+const asignaturaStore = useAsignaturaStore();
+const isLoadingAsignaturas = ref(false);
 
-// Inicializar valor seleccionado
-onMounted(() => {
+// Filtros estáticos (siempre disponibles)
+const filtrosEstaticos = ref(['Recientes', 'Populares', 'Por dificultad']);
+
+// Combinar filtros estáticos con asignaturas dinamicamente
+const filtrosDisponibles = computed(() => {
+  const nombreAsignaturas = asignaturaStore.asignaturas.map(asignatura => asignatura.nombre);
+  return [...filtrosEstaticos.value, ...nombreAsignaturas];
+});
+
+// Inicializar para cargar asignaturas
+onMounted(async () => {
   filtroSeleccionado.value = props.initialFilter;
+  
+  // Cargar asignaturas
+  isLoadingAsignaturas.value = true;
+  await asignaturaStore.fetchAllAsignaturas();
+  isLoadingAsignaturas.value = false;
 });
 
 // Observar cambios en filtro inicial
@@ -53,7 +66,7 @@ const seleccionarFiltro = (filtro) => {
       
       <!-- Indicador de carga -->
       <v-progress-circular
-        v-if="props.loading" 
+        v-if="props.loading || isLoadingAsignaturas"
         indeterminate
         color="primary"
         size="20"
@@ -70,7 +83,7 @@ const seleccionarFiltro = (filtro) => {
         class="filtros-chip-group"
       >
         <v-chip
-          v-for="filtro in props.filtrosDisponibles"
+          v-for="filtro in filtrosDisponibles"
           :key="filtro"
           :value="filtro"
           @click="seleccionarFiltro(filtro)"
