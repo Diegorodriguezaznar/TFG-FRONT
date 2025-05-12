@@ -1,22 +1,20 @@
-
-// src/components/Filtros.vue
-// Modificado para mostrar solo asignaturas
+// src/components/FiltrosQuizzes.vue
+// Implementación para obtener asignaturas dinámicamente
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
-import { useAsignaturaStore } from '../stores/Asignaturas';
-
+import { useAsignaturaStore } from '../stores/Asignaturas'; // Corregida la ruta de importación
 
 // Propiedades de entrada
 const props = defineProps({
   initialFilter: {
     type: String,
-    default: null
+    default: 'Recientes'
   },
+  // No necesitamos recibir filtrosDisponibles, los generaremos dinámicamente
   loading: {
     type: Boolean,
     default: false
-
   }
 });
 
@@ -28,10 +26,13 @@ const filtroSeleccionado = ref(props.initialFilter);
 const asignaturaStore = useAsignaturaStore();
 const isLoadingAsignaturas = ref(false);
 
-// Solo asignaturas disponibles
+// Filtros estáticos (siempre disponibles)
+const filtrosEstaticos = ref(['Recientes', 'Populares', 'Por dificultad']);
+
+// Combinar filtros estáticos con asignaturas dinamicamente
 const filtrosDisponibles = computed(() => {
   const nombreAsignaturas = asignaturaStore.asignaturas.map(asignatura => asignatura.nombre);
-  return nombreAsignaturas;
+  return [...filtrosEstaticos.value, ...nombreAsignaturas];
 });
 
 // Inicializar para cargar asignaturas
@@ -51,35 +52,17 @@ watch(() => props.initialFilter, (nuevoFiltro) => {
 
 // Función para cambiar el filtro
 const seleccionarFiltro = (filtro) => {
-  if (filtroSeleccionado.value === filtro) {
-    // Si ya está seleccionado, deseleccionar
-    filtroSeleccionado.value = null;
-    emit('filtro-cambiado', null);
-    return;
-  }
+  if (filtroSeleccionado.value === filtro) return;
   
   filtroSeleccionado.value = filtro;
   emit('filtro-cambiado', filtro);
-
 };
-
-// --------------------------- Observar cambios en el curso ---------------------------
-watch(() => props.cursoId, (newValue) => {
-  if (newValue) {
-    cargarAsignaturas();
-  }
-});
-
-// --------------------------- Cargar datos al montar ---------------------------
-onMounted(() => {
-  cargarAsignaturas();
-});
 </script>
 
 <template>
   <div class="filtros-container">
     <div class="d-flex align-center mb-4">
-      <h2 class="text-h5 font-weight-medium">Explora por Asignaturas</h2>
+      <h2 class="text-h5 font-weight-medium">Explora Quizzes</h2>
       
       <!-- Indicador de carga -->
       <v-progress-circular
@@ -91,10 +74,12 @@ onMounted(() => {
       ></v-progress-circular>
     </div>
     
-    <!-- Chips de filtros (solo asignaturas) -->
+    <!-- Chips de filtros -->
     <div class="filtros-chips">
       <v-chip-group
         v-model="filtroSeleccionado"
+        mandatory
+        selected-class="primary"
         class="filtros-chip-group"
       >
         <v-chip
@@ -104,13 +89,11 @@ onMounted(() => {
           @click="seleccionarFiltro(filtro)"
           class="mr-2 mb-2"
           variant="elevated"
-          :color="filtroSeleccionado === filtro ? 'primary' : undefined"
         >
           {{ filtro }}
         </v-chip>
       </v-chip-group>
     </div>
-
   </div>
 </template>
 
@@ -142,24 +125,5 @@ onMounted(() => {
   .filtros-chip-group::-webkit-scrollbar {
     display: none;
   }
-}
-
-.Filtros__Chip {
-  border: 2px solid #FF9800 !important;
-  background-color: white !important;
-  color: #FF9800 !important;
-}
-
-.Filtros__Chip--activo {
-  background-color: #FF9800 !important;
-  color: white !important;
-}
-
-.Filtros__Loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
-  color: #FF9800;
 }
 </style>

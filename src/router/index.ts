@@ -1,29 +1,35 @@
 import { createRouter, createWebHistory } from "vue-router";
-import AsignaturasPage from "@/views/AsignaturasPage.vue";
-import Historial from "@/views/Historial.vue";
-import TemariosPage from "@/views/TemariosPage.vue";
-import CursosPage from "@/views/CursosPage.vue";
-import PerfilPage from "@/views/PerfilPage.vue";
-import MisCursosPage from "@/views/MisCursosPage.vue";
-import ArchivosyTestPage from "@/views/ArchivosyTestPage.vue";
-import ReproductorVideo from "@/views/ReproductorVideo.vue";
-import AdminPage from "@/views/AdminPage.vue";
-import HomePage from "@/views/Home.vue";
+// import HomeView from "@/views/HomePage.vue";
+import AsignaturasPage from "../views/AsignaturasPage.vue";
+import TemariosPage from "../views/TemariosPage.vue";
+import CursosPage from "../views/CursosPage.vue";
+import PerfilPage from "../views/PerfilPage.vue";
+import MisCursosPage from "../views/MisCursosPage.vue";
+import MisArchivosPage from "../views/MisArchivosPage.vue";
+import ArchivosyTestPage from "../views/ArchivosyTestPage.vue";
+import HomePage from "../views/Home.vue";
+import AdminPage from "../views/AdminPage.vue";
+import Quizzes from "../views/Quizzes.vue";
+import QuizDetalle from "../views/QuizDetalle.vue";
+
 
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
-
+ 
 const routes = [
-  { path: "/", component: CursosPage },
-  // Añadimos la nueva ruta para ver los videos de un curso específico
-  { path: "/curso/:id", component: HomePage, props: true },
-  { path: "/historial", component: Historial }, 
+  { path: "/", component: Quizzes },
   { path: "/asignaturas/:idCurso", component: AsignaturasPage, props: true },
   { path: "/temarios/:idAsignatura", component: TemariosPage, props: true },
   { path: "/temarios/:idTemario/archivos-test", component: ArchivosyTestPage, props: true },
   { path: "/cursos", component: CursosPage },
   { path: "/perfil", component: PerfilPage },
   { path: "/mis-cursos", component: MisCursosPage },
-  { path: "/reproductor-video", component: ReproductorVideo },
+  { path: "/mis-archivos", component: MisArchivosPage },
+  { path: "/quizz-time!", component: Quizzes},
+  // Mantenemos la ruta actual para no romper nada
+  { path: "/quizz-detail", component: QuizDetalle},
+  // Agregamos una ruta opcional con ID en los parámetros (para futura implementación)
+  { path: "/quizz-detail/:id", component: QuizDetalle, props: true},
+
   { 
     path: "/admin", component: AdminPage,
     meta: { requiresAuth: true, requiresAdmin: true } 
