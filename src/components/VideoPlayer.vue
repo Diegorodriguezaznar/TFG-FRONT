@@ -13,10 +13,15 @@ const props = defineProps({
     <!-- Reproductor de video (simulado) -->
     <div class="VideoPlayer__Container">
       <img 
-        src="https://picsum.photos/seed/videoplayer/1280/720" 
+        :src="video.miniatura || 'https://picsum.photos/seed/videoplayer/1280/720'" 
         class="VideoPlayer__Placeholder"
         alt="Video placeholder"
       />
+      
+      <!-- Icono de reproducción en el centro -->
+      <div class="VideoPlayer__PlayButton">
+        <v-icon icon="mdi-play" size="x-large" color="white"></v-icon>
+      </div>
       
       <!-- Overlay con controles simulados -->
       <div class="VideoPlayer__Controls">
@@ -51,6 +56,9 @@ const props = defineProps({
       <div class="VideoPlayer__Duration">
         {{ props.video.duracion }}
       </div>
+      
+      <!-- Barra de progreso roja -->
+      <div class="VideoPlayer__ProgressBarRed"></div>
     </div>
   </div>
 </template>
@@ -74,6 +82,21 @@ const props = defineProps({
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.VideoPlayer__PlayButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .VideoPlayer__Controls {
@@ -126,5 +149,14 @@ const props = defineProps({
   padding: 1px 4px;
   border-radius: 2px;
   font-size: 12px;
+}
+
+.VideoPlayer__ProgressBarRed {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: #FF0000;
 }
 </style>

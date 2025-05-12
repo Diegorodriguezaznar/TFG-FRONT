@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 //Imports
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -52,6 +52,7 @@ const usuarioId = computed(() => {
 
 // Estado de inscripción
 const estaInscrito = ref(false);
+const animacionCorazon = ref(false);
 
 // Verificar si el usuario está inscrito en este curso al cargar el componente
 onMounted(async () => {
@@ -87,6 +88,9 @@ const toggleInscripcion = async (event) => {
   }
   
   try {
+    // Añadir animación
+    animacionCorazon.value = true;
+    
     if (estaInscrito.value) {
       // ELIMINAR inscripción (usando query parameters)
       const url = `http://localhost:5190/api/UsuarioCurso?idUsuario=${usuarioId.value}&idCurso=${props.id}`;
@@ -128,56 +132,78 @@ const toggleInscripcion = async (event) => {
         mostrarMensaje('Error al marcar como favorito', 'error');
       }
     }
+
+    // Quitar animación después de un tiempo
+    setTimeout(() => {
+      animacionCorazon.value = false;
+    }, 500);
+    
   } catch (error) {
     console.error("Error en operación:", error);
     mostrarMensaje('Error en la operación', 'error');
+    animacionCorazon.value = false;
   }
 };
 </script>
 
 <template>
   <div>
-    <v-card class="curso-card" @click="seleccionarCurso">
-      <!-- Usamos una imagen por defecto si no hay imagen proporcionada -->
-      <v-img 
-        :src="imagen || 'https://picsum.photos/300/200'" 
-        height="200px" 
-        cover
-        class="curso-card-imagen"
-      ></v-img>
-      
-      <v-card-title class="text-subtitle-1 font-weight-bold">
-        {{ titulo }}
-      </v-card-title>
-      
-      <v-card-text v-if="descripcion" class="curso-card-descripcion text-caption">
-        {{ descripcion }}
-      </v-card-text>
-      
-      <v-card-actions>
-        <v-btn 
-          variant="flat" 
-          :color="estaInscrito ? 'orange' : 'white'" 
-          class="curso-card-boton" 
-          @click.stop="toggleInscripcion($event)"
-        >
-          <v-icon :color="estaInscrito ? 'white' : 'orange'">
-            {{ estaInscrito ? 'mdi-heart' : 'mdi-heart-outline' }}
-          </v-icon>
-        </v-btn>
+    <v-hover v-slot="{ isHovering }">
+      <v-card 
+        class="curso-card" 
+        @click="seleccionarCurso"
+        :elevation="isHovering ? 8 : 2"
+      >
+        <!-- Contenedor de imagen con overlay de gradiente -->
+        <div class="curso-card-imagen-container">
+          <v-img 
+            :src="imagen || 'https://picsum.photos/300/200'" 
+            height="220px" 
+            cover
+            class="curso-card-imagen"
+            :class="{ 'imagen-hover': isHovering }"
+          >
+            <!-- Overlay con gradiente -->
+            <div class="curso-card-overlay">
+              <!-- Botón de favorito -->
+              <v-btn 
+                :class="['curso-card-favorito', { 'favorito-activo': estaInscrito, 'animar': animacionCorazon }]"
+                icon
+                size="small"
+                @click.stop="toggleInscripcion($event)"
+              >
+                <v-icon>
+                  {{ estaInscrito ? 'mdi-heart' : 'mdi-heart-outline' }}
+                </v-icon>
+              </v-btn>
+            </div>
+          </v-img>
+        </div>
         
-        <v-spacer></v-spacer>
+        <v-card-title class="curso-card-titulo">
+          {{ titulo }}
+        </v-card-title>
         
-        <v-btn 
-          variant="text" 
-          color="primary" 
-          size="small"
-          @click.stop="seleccionarCurso"
-        >
-          Ver videos
-        </v-btn>
-      </v-card-actions>
-    </v-card>
+        <v-card-text v-if="descripcion" class="curso-card-descripcion">
+          {{ descripcion }}
+        </v-card-text>
+        
+        <v-card-actions class="curso-card-acciones">
+          <v-spacer></v-spacer>
+          
+          <v-btn 
+            variant="flat" 
+            color="primary" 
+            @click.stop="seleccionarCurso"
+            class="curso-card-boton"
+            :class="{ 'btn-hover': isHovering }"
+          >
+            <v-icon left class="mr-1">mdi-play-circle-outline</v-icon>
+            Ver videos
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-hover>
     
     <!-- Alerta de acción completada (solo para errores) -->
     <v-snackbar
@@ -202,19 +228,48 @@ const toggleInscripcion = async (event) => {
 
 <style scoped>
 .curso-card {
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   height: 100%;
   display: flex;
   flex-direction: column;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .curso-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-8px);
+}
+
+.curso-card-imagen-container {
+  position: relative;
+  overflow: hidden;
 }
 
 .curso-card-imagen {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  transition: transform 0.5s ease;
+}
+
+.imagen-hover {
+  transform: scale(1.05);
+}
+
+.curso-card-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 12px;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1;
+}
+
+.curso-card-titulo {
+  font-size: 1.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  color: rgba(0, 0, 0, 0.87);
 }
 
 .curso-card-descripcion {
@@ -223,11 +278,55 @@ const toggleInscripcion = async (event) => {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+  color: rgba(0, 0, 0, 0.6);
   flex-grow: 1;
+  font-size: 0.875rem;
+}
+
+.curso-card-acciones {
+  padding: 8px 16px 16px 16px;
+}
+
+.curso-card-favorito {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.curso-card-favorito:hover {
+  transform: scale(1.15);
+}
+
+.favorito-activo {
+  color: #f44336 !important;
+}
+
+.animar {
+  animation: pulse 0.4s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .curso-card-boton {
-  min-width: 36px !important;
-  border-radius: 50% !important;
+  transition: all 0.3s ease;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 0 16px;
+}
+
+.btn-hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 </style>

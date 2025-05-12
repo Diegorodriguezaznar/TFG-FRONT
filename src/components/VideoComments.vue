@@ -1,28 +1,28 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref, onMounted, watch, computed } from 'vue';
-// Comentamos temporalmente esta importación para ver si es el origen del problema
-// import { useComentarioStore } from '@/stores/Comentario';
+import { useComentarioStore } from '@/stores/Comentario';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
+import type { ComentarioUI } from '@/stores/dtos/ComentarioDTO';
+import { storeToRefs } from 'pinia';
 
 // --------------------------- Stores ---------------------------
-// Comentamos temporalmente el uso del store para ver si es el origen del problema
-// const comentarioStore = useComentarioStore();
+const comentarioStore = useComentarioStore();
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
+const { loading: storeLoading, errorMessage } = storeToRefs(comentarioStore);
 
 // --------------------------- Props ---------------------------
 const props = defineProps({
   videoId: {
     type: Number,
-    default: 0
+    required: true
   }
 });
 
 // --------------------------- Variables ---------------------------
-const comments = ref([]);
+const comments = ref<ComentarioUI[]>([]);
 const newComment = ref('');
 const commentError = ref('');
-const loading = ref(false);
 const showLoginMsg = ref(false);
 
 // --------------------------- Computed ---------------------------
@@ -33,83 +33,19 @@ const usuarioId = computed(() => {
 });
 
 // --------------------------- Métodos ---------------------------
-// Usamos datos simulados temporalmente para evitar el error
 const cargarComentarios = async () => {
-  loading.value = true;
-  
   try {
-    // Comentamos temporalmente la llamada al store
-    /*
     if (props.videoId) {
-      const comentarios = await comentarioStore.fetchComentariosByArchivoId(props.videoId);
-      comments.value = comentarios.map(c => transformarComentario(c));
+      console.log(`Cargando comentarios para video ID: ${props.videoId}`);
+      const comentarios = await comentarioStore.fetchComentariosByVideoId(props.videoId);
+      comments.value = comentarios;
+      
+      console.log("Comentarios cargados:", comentarios);
     }
-    */
-    
-    // Simulamos datos para probar
-    setTimeout(() => {
-      comments.value = [
-        {
-          id: 1,
-          user: 'Laura García',
-          avatar: 'https://picsum.photos/seed/user1/40/40',
-          content: 'Excelente video, me ha sido muy útil para entender este tema.',
-          likes: 24,
-          time: 'hace 2 días'
-        },
-        {
-          id: 2,
-          user: 'Carlos Mendoza',
-          avatar: 'https://picsum.photos/seed/user2/40/40',
-          content: 'Me encantaría ver más contenido como este. ¡Gracias por compartir!',
-          likes: 18,
-          time: 'hace 1 día'
-        }
-      ];
-      loading.value = false;
-    }, 500);
-    
   } catch (error) {
     console.error("Error al cargar comentarios:", error);
-    loading.value = false;
   }
 };
-
-// Transformar comentario - también desactivado temporalmente
-/*
-const transformarComentario = (c) => {
-  const fecha = new Date(c.fechaCreacion);
-  const ahora = new Date();
-  
-  let tiempoTexto = '';
-  const diferenciaMs = ahora.getTime() - fecha.getTime();
-  const segundos = Math.floor(diferenciaMs / 1000);
-  const minutos = Math.floor(segundos / 60);
-  const horas = Math.floor(minutos / 60);
-  const dias = Math.floor(horas / 24);
-  
-  if (dias > 0) {
-    tiempoTexto = dias === 1 ? 'hace 1 día' : `hace ${dias} días`;
-  } else if (horas > 0) {
-    tiempoTexto = horas === 1 ? 'hace 1 hora' : `hace ${horas} horas`;
-  } else if (minutos > 0) {
-    tiempoTexto = minutos === 1 ? 'hace 1 minuto' : `hace ${minutos} minutos`;
-  } else {
-    tiempoTexto = 'ahora mismo';
-  }
-  
-  return {
-    id: c.idComentario,
-    user: c.usuario?.nombre || 'Usuario',
-    avatar: `https://picsum.photos/seed/user${c.idUsuario}/40/40`,
-    content: c.contenido,
-    likes: Math.floor(Math.random() * 100),
-    time: tiempoTexto,
-    idUsuario: c.idUsuario,
-    fechaCreacion: c.fechaCreacion
-  };
-};
-*/
 
 const submitComment = async () => {
   // Validar que el comentario no esté vacío
@@ -124,24 +60,26 @@ const submitComment = async () => {
     return;
   }
   
-  // Simular envío de comentario
-  loading.value = true;
+  commentError.value = '';
   
-  setTimeout(() => {
-    const nuevoComentario = {
-      id: Date.now(),
-      user: usuarioActual.value?.nombre || 'Usuario actual',
-      avatar: `https://picsum.photos/seed/user${usuarioId.value}/40/40`,
-      content: newComment.value,
-      likes: 0,
-      time: 'ahora mismo'
-    };
+  try {
+    const nuevoComentario = await comentarioStore.createComentario({
+      contenido: newComment.value,
+      idUsuario: usuarioId.value,
+      idVideo: props.videoId
+    });
     
-    comments.value.unshift(nuevoComentario);
-    newComment.value = '';
-    commentError.value = '';
-    loading.value = false;
-  }, 500);
+    if (nuevoComentario) {
+      // Añadir el nuevo comentario al inicio de la lista
+      comments.value.unshift(nuevoComentario);
+      
+      // Limpiar el formulario
+      newComment.value = '';
+    }
+  } catch (error: any) {
+    commentError.value = error.message || 'Error al enviar el comentario';
+    console.error("Error al enviar comentario:", error);
+  }
 };
 
 // --------------------------- Watchers ---------------------------
@@ -164,12 +102,23 @@ onMounted(() => {
     </h3>
     
     <!-- Loader -->
-    <div v-if="loading && comments.length === 0" class="d-flex justify-center my-4">
+    <div v-if="storeLoading && comments.length === 0" class="d-flex justify-center my-4">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     
+    <!-- Mensaje de error -->
+    <v-alert
+      v-if="errorMessage"
+      type="error"
+      variant="tonal"
+      closable
+      class="mb-4"
+    >
+      {{ errorMessage }}
+    </v-alert>
+    
     <!-- Formulario para agregar comentarios -->
-    <div v-if="!loading || comments.length > 0" class="VideoComments__Form d-flex align-start mb-6">
+    <div v-if="!storeLoading || comments.length > 0" class="VideoComments__Form d-flex align-start mb-6">
       <v-avatar size="40" class="mr-3 mt-1">
         <v-img 
           :src="usuarioActual ? `https://picsum.photos/seed/user${usuarioId}/40/40` : 'https://picsum.photos/seed/guest/40/40'" 
@@ -203,7 +152,7 @@ onMounted(() => {
           <v-btn 
             color="primary" 
             @click="submitComment"
-            :loading="loading"
+            :loading="storeLoading"
             :disabled="!usuarioActual || !newComment.trim()"
           >
             Comentar
@@ -259,7 +208,7 @@ onMounted(() => {
     </div>
     
     <!-- Estado sin comentarios -->
-    <div v-else-if="!loading" class="VideoComments__Empty text-center py-4">
+    <div v-else-if="!storeLoading" class="VideoComments__Empty text-center py-4">
       <v-icon color="grey" size="large">mdi-comment-text-outline</v-icon>
       <p class="mt-2 text-body-2 text-grey">No hay comentarios aún. ¡Sé el primero en comentar!</p>
     </div>
