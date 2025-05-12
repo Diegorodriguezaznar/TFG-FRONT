@@ -56,37 +56,44 @@ onMounted(fetchCursos);
     <!-- --------------------------- Header --------------------------- -->
     <Header @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
 
-    <!-- --------------------------- Breadcrumb --------------------------- -->
-    <v-breadcrumbs class="CursosPage___Breadcrumb" :items="items">
-      <template v-slot:prepend>
-        <v-icon icon="$vuetify" size="small"></v-icon>
-      </template>
-    </v-breadcrumbs>
-
     <!-- --------------------------- Contenedor principal --------------------------- -->
-    <v-container class="CursosPage__Contenedor">
-      <!-- --------------------------- Sidebar --------------------------- -->
-      <Sidebar v-model="drawer" @mostrar-login="mostrarLogin = true" />
+    <div class="CursosPage__Wrapper">
+      <!-- --------------------------- Breadcrumb --------------------------- -->
+      <v-breadcrumbs class="CursosPage___Breadcrumb" :items="items">
+        <template v-slot:prepend>
+          <v-icon icon="mdi-book-open-variant" size="small"></v-icon>
+        </template>
+      </v-breadcrumbs>
 
-      <!-- --------------------------- Contenido --------------------------- -->
-      <div class="CursosPage___contenido">
-        <v-container class="CursosPage___ContenedorCursos">
-          <v-row align="start" justify="start">
-            <!-- --------------------------- Mostrar cursos --------------------------- -->
-            <v-col v-for="curso in cursosFiltrados" :key="curso.idCurso" cols="12" sm="6" md="4" lg="3">
-              <CardCurso 
-                :id="curso.idCurso"
-                :titulo="curso.nombre"
-                :subtitulo="curso.subtitulo"
-                :descripcion="curso.descripcion"
-                :imagen="curso.imagen"
-              />
-            </v-col>
-          </v-row>
-        </v-container>
-      </div>
-    </v-container>
+      <v-container class="CursosPage__Contenedor">
 
+
+        <!-- --------------------------- Título de la página --------------------------- -->
+        <div class="CursosPage__Header">
+          <h1 class="CursosPage__Titulo">Explora nuestros cursos</h1>
+          <p class="CursosPage__Subtitulo">Encuentra los mejores cursos para impulsar tu carrera</p>
+        </div>
+
+        <!-- --------------------------- Contenido --------------------------- -->
+        <div class="CursosPage___contenido">
+          <v-container class="CursosPage___ContenedorCursos">
+            <v-row align="stretch" justify="start">
+              <!-- --------------------------- Mostrar cursos --------------------------- -->
+              <v-col v-for="curso in cursosFiltrados" :key="curso.idCurso" cols="12" sm="6" md="4" lg="3" class="d-flex">
+                <CardCurso 
+                  :id="curso.idCurso"
+                  :titulo="curso.nombre"
+                  :subtitulo="curso.subtitulo"
+                  :descripcion="curso.descripcion"
+                  :imagen="curso.imagen"
+                />
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
+      </v-container>
+    </div>
+    
     <!-- --------------------------- Footer --------------------------- -->
     <Footer />
 
@@ -100,5 +107,73 @@ onMounted(fetchCursos);
 </template>
 
 <style lang="scss" scoped>
-  @import "@/assets/sass/pages/Cursos.scss";
+.CursosPage__Wrapper {
+  min-height: calc(100vh - 64px - 64px); // Altura total - header - footer
+  background-color: #f5f7fa;
+  padding-bottom: 24px;
+}
+
+.CursosPage___Breadcrumb {
+  background-color: transparent;
+  padding: 16px 24px 0;
+}
+
+.CursosPage__Contenedor {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.CursosPage__Header {
+  text-align: center;
+  padding: 24px 0 40px;
+}
+
+.CursosPage__Titulo {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, #3f51b5 0%, #2196f3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.CursosPage__Subtitulo {
+  font-size: 1.25rem;
+  color: #607d8b;
+  margin: 0 auto;
+  max-width: 600px;
+}
+
+.CursosPage___contenido {
+  padding-top: 16px;
+}
+
+.CursosPage___ContenedorCursos {
+  width: 100%;
+}
+
+/* Media queries para mejor responsividad */
+@media (max-width: 960px) {
+  .CursosPage__Titulo {
+    font-size: 2rem;
+  }
+  
+  .CursosPage__Subtitulo {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .CursosPage__Header {
+    padding: 16px 0 24px;
+  }
+  
+  .CursosPage__Titulo {
+    font-size: 1.75rem;
+  }
+  
+  .CursosPage__Subtitulo {
+    font-size: 1rem;
+  }
+}
 </style>

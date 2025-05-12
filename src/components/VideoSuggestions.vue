@@ -1,4 +1,56 @@
-<script setup lang="ts">
+.VideoSuggestions__Item {
+  width: 210px;
+  min-width: 210px;
+  margin-right: 16px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.VideoSuggestions__Item:hover {
+  transform: translateY(-4px);
+}
+
+.VideoSuggestions__Thumbnail {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.VideoSuggestions__Duration {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-size: 12px;
+}
+
+.VideoSuggestions__Info {
+  padding: 0 4px;
+}
+
+.VideoSuggestions__Title {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.VideoSuggestions__Channel {
+  font-size: 12px;
+  color: #606060;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggested-videos-row {
+  scrollbar-width:<script setup lang="ts">
 // --------------------------- Props ---------------------------
 const props = defineProps({
   videos: {
@@ -18,14 +70,12 @@ const selectVideo = (videoId) => {
 
 <template>
   <div class="VideoSuggestions">
-    <h3 class="text-subtitle-1 font-weight-bold mb-4">Videos sugeridos</h3>
-    
     <div v-if="videos.length === 0" class="text-center py-4">
       <v-icon color="grey" size="large">mdi-playlist-remove</v-icon>
       <p class="mt-2 text-body-2 text-grey">No hay videos sugeridos disponibles</p>
     </div>
     
-    <div v-else>
+    <div v-else class="d-flex overflow-x-auto pb-3 suggested-videos-row">
       <div 
         v-for="video in videos" 
         :key="video.idVideo" 
@@ -36,7 +86,8 @@ const selectVideo = (videoId) => {
         <div class="VideoSuggestions__Thumbnail">
           <v-img 
             :src="video.miniatura" 
-            :aspect-ratio="16/9"
+            width="210"
+            height="120"
             class="rounded"
             cover
           ></v-img>
@@ -54,12 +105,6 @@ const selectVideo = (videoId) => {
           <div class="VideoSuggestions__Channel">
             {{ video.autor }}
           </div>
-          
-          <div class="VideoSuggestions__Stats">
-            <span>{{ video.vistas }} visualizaciones</span>
-            <span class="mx-1">•</span>
-            <span>{{ video.fecha }}</span>
-          </div>
         </div>
       </div>
     </div>
@@ -68,29 +113,35 @@ const selectVideo = (videoId) => {
 
 <style scoped>
 .VideoSuggestions__Item {
-  display: flex;
-  margin-bottom: 12px;
+  width: 210px;
+  min-width: 210px;
+  margin-right: 16px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: transform 0.2s;
+  background-color: #0f3670;
+  border: 1px solid #0812ff;
   border-radius: 8px;
-  padding: 4px;
+  padding: 8px;
+  overflow: hidden;
 }
 
 .VideoSuggestions__Item:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateY(-4px);
+  box-shadow: 0 4px 8px rgba(8, 18, 255, 0.3);
 }
 
 .VideoSuggestions__Thumbnail {
-  flex: 0 0 168px;
-  margin-right: 12px;
   position: relative;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .VideoSuggestions__Duration {
   position: absolute;
   bottom: 4px;
   right: 4px;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(255, 158, 12, 0.7);
   color: white;
   padding: 1px 4px;
   border-radius: 2px;
@@ -98,8 +149,7 @@ const selectVideo = (videoId) => {
 }
 
 .VideoSuggestions__Info {
-  flex: 1;
-  min-width: 0;
+  padding: 0 4px;
 }
 
 .VideoSuggestions__Title {
@@ -111,22 +161,34 @@ const selectVideo = (videoId) => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  color: #ffffff;
 }
 
 .VideoSuggestions__Channel {
   font-size: 12px;
-  color: #606060;
-  margin-bottom: 2px;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.VideoSuggestions__Stats {
-  font-size: 12px;
-  color: #606060;
+.suggested-videos-row {
+  scrollbar-width: thin;
+}
+
+.suggested-videos-row::-webkit-scrollbar {
+  height: 6px;
+}
+
+.suggested-videos-row::-webkit-scrollbar-thumb {
+  background-color: #ff9e0c;
+  border-radius: 3px;
 }
 
 @media (max-width: 600px) {
-  .VideoSuggestions__Thumbnail {
-    flex: 0 0 120px;
+  .VideoSuggestions__Item {
+    width: 180px;
+    min-width: 180px;
   }
 }
 </style>
