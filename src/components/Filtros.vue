@@ -1,66 +1,59 @@
+<script setup lang="ts">
+// --------------------------- Imports ---------------------------
+import { ref, computed, watch, onMounted } from 'vue';
+import { useAsignaturaStore } from '@/stores/Asignaturas';
+import type { AsignaturaDTO } from '@/stores/dtos/AsignaturasDTO';
 
-// src/components/Filtros.vue
-// Modificado para mostrar solo asignaturas
-
-<script setup>
-import { ref, onMounted, watch, computed } from 'vue';
-import { useAsignaturaStore } from '../stores/Asignaturas';
-
-
-// Propiedades de entrada
-const props = defineProps({
-  initialFilter: {
-    type: String,
-    default: null
-  },
-  loading: {
-    type: Boolean,
-    default: false
-
-  }
-});
-
-// Eventos de salida
-const emit = defineEmits(['filtro-cambiado']);
-
-// Estado local
-const filtroSeleccionado = ref(props.initialFilter);
+// --------------------------- Stores ---------------------------
 const asignaturaStore = useAsignaturaStore();
-const isLoadingAsignaturas = ref(false);
 
-// Solo asignaturas disponibles
-const filtrosDisponibles = computed(() => {
-  const nombreAsignaturas = asignaturaStore.asignaturas.map(asignatura => asignatura.nombre);
-  return nombreAsignaturas;
+// --------------------------- Props y Emits ---------------------------
+const props = defineProps({
+  filtroActual: {
+    type: String || Number,
+    default: 'Todos'
+  },
+  cursoId: {
+    type: Number,
+    default: null
+  }
 });
 
-// Inicializar para cargar asignaturas
-onMounted(async () => {
-  filtroSeleccionado.value = props.initialFilter;
+const emit = defineEmits(['filtro-seleccionado']);
+
+// --------------------------- Estado local ---------------------------
+const loading = computed(() => asignaturaStore.isLoading);
+
+// --------------------------- Asignaturas/filtros computados ---------------------------
+const asignaturas = computed(() => {
+  // Siempre incluimos la opción "Todos"
+  const opciones = [{ idAsignatura: 'Todos', nombre: 'Todos' }];
   
-  // Cargar asignaturas
-  isLoadingAsignaturas.value = true;
-  await asignaturaStore.fetchAllAsignaturas();
-  isLoadingAsignaturas.value = false;
-});
-
-// Observar cambios en filtro inicial
-watch(() => props.initialFilter, (nuevoFiltro) => {
-  filtroSeleccionado.value = nuevoFiltro;
-});
-
-// Función para cambiar el filtro
-const seleccionarFiltro = (filtro) => {
-  if (filtroSeleccionado.value === filtro) {
-    // Si ya está seleccionado, deseleccionar
-    filtroSeleccionado.value = null;
-    emit('filtro-cambiado', null);
-    return;
+  // Agregamos cada asignatura del store
+  if (asignaturaStore.asignaturas && asignaturaStore.asignaturas.length > 0) {
+    asignaturaStore.asignaturas.forEach(asignatura => {
+      opciones.push({
+        idAsignatura: asignatura.idAsignatura,
+        nombre: asignatura.nombre
+      });
+    });
   }
   
-  filtroSeleccionado.value = filtro;
-  emit('filtro-cambiado', filtro);
+  return opciones;
+});
 
+// --------------------------- Cargar asignaturas del curso ---------------------------
+const cargarAsignaturas = async () => {
+  if (props.cursoId) {
+    await asignaturaStore.fetchAsignaturasByCurso(props.cursoId);
+  } else {
+    await asignaturaStore.fetchAllAsignaturas();
+  }
+};
+
+// --------------------------- Métodos ---------------------------
+const seleccionarFiltro = (filtro: any) => {
+  emit('filtro-seleccionado', filtro);
 };
 
 // --------------------------- Observar cambios en el curso ---------------------------
@@ -77,71 +70,37 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="filtros-container">
-    <div class="d-flex align-center mb-4">
-      <h2 class="text-h5 font-weight-medium">Explora por Asignaturas</h2>
+  <div class="Filtros">
+    <v-sheet class="Filtros__Contenedor">
+      <div v-if="loading" class="Filtros__Loading text-center py-2">
+        <v-progress-circular indeterminate size="24" color="orange"></v-progress-circular>
+        <span class="ml-2">Cargando asignaturas...</span>
+      </div>
       
-      <!-- Indicador de carga -->
-      <v-progress-circular
-        v-if="props.loading || isLoadingAsignaturas"
-        indeterminate
-        color="primary"
-        size="20"
-        class="ml-4"
-      ></v-progress-circular>
-    </div>
-    
-    <!-- Chips de filtros (solo asignaturas) -->
-    <div class="filtros-chips">
-      <v-chip-group
-        v-model="filtroSeleccionado"
-        class="filtros-chip-group"
-      >
-        <v-chip
-          v-for="filtro in filtrosDisponibles"
-          :key="filtro"
-          :value="filtro"
-          @click="seleccionarFiltro(filtro)"
-          class="mr-2 mb-2"
-          variant="elevated"
-          :color="filtroSeleccionado === filtro ? 'primary' : undefined"
-        >
-          {{ filtro }}
-        </v-chip>
-      </v-chip-group>
-    </div>
-
+      <v-slide-group v-else show-arrows>
+        <v-slide-group-item v-for="asignatura in asignaturas" :key="asignatura.idAsignatura">
+          <v-chip
+            class="ma-2 Filtros__Chip"
+            :class="{ 'Filtros__Chip--activo': filtroActual === asignatura.idAsignatura }"
+            variant="outlined"
+            @click="seleccionarFiltro(asignatura.idAsignatura)"
+          >
+            {{ asignatura.nombre }}
+          </v-chip>
+        </v-slide-group-item>
+      </v-slide-group>
+    </v-sheet>
   </div>
 </template>
 
 <style scoped>
-.filtros-container {
-  width: 100%;
-  padding-top: 16px;
+.Filtros {
+  margin-bottom: 16px;
 }
 
-.filtros-chips {
-  display: flex;
-  align-items: center;
-  padding-bottom: 8px;
-}
-
-.filtros-chip-group {
-  flex-wrap: wrap;
-}
-
-/* Scroll horizontal en dispositivos pequeños */
-@media (max-width: 600px) {
-  .filtros-chip-group {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .filtros-chip-group::-webkit-scrollbar {
-    display: none;
-  }
+.Filtros__Contenedor {
+  border-radius: 8px;
+  padding: 8px 0;
 }
 
 .Filtros__Chip {

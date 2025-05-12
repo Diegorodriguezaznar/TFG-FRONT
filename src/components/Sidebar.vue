@@ -23,7 +23,9 @@ const menuItems = [
   { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },
-  { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' }
+  { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
+  { title: 'Quizzes', icon: 'mdi-school-outline', route: '/quizz-time!' }
+
 ];
 
 // --------------------------- Métodos ---------------------------
