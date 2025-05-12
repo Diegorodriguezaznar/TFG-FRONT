@@ -1,4 +1,10 @@
-<script setup>
+<script setup lang="ts">
+// --------------------------- Imports ---------------------------
+import { useRouter } from 'vue-router';
+
+// --------------------------- Router ---------------------------
+const router = useRouter();
+
 // --------------------------- Props ---------------------------
 const props = defineProps({
   videos: {
@@ -6,6 +12,14 @@ const props = defineProps({
     default: () => []
   }
 });
+
+// --------------------------- Métodos ---------------------------
+const verVideo = (video) => {
+  router.push({
+    path: '/reproductor-video',
+    query: { id: video.idVideo || video.id }
+  });
+};
 </script>
 
 <template>
@@ -13,9 +27,9 @@ const props = defineProps({
     <div class="text-h6 font-weight-bold mb-3">Sugerencias</div>
     
     <v-row>
-      <v-col v-for="video in videos" :key="video.id" cols="12" sm="6" md="3">
-        <v-card class="Sugerencias__Card" elevation="0" rounded="lg">
-          <v-img :src="video.thumbnail" height="140" cover class="Sugerencias__Imagen"></v-img>
+      <v-col v-for="video in videos" :key="video.idVideo || video.id" cols="12" sm="6" md="3">
+        <v-card class="Sugerencias__Card" elevation="0" rounded="lg" @click="verVideo(video)">
+          <v-img :src="video.miniatura || video.thumbnail" height="140" cover class="Sugerencias__Imagen"></v-img>
           
           <v-card-item>
             <v-card-title class="text-subtitle-1 font-weight-bold pa-0">

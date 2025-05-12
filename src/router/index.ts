@@ -12,7 +12,7 @@ import AdminPage from "../views/AdminPage.vue";
 import Quizzes from "../views/Quizzes.vue";
 import QuizDetalle from "../views/QuizDetalle.vue";
 
-// Importar store de usuario para proteger rutas
+
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
  
 const routes = [
@@ -29,10 +29,9 @@ const routes = [
   { path: "/quizz-detail", component: QuizDetalle},
   // Agregamos una ruta opcional con ID en los parámetros (para futura implementación)
   { path: "/quizz-detail/:id", component: QuizDetalle, props: true},
+
   { 
     path: "/admin", component: AdminPage,
-    //nos aseguramos de que solo los usuarios admin puedan 
-    // entrar filtrando por su id rol
     meta: { requiresAuth: true, requiresAdmin: true } 
   }
 ];

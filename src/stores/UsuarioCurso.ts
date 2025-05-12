@@ -9,7 +9,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
   // Obtener todas las inscripciones
   async function fetchAllInscripciones() {
     try {
-      const response = await fetch("http://localhost:5687/api/UsuarioCurso");
+      const response = await fetch("http://localhost:5190/api/UsuarioCurso");
       if (!response.ok) throw new Error("Error al obtener las inscripciones");
 
       inscripciones.value = await response.json();
@@ -22,7 +22,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
   // Obtener inscripciones por ID de usuario
   async function fetchInscripcionesByUsuarioId(idUsuario: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/UsuarioCurso/usuario/${idUsuario}`);
+      const response = await fetch(`http://localhost:5190/api/UsuarioCurso/usuario/${idUsuario}`);
       if (!response.ok) throw new Error("Error al obtener las inscripciones del usuario");
 
       return await response.json();
@@ -36,7 +36,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
   // Obtener inscripciones por ID de curso
   async function fetchInscripcionesByCursoId(idCurso: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/UsuarioCurso/curso/${idCurso}`);
+      const response = await fetch(`http://localhost:5190/api/UsuarioCurso/curso/${idCurso}`);
       if (!response.ok) throw new Error("Error al obtener las inscripciones del curso");
 
       return await response.json();
@@ -50,12 +50,12 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
   // Crear una nueva inscripción
   async function createInscripcion(nuevaInscripcion: UsuarioCursoDTO) {
     try {
-      console.log("Enviando POST a http://localhost:5687/api/UsuarioCurso:", nuevaInscripcion);
+      console.log("Enviando POST a http://localhost:5190/api/UsuarioCurso:", nuevaInscripcion);
       
       // Probar diferentes formatos de envío
       try {
         // Formato 1: Enviar directamente
-        const response = await fetch("http://localhost:5687/api/UsuarioCurso", {
+        const response = await fetch("http://localhost:5190/api/UsuarioCurso", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nuevaInscripcion)
@@ -76,7 +76,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
           IdCurso: nuevaInscripcion.idCurso
         };
         
-        const response2 = await fetch("http://localhost:5687/api/UsuarioCurso", {
+        const response2 = await fetch("http://localhost:5190/api/UsuarioCurso", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(datosAlternativos)
@@ -99,7 +99,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
           }
         };
         
-        const response3 = await fetch("http://localhost:5687http://localhost:5687/api/UsuarioCurso", {
+        const response3 = await fetch("http://localhost:5190http://localhost:5190/api/UsuarioCurso", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(datosConWrapper)
@@ -129,7 +129,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
       // Intentar varios formatos para el DELETE
       try {
         // Formato 1: Con query parameters
-        const urlDelete = `http://localhost:5687/api/UsuarioCurso?idUsuario=${idUsuario}&idCurso=${idCurso}`;
+        const urlDelete = `http://localhost:5190/api/UsuarioCurso?idUsuario=${idUsuario}&idCurso=${idCurso}`;
         console.log("Intentando eliminar con URL:", urlDelete);
         
         const response = await fetch(urlDelete, {
@@ -147,7 +147,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
         
         // Formato 2: Con cuerpo JSON
         console.log("Intentando formato 2 para eliminar");
-        const response2 = await fetch("http://localhost:5687http://localhost:5687/api/UsuarioCurso", {
+        const response2 = await fetch("http://localhost:5190http://localhost:5190/api/UsuarioCurso", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ idUsuario, idCurso })
@@ -164,7 +164,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
         
         // Formato 3: Con IdUsuario/IdCurso
         console.log("Intentando formato 3 para eliminar");
-        const response3 = await fetch("http://localhost:5687http://localhost:5687/api/UsuarioCurso", {
+        const response3 = await fetch("http://localhost:5190http://localhost:5190/api/UsuarioCurso", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ IdUsuario: idUsuario, IdCurso: idCurso })

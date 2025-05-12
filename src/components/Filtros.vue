@@ -1,9 +1,11 @@
+
 // src/components/Filtros.vue
 // Modificado para mostrar solo asignaturas
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
 import { useAsignaturaStore } from '../stores/Asignaturas';
+
 
 // Propiedades de entrada
 const props = defineProps({
@@ -14,6 +16,7 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false
+
   }
 });
 
@@ -57,7 +60,20 @@ const seleccionarFiltro = (filtro) => {
   
   filtroSeleccionado.value = filtro;
   emit('filtro-cambiado', filtro);
+
 };
+
+// --------------------------- Observar cambios en el curso ---------------------------
+watch(() => props.cursoId, (newValue) => {
+  if (newValue) {
+    cargarAsignaturas();
+  }
+});
+
+// --------------------------- Cargar datos al montar ---------------------------
+onMounted(() => {
+  cargarAsignaturas();
+});
 </script>
 
 <template>
@@ -94,6 +110,7 @@ const seleccionarFiltro = (filtro) => {
         </v-chip>
       </v-chip-group>
     </div>
+
   </div>
 </template>
 
@@ -125,5 +142,24 @@ const seleccionarFiltro = (filtro) => {
   .filtros-chip-group::-webkit-scrollbar {
     display: none;
   }
+}
+
+.Filtros__Chip {
+  border: 2px solid #FF9800 !important;
+  background-color: white !important;
+  color: #FF9800 !important;
+}
+
+.Filtros__Chip--activo {
+  background-color: #FF9800 !important;
+  color: white !important;
+}
+
+.Filtros__Loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  color: #FF9800;
 }
 </style>

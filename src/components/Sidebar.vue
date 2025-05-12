@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify';
@@ -23,8 +23,6 @@ const menuItems = [
   { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },
-  { title: 'Mis videos', icon: 'mdi-play-box-multiple', route: '/mis-videos' },
-  { title: 'Ver más tarde', icon: 'mdi-clock', route: '/ver-mas-tarde' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' }
 ];
 

@@ -110,7 +110,7 @@ async function createUsuario() {
       idRol: parseInt(String(usuarioForm.value.idRol)) || 2
     };
     
-    await handleApiRequest("http://localhost:5687/api/Usuario", "POST", payload);
+    await handleApiRequest("http://localhost:5190/api/Usuario", "POST", payload);
     await usuarioStore.fetchAllUsuarios();
     successMessage.value = "Usuario creado con éxito";
     closeForm();
@@ -143,7 +143,7 @@ async function updateUsuario() {
       idRol: parseInt(String(usuarioForm.value.idRol)) || 2
     };
     
-    await handleApiRequest(`http://localhost:5687/api/Usuario/${selectedUsuario.value.idUsuario}`, "PUT", payload);
+    await handleApiRequest(`http://localhost:5190/api/Usuario/${selectedUsuario.value.idUsuario}`, "PUT", payload);
     await usuarioStore.fetchAllUsuarios();
     successMessage.value = "Usuario actualizado con éxito";
     closeForm();
@@ -171,7 +171,7 @@ async function confirmDeleteUsuario() {
   errorMessage.value = '';
   
   try {
-    await handleApiRequest(`http://localhost:5687/api/Usuario/${idToDelete.value}`, "DELETE");
+    await handleApiRequest(`http://localhost:5190/api/Usuario/${idToDelete.value}`, "DELETE");
     successMessage.value = "Usuario eliminado con éxito";
     await usuarioStore.fetchAllUsuarios();
     confirmDelete.value = false;

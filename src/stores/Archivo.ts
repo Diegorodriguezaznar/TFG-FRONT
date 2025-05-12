@@ -13,7 +13,7 @@ export const useArchivoStore = defineStore("archivo", () => {
   // Obtener todos los archivos
   async function fetchAllArchivos() {
     try {
-      const response = await fetch("http://localhost:5687/api/Archivo");
+      const response = await fetch("http://localhost:5190/api/Archivo");
       if (!response.ok) throw new Error("Error al obtener todos los archivos");
 
       archivos.value = await response.json();
@@ -26,7 +26,7 @@ export const useArchivoStore = defineStore("archivo", () => {
   // Obtener archivo por ID
   async function fetchArchivoById(idArchivo: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Archivo/${idArchivo}`);
+      const response = await fetch(`http://localhost:5190/api/Archivo/${idArchivo}`);
       if (!response.ok) throw new Error("Error al obtener el archivo");
 
       return await response.json();
@@ -40,7 +40,7 @@ export const useArchivoStore = defineStore("archivo", () => {
   // Obtener archivos por Tipo y Temario
   async function fetchArchivosByTipoAndTemario(tipo: string, idTemario: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Archivo/tipo/${tipo}/temario/${idTemario}`);
+      const response = await fetch(`http://localhost:5190/api/Archivo/tipo/${tipo}/temario/${idTemario}`);
       if (!response.ok) throw new Error("Error al obtener los archivos del tipo y temario seleccionados");
 
       const data = await response.json();
@@ -58,7 +58,7 @@ export const useArchivoStore = defineStore("archivo", () => {
   // Obtener archivos por ID de temario
   async function fetchArchivosByTemario(idTemario: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Archivo/temario/${idTemario}`);
+      const response = await fetch(`http://localhost:5190/api/Archivo/temario/${idTemario}`);
       if (!response.ok) throw new Error("Error al obtener los archivos del temario");
 
       const data = await response.json();
@@ -77,7 +77,7 @@ export const useArchivoStore = defineStore("archivo", () => {
   async function fetchArchivosByUsuario(idUsuario: number) {
     try {
       archivos.value = [];
-      const response = await fetch(`http://localhost:5687/api/Archivo/usuario/${idUsuario}`);
+      const response = await fetch(`http://localhost:5190/api/Archivo/usuario/${idUsuario}`);
       if (!response.ok) throw new Error("Error al obtener los archivos del usuario");
 
       const data = await response.json();
@@ -129,7 +129,7 @@ export const useArchivoStore = defineStore("archivo", () => {
 
       return await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:5687/api/Archivo/upload", true);
+        xhr.open("POST", "http://localhost:5190/api/Archivo/upload", true);
         xhr.timeout = 300000;
         xhr.withCredentials = false;
 
@@ -178,7 +178,7 @@ export const useArchivoStore = defineStore("archivo", () => {
   // --------------------------- Crear archivo ---------------------------
   async function createArchivo(archivo: Partial<ArchivoDTO>, userId: number) {
     try {
-      const response = await fetch("http://localhost:5687/api/Archivo", {
+      const response = await fetch("http://localhost:5190/api/Archivo", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

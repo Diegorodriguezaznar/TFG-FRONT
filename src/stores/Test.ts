@@ -9,7 +9,7 @@ export const useTestStore = defineStore("test", () => {
   // Obtener todos los tests
   async function fetchAllTests() {
     try {
-      const response = await fetch("http://localhost:5687/api/Test");
+      const response = await fetch("http://localhost:5190/api/Test");
       if (!response.ok) throw new Error("Error al obtener todos los tests");
 
       tests.value = await response.json();
@@ -22,7 +22,7 @@ export const useTestStore = defineStore("test", () => {
   // Obtener test por ID
   async function fetchTestById(idTest: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Test/${idTest}`);
+      const response = await fetch(`http://localhost:5190/api/Test/${idTest}`);
       if (!response.ok) throw new Error("Error al obtener el test");
 
       return await response.json();
@@ -36,7 +36,7 @@ export const useTestStore = defineStore("test", () => {
   // Obtener tests por ID de temario
   async function fetchTestsByTemario(idTemario: number) {
     try {
-      const response = await fetch(`http://localhost:5687/api/Test/temario/${idTemario}`);
+      const response = await fetch(`http://localhost:5190/api/Test/temario/${idTemario}`);
       if (!response.ok) throw new Error("Error al obtener los tests del temario");
 
       tests.value = await response.json();
