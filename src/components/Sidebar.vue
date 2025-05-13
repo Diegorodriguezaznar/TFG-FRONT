@@ -24,7 +24,8 @@ const menuItems = [
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
-  { title: 'Quizzes', icon: 'mdi-school-outline', route: '/quizz-time!' }
+  { title: 'Quizzes', icon: 'mdi-school-outline', route: '/quizz-time!' },
+  { title: 'Subir Video', icon: 'mdi-upload', route: '/subir-video' }
 
 ];
 
