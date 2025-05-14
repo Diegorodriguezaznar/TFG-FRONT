@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import type { Usuario } from "@/types/usuario";
+import type { Usuario } from "../stores/Usuario";
 
 export const useUsuarioLogeadoStore = defineStore("usuarioLogeado", () => {
   // Estado del usuario actual

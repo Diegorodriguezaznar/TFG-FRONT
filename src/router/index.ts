@@ -1,75 +1,72 @@
-import { createRouter, createWebHistory } from "vue-router";
-// import HomeView from "@/views/HomePage.vue";
-import AsignaturasPage from "../views/AsignaturasPage.vue";
-import Historial from "@/views/Historial.vue";
-import CursosPage from "../views/CursosPage.vue";
-import PerfilPage from "../views/PerfilPage.vue";
-import HomePage from "../views/CursosPage.vue";
-import AdminPage from "../views/AdminPage.vue";
-import ReproductorVideo from "@/views/ReproductorVideo.vue";
-import Quizzes from "../views/Quizzes.vue";
-import QuizDetalle from "../views/QuizDetalle.vue";
-import Videos from "@/views/Home.vue";
+import { createRouter, createWebHistory } from 'vue-router';
+import HomePage from '../views/CursosPage.vue';
+import AsignaturasPage from '../views/AsignaturasPage.vue';
+import Historial from '@/views/Historial.vue';
+import CursosPage from '../views/CursosPage.vue';
+import PerfilPage from '../views/PerfilPage.vue';
+import ReproductorVideo from '@/views/ReproductorVideo.vue';
+import Quizzes from '../views/Quizzes.vue';
+import QuizDetalle from '../views/QuizDetalle.vue';
+import Videos from '@/views/Home.vue';
+import Login from '../views/LoginView.vue';
+import Registro from '../views/RegistroView.vue';
+import AdminPage from '../views/AdminPage.vue';
 
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 
-import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
- 
 const routes = [
-  { path: "/", component: HomePage },
-  { path: "/curso/:id", component: Videos, props: true },
-  { path: "/reproductor-video", component: ReproductorVideo },
-  { path: "/historial", component: Historial }, 
-  { path: "/asignaturas/:idCurso", component: AsignaturasPage, props: true },
-  { path: "/cursos", component: CursosPage },
-  { path: "/perfil", component: PerfilPage },
-  { path: "/quizz-time!", component: Quizzes},
-  // Mantenemos la ruta actual para no romper nada
-  { path: "/quizz-detail", component: QuizDetalle},
-  // Agregamos una ruta opcional con ID en los parámetros (para futura implementación)
-  { path: "/quizz-detail/:id", component: QuizDetalle, props: true},
-
+  { path: '/', component: HomePage },
+  { path: '/curso/:id', component: Videos, props: true },
+  { path: '/reproductor-video', component: ReproductorVideo },
+  { path: '/historial', component: Historial },
+  { path: '/asignaturas/:idCurso', component: AsignaturasPage, props: true },
+  { path: '/cursos', component: CursosPage },
+  { path: '/perfil', component: PerfilPage },
+  { path: '/quizz-time!', component: Quizzes },
+  { path: '/quizz-detail', component: QuizDetalle },
+  { path: '/quizz-detail/:id', component: QuizDetalle, props: true },
   { 
-    path: "/admin", component: AdminPage,
-    meta: { requiresAuth: true, requiresAdmin: true } 
-  }
+    path: '/admin', 
+    component: AdminPage,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  { path: '/login', component: Login },
+  { path: '/registro', component: Registro },
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
 });
 
 router.beforeEach((to, from, next) => {
-  if (!to.meta.requiresAuth) {
-    next();
-    return;
+  const publicPages = ['/login', '/registro'];
+  const authRequired = !publicPages.includes(to.path);
+  const loggedIn = localStorage.getItem('token');
+
+  if (authRequired && !loggedIn) {
+    return next('/login');
   }
 
-  const usuarioLogeadoStore = useUsuarioLogeadoStore();
-  
-  if (!usuarioLogeadoStore.estaAutenticado) {
-    next("/"); 
-    return;
-  }
-  
-  if (to.meta.requiresAdmin) {
-    const usuario = usuarioLogeadoStore.usuarioActual;
-    
-    if (!usuario) {
-      next("/");
-      return;
+  if (to.meta.requiresAuth) {
+    const usuarioLogeadoStore = useUsuarioLogeadoStore();
+
+    if (!usuarioLogeadoStore.estaAutenticado) {
+      return next('/login');
     }
-    
-    const idRol = usuario.idRol || 
-                (usuario.rol && usuario.rol.idRol) || 
-                (usuario.rol && usuario.rol.id);
-    
-    if (idRol !== 1) {
-      next("/cursos"); 
-      return;
+
+    if (to.meta.requiresAdmin) {
+      const usuario = usuarioLogeadoStore.usuarioActual;
+      if (!usuario) {
+        return next('/login');
+      }
+      const idRol = usuario.idRol || (usuario.rol && usuario.rol.idRol) || (usuario.rol && usuario.rol.id);
+      if (idRol !== 1) {
+        return next('/cursos');
+      }
     }
   }
-  
+
   next();
 });
 
