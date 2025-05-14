@@ -10,7 +10,7 @@ import ReproductorVideo from "@/views/ReproductorVideo.vue";
 import Quizzes from "../views/Quizzes.vue";
 import QuizDetalle from "../views/QuizDetalle.vue";
 import Videos from "@/views/Home.vue";
-import SubirVideos from "../views/UploadPage.vue";
+import SubirVideos from "../views/SubirVideoPage.vue";
 
 
 

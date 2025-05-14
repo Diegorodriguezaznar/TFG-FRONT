@@ -1,0 +1,127 @@
+.video-upload-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .stepper-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+  }
+  
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+  }
+  
+  .step-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .step.active .step-number {
+    background-color: #4285f4;
+    color: white;
+  }
+  
+  .step.completed .step-number {
+    background-color: #34a853;
+    color: white;
+  }
+  
+  .step-title {
+    font-size: 14px;
+    color: #5f6368;
+    text-align: center;
+  }
+  
+  .step.active .step-title,
+  .step.completed .step-title {
+    color: #202124;
+    font-weight: 500;
+  }
+  
+  .step-connector {
+    position: absolute;
+    top: 18px;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background-color: #e0e0e0;
+    z-index: -1;
+  }
+  
+  .step.completed .step-connector {
+    background-color: #34a853;
+  }
+  
+  .stepper-content {
+    min-height: 400px;
+    margin-bottom: 2rem;
+  }
+  
+  .stepper-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .btn-primary {
+    background-color: #4285f4;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #3367d6;
+  }
+  
+  .btn-primary:disabled {
+    background-color: #c5d0e6;
+    cursor: not-allowed;
+  }
+  
+  .btn-secondary {
+    background-color: #f1f3f4;
+    color: #5f6368;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #e8eaed;
+  }
+  
+  .btn-secondary:disabled {
+    color: #9aa0a6;
+    cursor: not-allowed;
+  }
+  
+  .step-content {
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
