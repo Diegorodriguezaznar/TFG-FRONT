@@ -1,4 +1,4 @@
-// VideoService.ts con solución rápida para el problema de idCurso
+// VideoService.ts with fixed S3 authentication issues
 import axios from 'axios';
 
 // Tipos de datos
@@ -29,77 +29,72 @@ class VideoService {
   /**
    * Sube un archivo a Amazon S3
    */
-  async uploadFileToS3(file: File, type: string, progressCallback: (progress: number) => void = () => {}): Promise<string> {
-    try {
-      console.log(`Solicitando URL presignada para: ${type}/${file.name}`);
-      
-      // 1. Obtener una URL prefirmada del backend
-      const response = await axios.post('/s3/obtener-url', {
-        Tipo: type,
-        NombreArchivo: file.name
-      });
-      
-      console.log('Respuesta del servidor:', response.data);
-      
-      // Obtener URL y clave
-      let presignedUrl: string;
-      let fileKey: string;
-      
-      if (typeof response.data === 'string') {
-        presignedUrl = response.data;
-        // Extraer el fileKey de la URL - puede necesitar ajustes según la estructura exacta
-        const urlObj = new URL(presignedUrl);
-        fileKey = urlObj.pathname.split('/').pop() || '';
-      } else if (response.data && response.data.presignedUrl) {
-        presignedUrl = response.data.presignedUrl;
-        fileKey = response.data.fileKey;
-      } else {
-        throw new Error('Formato de respuesta inesperado del servidor');
-      }
-      
-      // 2. Subir el archivo a S3 usando la URL prefirmada
-      await axios.put(presignedUrl, file, {
-        headers: {
-          'Content-Type': file.type
-        },
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            progressCallback(percentCompleted);
-          }
+  // VideoService.ts - Solo la función uploadFileToS3 modificada
+async uploadFileToS3(file: File, type: string, progressCallback: (progress: number) => void = () => {}): Promise<string> {
+  try {
+    console.log(`Preparando para subir: ${type}/${file.name}`);
+    
+    // Crear FormData para el archivo
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('tipo', type);
+    
+    // Llamar al nuevo endpoint de subida directa
+    const response = await axios.post('/S3/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          progressCallback(percentCompleted);
         }
-      });
-      
-      // 3. Devolver la URL pública
-      const bucketName = 'archivos-academiq'; // Asegúrate de que este es el nombre correcto de tu bucket
-      const region = 'us-east-1'; // Asegúrate de que esta es la región correcta
-      const publicUrl = `https://${bucketName}.s3.${region}.amazonaws.com/${fileKey}`;
-      
-      return publicUrl;
-    } catch (error: any) {
-      console.error(`Error al subir ${type} a S3:`, error);
-      throw error;
+      }
+    });
+    
+    console.log('Respuesta del servidor:', response.data);
+    
+    // El backend devuelve la URL completa del archivo
+    if (response.data && response.data.url) {
+      return response.data.url;
     }
+    
+    throw new Error('No se recibió la URL del archivo del servidor');
+  } catch (error: any) {
+    console.error(`Error al subir ${type} a S3:`, error);
+    
+    // Mejorar el registro de errores para depuración
+    if (error.response) {
+      console.error('Datos de respuesta de error:', error.response.data);
+      console.error('Estado de respuesta de error:', error.response.status);
+    }
+    
+    throw error;
   }
+}
   
-  /**
-   * Crea un nuevo video en la base de datos
-   */
+
+
   async createVideo(videoData: VideoData): Promise<any> {
     try {
       console.log('Datos para registrar video:', videoData);
       
-      // SOLUCIÓN CLAVE: Asegurarse de que IdCurso e IdAsignatura siempre tengan valores
-      // Usar valores por defecto si no están presentes
+      // Obtener el ID del usuario actual del almacenamiento local si está disponible
+      const currentUser = localStorage.getItem('user') 
+        ? JSON.parse(localStorage.getItem('user') || '{}')
+        : null;
+      
+      const userId = currentUser?.id || 1; // Usar 1 como valor predeterminado si no hay usuario
+      
       const requestData = {
         Titulo: videoData.title,
         Descripcion: videoData.description || '',
         UrlVideo: videoData.videoUrl,
         UrlMiniatura: videoData.thumbnailUrl,
-        // IMPORTANTE: Asignar valores fijos y válidos para estas propiedades
-        IdCurso: 1,  // Asignar un valor fijo que exista en tu base de datos
-        IdAsignatura: 1, // Asignar un valor fijo que exista en tu base de datos y corresponda al curso
-        IdUsuario: 1, // Asignar un valor fijo o usar el ID del usuario actual si está disponible
+        // Usar valores proporcionados o predeterminados
+        IdCurso: videoData.idCurso || 1,
+        IdAsignatura: videoData.idAsignatura || 1,
+        IdUsuario: videoData.idUsuario || userId,
         Marcadores: videoData.timestamps ? videoData.timestamps.map(ts => ({
           MinutoInicio: ts.time,
           MinutoFin: ts.time + 0.1, // Valor temporal hasta que cambies el modelo
@@ -125,7 +120,9 @@ class VideoService {
     videoDetails: VideoDetails, 
     thumbnailFile: File | null, 
     timestamps: Timestamp[], 
-    progressCallback: (progress: number) => void = () => {}
+    progressCallback: (progress: number) => void = () => {},
+    idCurso?: number,
+    idAsignatura?: number
   ): Promise<any> {
     try {
       // Iniciar el progreso
@@ -163,8 +160,8 @@ class VideoService {
         description: videoDetails.description,
         videoUrl,
         thumbnailUrl,
-        // No necesitamos especificar idCurso e idAsignatura aquí,
-        // ya que se asignarán valores fijos en createVideo
+        idCurso, // Pasar el ID del curso si está disponible
+        idAsignatura, // Pasar el ID de la asignatura si está disponible
         timestamps: timestamps.map(ts => ({
           ...ts,
           time: parseFloat(ts.time.toString())
