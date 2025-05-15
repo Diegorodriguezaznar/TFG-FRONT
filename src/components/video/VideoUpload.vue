@@ -1,21 +1,24 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
-import { ref, computed, reactive } from 'vue';
+import { ref, computed, reactive, nextTick } from 'vue';
+import { useRouter } from 'vue-router';
 import FileUploadStep from './steps/Paso1SubirVideo.vue';
 import VideoDetailsStep from './steps/Paso2DetallesVideo.vue';
-import TimestampStep from './steps/Paso3SelectorMinutos.vue';
-import SummaryStep from './steps/Paso4Resumen.vue';
+import TimestampStep from './steps/PasoExtraSelectorMinutos.vue';
+import SummaryStep from './steps/Paso3Resumen.vue';
 import ErrorDialog from '../ErrorDialog.vue';
 import VideoService from '@/services/VideoService';
+import { useMarcadorVideoStore } from '@/stores/MarcadorVideo';
 
 // --------------------------- Variables ---------------------------
 const emit = defineEmits(['upload-complete']);
+const router = useRouter();
+const marcadorVideoStore = useMarcadorVideoStore();
 
 const currentStep = ref(0);
 const steps = ref([
   { title: 'Subir Video', completed: false },
   { title: 'Detalles', completed: false },
-  { title: 'Marcadores', completed: false },
   { title: 'Finalizar', completed: false }
 ]);
 
@@ -23,10 +26,17 @@ const videoFile = ref(null);
 const videoDetails = reactive({
   title: '',
   description: '',
-  thumbnail: null
+  thumbnail: null,
+  courseId: null,
+  subjectId: null
 });
 const timestamps = ref([]);
 const uploading = ref(false);
+const uploadComplete = ref(false);
+const uploadedVideoData = ref(null);
+
+// Diálogo para preguntar sobre marcadores
+const showMarkerDialog = ref(false);
 
 // Error dialog properties
 const showErrorDialog = ref(false);
@@ -41,8 +51,6 @@ const canProceed = computed(() => {
       return videoFile.value !== null;
     case 1:
       return videoDetails.title.trim() !== '';
-    case 2:
-      return true; // Timestamps are optional
     default:
       return true;
   }
@@ -70,6 +78,9 @@ const handleDetailsUpdate = (details) => {
   videoDetails.title = details.title;
   videoDetails.description = details.description;
   videoDetails.thumbnail = details.thumbnail;
+  // Asegurarse de capturar también los IDs de curso y asignatura
+  videoDetails.courseId = details.courseId;
+  videoDetails.subjectId = details.subjectId;
 };
 
 const handleTimestampsUpdate = (newTimestamps) => {
@@ -84,6 +95,8 @@ const resetForm = () => {
   videoDetails.thumbnail = null;
   timestamps.value = [];
   steps.value.forEach(step => step.completed = false);
+  uploadComplete.value = false;
+  uploadedVideoData.value = null;
 };
 
 // Error handling methods
@@ -124,14 +137,22 @@ const showError = (error) => {
   showErrorDialog.value = true;
 };
 
-const showSuccessMessage = (title, message) => {
+const showSuccessMessage = (title, message, isVideoUploaded = false) => {
   errorDialogTitle.value = title;
   errorDialogMessage.value = message;
   errorDialogDetails.value = '';
   showErrorDialog.value = true;
+  
+  // Si es el mensaje de éxito por subir el video, mostrar el diálogo para preguntar sobre marcadores
+  if (isVideoUploaded) {
+    nextTick(() => {
+      showErrorDialog.value = false;
+      showMarkerDialog.value = true;
+    });
+  }
 };
 
-// Upload video method - Simplified without progress tracking
+// Upload video method - Modificado para el nuevo flujo
 const uploadVideo = async () => {
   try {
     uploading.value = true;
@@ -141,25 +162,28 @@ const uploadVideo = async () => {
     console.log('Miniatura:', videoDetails.thumbnail?.name || 'Sin miniatura');
     
     // Use the service to upload the video (simplified)
+    // Ahora no incluimos los timestamps en la subida inicial
     const result = await VideoService.uploadCompleteVideo(
       videoFile.value,
       videoDetails,
       videoDetails.thumbnail,
-      timestamps.value
+      [] // Sin marcadores inicialmente
     );
     
     console.log('Subida completada correctamente:', result);
     
+    uploadedVideoData.value = result;
+    uploadComplete.value = true;
     emit('upload-complete', result);
     
-    // Reset form after a delay
+    // Ahora mostramos un mensaje de éxito que llevará al diálogo de marcadores
     setTimeout(() => {
       uploading.value = false;
-      resetForm();
-      
-      // Show success message
-      showSuccessMessage('Video publicado con éxito', 
-        'Tu video ha sido subido y está disponible para su visualización.');
+      showSuccessMessage(
+        'Video publicado con éxito', 
+        'Tu video ha sido subido correctamente y está disponible para su visualización.',
+        true // Indicar que es un mensaje de video subido
+      );
     }, 1000);
     
   } catch (error) {
@@ -171,10 +195,70 @@ const uploadVideo = async () => {
   }
 };
 
+// Método para gestionar la decisión de añadir marcadores
+const handleMarkerDecision = async (addMarkers) => {
+  showMarkerDialog.value = false;
+  
+  if (addMarkers) {
+    // Ir al componente de marcadores de tiempo
+    console.log('Redirigiendo al editor de marcadores...');
+    // Añadir un paso extra para marcadores y mostrar ese paso
+    steps.value = [
+      { title: 'Subir Video', completed: true },
+      { title: 'Detalles', completed: true },
+      { title: 'Marcadores', completed: false },
+      { title: 'Finalizar', completed: false }
+    ];
+    currentStep.value = 2; // Ir al paso de marcadores (índice 2)
+  } else {
+    // No se añadirán marcadores, redirigir a home
+    console.log('Redirigiendo a home...');
+    router.push('/');
+    resetForm();
+  }
+};
+
 // Method to handle step navigation from child components
 const handleGoToStep = (stepIndex) => {
   if (stepIndex >= 0 && stepIndex < steps.value.length) {
     currentStep.value = stepIndex;
+  }
+};
+
+// Método para guardar marcadores después de subirlos
+const saveTimestamps = async () => {
+  if (!uploadedVideoData.value || !uploadedVideoData.value.idVideo) {
+    showError({ message: 'No se pudo guardar los marcadores porque el video no se ha subido correctamente.' });
+    return;
+  }
+  
+  try {
+    uploading.value = true;
+    
+    // Convertir timestamps al formato MarcadorVideoDTO
+    const marcadoresDTO = timestamps.value.map(t => 
+      marcadorVideoStore.convertTimestampToMarcadorDTO(t, uploadedVideoData.value.idVideo)
+    );
+    
+    // Guardar marcadores usando el store
+    await marcadorVideoStore.createMarcadoresEnLote(uploadedVideoData.value.idVideo, marcadoresDTO);
+    
+    // Finalizar proceso
+    uploading.value = false;
+    showSuccessMessage(
+      'Marcadores guardados', 
+      'Los marcadores de tiempo han sido guardados correctamente.'
+    );
+    
+    // Redirigir a home después de un tiempo
+    setTimeout(() => {
+      router.push('/');
+      resetForm();
+    }, 2000);
+    
+  } catch (error) {
+    uploading.value = false;
+    showError(error);
   }
 };
 </script>
@@ -223,8 +307,8 @@ const handleGoToStep = (stepIndex) => {
         />
       </div>
 
-      <!-- Step 3: Timestamp Markers -->
-      <div v-if="currentStep === 2" class="VideoUpload__StepContent">
+      <!-- Step 3: Timestamp Markers (solo se muestra si está activo) -->
+      <div v-if="currentStep === 2 && steps.length === 4" class="VideoUpload__StepContent">
         <timestamp-step 
           @timestamps-updated="handleTimestampsUpdate" 
           :videoFile="videoFile" 
@@ -232,8 +316,8 @@ const handleGoToStep = (stepIndex) => {
         />
       </div>
 
-      <!-- Step 4: Summary and Finalize -->
-      <div v-if="currentStep === 3" class="VideoUpload__StepContent">
+      <!-- Step 3/4: Summary and Finalize -->
+      <div v-if="(currentStep === 2 && steps.length === 3) || (currentStep === 3 && steps.length === 4)" class="VideoUpload__StepContent">
         <summary-step 
           :videoFile="videoFile" 
           :videoDetails="videoDetails" 
@@ -257,6 +341,8 @@ const handleGoToStep = (stepIndex) => {
       >
         Anterior
       </v-btn>
+      
+      <!-- Botón de Siguiente - Visible según el paso actual -->
       <v-btn
         v-if="currentStep < steps.length - 1"
         variant="elevated"
@@ -266,7 +352,57 @@ const handleGoToStep = (stepIndex) => {
       >
         Siguiente
       </v-btn>
+      
+      <!-- Botón para guardar marcadores si estamos en el paso de marcadores -->
+      <v-btn
+        v-if="currentStep === 2 && steps.length === 4"
+        variant="elevated"
+        color="success"
+        @click="saveTimestamps"
+        :disabled="uploading"
+      >
+        Guardar marcadores
+      </v-btn>
     </div>
+    
+    <!-- Diálogo de preguntar sobre marcadores -->
+    <v-dialog
+      v-model="showMarkerDialog"
+      persistent
+      max-width="500"
+    >
+      <v-card>
+        <v-card-title class="text-h5 pa-4">
+          Añadir marcadores de tiempo
+        </v-card-title>
+        
+        <v-card-text class="pa-4">
+          <p>¿Quieres añadir marcadores para minutos importantes a tu video?</p>
+          <p class="text-body-2 text-grey mt-2">
+            Los marcadores ayudan a los espectadores a navegar por secciones específicas de tu video.
+          </p>
+        </v-card-text>
+        
+        <v-card-actions class="pa-4">
+          <v-spacer></v-spacer>
+          <v-btn
+            variant="outlined"
+            color="grey"
+            @click="handleMarkerDecision(false)"
+          >
+            No, gracias
+          </v-btn>
+          <v-btn
+            variant="elevated"
+            color="primary"
+            @click="handleMarkerDecision(true)"
+            class="ml-2"
+          >
+            Sí, añadir marcadores
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     
     <!-- Global Error Dialog -->
     <ErrorDialog
