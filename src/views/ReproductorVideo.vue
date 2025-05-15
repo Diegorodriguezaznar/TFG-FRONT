@@ -1,27 +1,31 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useVideoStore } from '@/stores/Video';
+import { useMarcadorVideoStore } from '@/stores/MarcadorVideo';
 import VideoPlayer from '@/components/VideoPlayer.vue';
 import VideoInfo from '@/components/VideoInfo.vue';
-import VideoSuggestions from '@/components/VideoSuggestions.vue';
 import VideoComments from '@/components/VideoComments.vue';
 import Header from '@/components/Header.vue';
 import Sidebar from '@/components/Sidebar.vue';
 import type { VideoDTO } from '@/stores/dtos/VideoDTO';
+import type { MarcadorVideoDTO } from '@/stores/dtos/MarcadorVideoDTO';
 
 // --------------------------- Route ---------------------------
 const route = useRoute();
 
 // --------------------------- Store ---------------------------
 const videoStore = useVideoStore();
+const marcadorVideoStore = useMarcadorVideoStore();
 
 // --------------------------- Variables ---------------------------
 const sidebarOpen = ref(true);
 const searchQuery = ref('');
 const loading = ref(true);
 const error = ref('');
+const marcadores = ref<MarcadorVideoDTO[]>([]);
+const loadingMarcadores = ref(false);
 
 // Inicializar currentVideo con valores por defecto para evitar errores durante la carga
 const currentVideo = ref<VideoDTO>({
@@ -63,6 +67,15 @@ const handleVideoSelect = (videoId: number) => {
   window.location.href = `/reproductor-video?id=${videoId}`;
 };
 
+// Formatear tiempo en segundos a formato mm:ss
+const formatTime = (seconds: number): string => {
+  if (isNaN(seconds) || !isFinite(seconds)) return '00:00';
+  
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+};
+
 // Cargar el video actual
 const loadCurrentVideo = async () => {
   loading.value = true;
@@ -87,6 +100,22 @@ const loadCurrentVideo = async () => {
   }
 };
 
+// Cargar marcadores del video
+const loadMarcadores = async () => {
+  if (!videoId.value) return;
+  
+  loadingMarcadores.value = true;
+  
+  try {
+    marcadores.value = await marcadorVideoStore.fetchMarcadoresByVideoId(videoId.value);
+    console.log('Marcadores cargados:', marcadores.value);
+  } catch (err: any) {
+    console.error('Error al cargar marcadores:', err);
+  } finally {
+    loadingMarcadores.value = false;
+  }
+};
+
 // Cargar videos sugeridos
 const loadSuggestedVideos = async () => {
   try {
@@ -100,9 +129,29 @@ const loadSuggestedVideos = async () => {
   }
 };
 
+// Ir a un tiempo específico del video
+const seekToTime = (time: number) => {
+  const videoElement = document.querySelector('video');
+  if (videoElement) {
+    videoElement.currentTime = time;
+    // Si el video estaba pausado, iniciarlo
+    if (videoElement.paused) {
+      videoElement.play();
+    }
+  }
+};
+
 // --------------------------- Cargar datos iniciales ---------------------------
 onMounted(async () => {
   await loadCurrentVideo();
+  await loadMarcadores();
+  await loadSuggestedVideos();
+});
+
+// Observar cambios en el ID del video para recargar los datos
+watch(() => route.query.id, async () => {
+  await loadCurrentVideo();
+  await loadMarcadores();
   await loadSuggestedVideos();
 });
 </script>
@@ -160,23 +209,46 @@ onMounted(async () => {
                    : currentVideo.descripcion }}
               </p>
               
-              <!-- Secciones del video con marcas de tiempo -->
-              <div class="video-sections mt-4">
-                <div class="section-item d-flex align-center py-1">
-                  <span class="time-mark">0:00</span>
-                  <span class="ml-2">Presentación</span>
+              <!-- Secciones del video con marcas de tiempo desde la base de datos -->
+              <div v-if="marcadores.length > 0" class="video-sections mt-4">
+                <h4 class="text-subtitle-2 mb-2">
+                  <v-icon size="small" class="mr-1">mdi-bookmark-outline</v-icon>
+                  Marcadores de tiempo
+                </h4>
+                
+                <div 
+                  v-for="(marcador, index) in marcadores" 
+                  :key="index"
+                  class="section-item d-flex align-center py-1"
+                  @click="seekToTime(marcador.minutoImportante)"
+                >
+                  <span class="time-mark">{{ formatTime(marcador.minutoImportante) }}</span>
+                  <span class="ml-2">{{ marcador.titulo || `Marcador ${index + 1}` }}</span>
                 </div>
-                <div class="section-item d-flex align-center py-1">
-                  <span class="time-mark">1:23</span>
-                  <span class="ml-2">Explicación</span>
+                
+                <div v-if="marcadores.length === 0 && !loadingMarcadores" class="text-center py-2 text-grey">
+                  No hay marcadores para este video
                 </div>
-                <div class="section-item d-flex align-center py-1">
-                  <span class="time-mark">4:13</span>
-                  <span class="ml-2">Ejemplo</span>
+                
+                <div v-if="loadingMarcadores" class="text-center py-2">
+                  <v-progress-circular indeterminate size="20" color="grey" class="mr-2"></v-progress-circular>
+                  Cargando marcadores...
                 </div>
-                <div class="section-item d-flex align-center py-1">
-                  <span class="time-mark">7:08</span>
-                  <span class="ml-2">Despedida</span>
+              </div>
+              
+              <!-- Mensaje cuando no hay marcadores -->
+              <div v-else-if="!loadingMarcadores" class="video-sections mt-4">
+                <div class="text-center py-3 text-grey-darken-1">
+                  <v-icon size="large" class="mb-2 text-grey">mdi-bookmark-off-outline</v-icon>
+                  <p>No hay marcadores disponibles para este video</p>
+                </div>
+              </div>
+              
+              <!-- Cargando marcadores -->
+              <div v-else class="video-sections mt-4">
+                <div class="text-center py-3">
+                  <v-progress-circular indeterminate size="24" color="grey" class="mb-2"></v-progress-circular>
+                  <p class="text-grey-darken-1">Cargando marcadores...</p>
                 </div>
               </div>
             </div>
@@ -229,6 +301,7 @@ onMounted(async () => {
 
 .section-item {
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .section-item:hover {
