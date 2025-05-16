@@ -4,11 +4,11 @@ import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useVideoStore } from '@/stores/Video';
 import { useMarcadorVideoStore } from '@/stores/MarcadorVideo';
-import VideoPlayer from '@/components/VideoPlayer.vue';
-import VideoInfo from '@/components/VideoInfo.vue';
-import VideoComments from '@/components/VideoComments.vue';
-import Header from '@/components/Header.vue';
-import Sidebar from '@/components/Sidebar.vue';
+import VideoPlayer from '@/components/Video/VideoPlayer.vue';
+import VideoInfo from '@/components/Video/VideoInfo.vue';
+import VideoComments from '@/components/Video/VideoComments.vue';
+import Header from '@/components/Layout/Header.vue';
+import Sidebar from '@/components/Layout/Sidebar.vue';
 import type { VideoDTO } from '@/stores/dtos/VideoDTO';
 import type { MarcadorVideoDTO } from '@/stores/dtos/MarcadorVideoDTO';
 

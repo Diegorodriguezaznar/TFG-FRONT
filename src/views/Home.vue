@@ -4,11 +4,11 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCursoStore } from '@/stores/Curso';
 import { useVideoStore } from '@/stores/Video';
-import Header from '@/components/Header.vue';
-import Sidebar from '@/components/Sidebar.vue';
-import Filtros from '@/components/Filtros.vue';
-import Sugerencias from '@/components/Sugerencias.vue';
-import ListaVideos from '@/components/ListaVideos.vue';
+import Header from '@/components/Layout/Header.vue';
+import Sidebar from '@/components/Layout/Sidebar.vue';
+import Filtros from '@/components/Home/Filtros.vue';
+import Sugerencias from '@/components/Video/Sugerencias.vue';
+import ListaVideos from '@/components/Home/ListaVideos.vue';
 
 // --------------------------- Route ---------------------------
 const route = useRoute();

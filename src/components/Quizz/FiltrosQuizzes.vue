@@ -3,7 +3,7 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue';
-import { useAsignaturaStore } from '../stores/Asignaturas'; // Corregida la ruta de importación
+import { useAsignaturaStore } from '../../stores/Asignaturas'; // Corregida la ruta de importación
 
 // Propiedades de entrada
 const props = defineProps({

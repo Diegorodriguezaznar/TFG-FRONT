@@ -1,9 +1,9 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref, onMounted } from 'vue';
-import Header from '@/components/Header.vue';
-import Sidebar from '@/components/Sidebar.vue';
-import HistorialVideos from '@/components/HistorialVideos.vue';
+import Header from '@/components/Layout/Header.vue';
+import Sidebar from '@/components/Layout/Sidebar.vue';
+import HistorialVideos from '@/components/Perfil/HistorialVideos.vue';
 
 // --------------------------- Variables ---------------------------
 const drawer = ref(false);
