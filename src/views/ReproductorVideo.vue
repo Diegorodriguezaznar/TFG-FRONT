@@ -154,6 +154,34 @@ watch(() => route.query.id, async () => {
   await loadMarcadores();
   await loadSuggestedVideos();
 });
+
+/// --------------------------- Reportar video ---------------------------
+import { useReporteStore } from '@/stores/Reporte'
+import type { ReporteDTO } from '@/stores/dtos/ReporteDTO'
+
+const reporteStore = useReporteStore()
+const dialogReportar = ref(false)
+const motivoSeleccionado = ref('Contenido engañoso')
+const motivos = [
+  'Contenido engañoso',
+  'Violación de privacidad',
+  'Contenido explícito',
+  'Acoso o bullying',
+  'Spam',
+  'Otro'
+]
+const idUsuario = 1 // ← sustituye esto si tienes auth
+
+const enviarReporte = async () => {
+  const nuevoReporte: ReporteDTO = {
+    idVideo: currentVideo.value.idVideo,
+    idUsuario,
+    motivo: motivoSeleccionado.value
+  }
+  await reporteStore.crearReporte(nuevoReporte)
+  dialogReportar.value = false
+}
+
 </script>
 
 <template>
@@ -251,6 +279,39 @@ watch(() => route.query.id, async () => {
                   <p class="text-grey-darken-1">Cargando marcadores...</p>
                 </div>
               </div>
+
+              <v-btn
+                class="mt-4"
+                color="warning"
+                variant="outlined"
+                prepend-icon="mdi-flag"
+                block
+                @click="dialogReportar = true"
+              >
+                Reportar vídeo
+              </v-btn>
+
+              <v-dialog v-model="dialogReportar" max-width="500px">
+                <v-card>
+                  <v-card-title>Reportar este vídeo</v-card-title>
+                  <v-card-text>
+                    <v-radio-group v-model="motivoSeleccionado">
+                      <v-radio
+                        v-for="motivo in motivos"
+                        :key="motivo"
+                        :label="motivo"
+                        :value="motivo"
+                      />
+                    </v-radio-group>
+                  </v-card-text>
+                  <v-card-actions>
+                    <v-spacer />
+                    <v-btn text @click="dialogReportar = false">Cancelar</v-btn>
+                    <v-btn color="error" @click="enviarReporte">Enviar</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
             </div>
           </v-col>
         </v-row>
