@@ -3,8 +3,8 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { useQuizStore } from '../stores/Quiz';
-import { useAsignaturaStore } from '../stores/Asignaturas';
+import { useQuizStore } from '../../stores/Quiz';
+import { useAsignaturaStore } from '../../stores/Asignaturas';
 
 // Propiedades de entrada
 const props = defineProps({

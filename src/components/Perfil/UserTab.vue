@@ -1,7 +1,6 @@
-<script setup>
+<script setup lang="ts">
   //imports
   import { ref } from 'vue';
-  import MisVideos from '@/components/MisVideos.vue';
 
   const tab = ref("one");
 </script>
@@ -17,7 +16,6 @@
         <v-tabs-window v-model="tab">
           <v-tabs-window-item value="one">
             <p>Tus Videos</p>
-            <MisVideos />
           </v-tabs-window-item>
   
           <v-tabs-window-item value="three">

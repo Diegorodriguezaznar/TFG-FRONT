@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 // import HomeView from "@/views/HomePage.vue";
-import AsignaturasPage from "../views/AsignaturasPage.vue";
 import Historial from "@/views/Historial.vue";
-import CursosPage from "../views/CursosPage.vue";
 import PerfilPage from "../views/PerfilPage.vue";
 import HomePage from "../views/CursosPage.vue";
 import AdminPage from "../views/AdminPage.vue";
@@ -22,8 +20,6 @@ const routes = [
   { path: "/curso/:id", component: Videos, props: true },
   { path: "/reproductor-video", component: ReproductorVideo },
   { path: "/historial", component: Historial }, 
-  { path: "/asignaturas/:idCurso", component: AsignaturasPage, props: true },
-  { path: "/cursos", component: CursosPage },
   { path: "/perfil", component: PerfilPage },
   { path: "/quizz-time!", component: Quizzes},
   // Mantenemos la ruta actual para no romper nada

@@ -1,11 +1,11 @@
 <script setup>
 // --------------------------- Imports ---------------------------
 import { ref, computed, onMounted } from 'vue';
-import Header from '@/components/Header.vue';
-import Footer from '@/components/Footer.vue';
-import Sidebar from '@/components/Sidebar.vue';
-import UserTab from '@/components/UserTab.vue';
-import PerfilHistorial from '@/components/PerfilHistorial.vue';
+import Header from '@/components/Layout/Header.vue';
+import Footer from '@/components/Layout/Footer.vue';
+import Sidebar from '@/components/Layout/Sidebar.vue';
+import UserTab from '@/components/Perfil/UserTab.vue';
+import PerfilHistorial from '@/components/Perfil/PerfilHistorial.vue';
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 import AvatarRiendo from '@/components/AvatarEmote.vue';
 

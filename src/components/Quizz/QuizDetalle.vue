@@ -6,8 +6,8 @@ import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuizStore } from '@/stores/Quiz';
 import { useAsignaturaStore } from '@/stores/Asignaturas';
-import Header from '@/components/Header.vue';
-import Sidebar from '@/components/Sidebar.vue';
+import Header from '@/components/Layout/Header.vue';
+import Sidebar from '@/components/Layout/Sidebar.vue';
 import { useDisplay } from 'vuetify';
 
 // Variables
