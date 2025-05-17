@@ -10,7 +10,8 @@ export interface VideoDTO {
   idUsuario: number;
   autor: string;
   idCurso: number;
+  duracion: string;
   vistas: string;
   fecha: string;
-  duracion?: string; 
+  numReportes?: number; 
 }

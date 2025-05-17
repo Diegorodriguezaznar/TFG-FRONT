@@ -45,6 +45,10 @@ const routes = [
       {
         path: "cursos",
         component: () => import("@/components/Private/AdminCursos.vue")
+      },
+            {
+        path: "reportes",
+        component: () => import("@/components/Private/AdminVideosReportados.vue")
       }
     ]
   }

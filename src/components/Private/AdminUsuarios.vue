@@ -38,18 +38,35 @@ function abrirDialogoEditar(usuario: UsuarioDTO) {
 }
 
 async function guardarCambios(usuarioActualizado: UsuarioDTO) {
-  await usuarioStore.updateUsuario(usuarioActualizado)
-  dialogEditar.value = false
+  try {
+    await usuarioStore.updateUsuario(usuarioActualizado);
+    await usuarioStore.fetchAllUsuarios(); 
+    dialogEditar.value = false;
+    
+  } catch (error: any) {
+    console.error("Error al actualizar usuario:", error);
+
+    alert(`Error al actualizar: ${error.message}`);
+  }
 }
 
 // --- Modal de creación ---
 const dialogCrear = ref(false)
+const errorCrear = ref('')
 
-async function crearUsuarioEnBD(nuevo: UsuarioDTO) {
-  await usuarioStore.createUsuario(nuevo)
-  await usuarioStore.fetchAllUsuarios()
-}
-
+  async function crearUsuarioEnBD(nuevo: UsuarioDTO) {
+    errorCrear.value = ''; // Limpiar errores previos
+    
+    try {
+      await usuarioStore.createUsuario(nuevo)
+      await usuarioStore.fetchAllUsuarios()
+      // Mostrar mensaje de éxito (opcional)
+      // Cerrar el diálogo
+    } catch (error: any) {
+      errorCrear.value = error.message || 'Error al crear el usuario';
+      dialogCrear.value = true; // Mantener el diálogo abierto
+    }
+  }
 // --- Crear usuario (por implementar) ---
 function crearUsuario() {
   console.log("Crear usuario aún no implementado")
@@ -145,10 +162,27 @@ function crearUsuario() {
         </v-btn>
 
     <!-- MODAL: Crear usuario -->
-        <ModalCrearUsuario
-        v-model="dialogCrear"
-        @crear="crearUsuarioEnBD"
-        />
+    <ModalCrearUsuario
+      v-model="dialogCrear"
+      @crear="crearUsuarioEnBD"
+    />
+
+   <!-- Alerta de error si hay un problema al crear el usuario -->
+    <v-snackbar
+      v-model="mostrarError"
+      :timeout="5000"
+      color="error"
+    >
+      {{ errorCrear }}
+      <template v-slot:actions>
+        <v-btn
+          variant="text"
+          @click="mostrarError = false"
+        >
+          Cerrar
+        </v-btn>
+      </template>
+    </v-snackbar>
 
   </section>
 </template>
