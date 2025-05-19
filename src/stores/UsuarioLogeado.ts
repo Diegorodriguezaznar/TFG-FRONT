@@ -1,73 +1,76 @@
 import { defineStore } from "pinia";
-import { ref } from "vue";
-import type { Usuario } from "@/types/usuario";
+import { ref, computed } from "vue";
+import type { UsuarioDTO } from "@/stores/dtos/UsuarioDTO";
 
 export const useUsuarioLogeadoStore = defineStore("usuarioLogeado", () => {
-  // Estado del usuario actual
-  const usuarioActual = ref<Usuario | null>(null);
-  const estaAutenticado = ref(false);
-  const errorMessage = ref("");
-
-  // Recuperar usuario desde localStorage al iniciar
-  function cargarUsuarioDesdeStorage() {
-    const usuarioGuardado = localStorage.getItem("usuario");
-    if (usuarioGuardado) {
-      try {
-        usuarioActual.value = JSON.parse(usuarioGuardado);
-        estaAutenticado.value = true;
-        console.log("Usuario cargado desde localStorage:", usuarioActual.value);
-      } catch (error) {
-        console.error("Error al recuperar usuario:", error);
-        localStorage.removeItem("usuario"); // Limpiar si hay error
-      }
-    }
+  // Estado
+  const usuarioActual = ref<UsuarioDTO | null>(null);
+  const token = ref<string | null>(null);
+  
+  // Computed
+  const estaAutenticado = computed(() => !!usuarioActual.value);
+  
+  const esAdmin = computed(() => {
+    if (!usuarioActual.value) return false;
+    
+    const idRol = usuarioActual.value.idRol;
+    return idRol === 2; // Rol 2 es profesor/admin
+  });
+  
+  // Método para iniciar sesión
+  function iniciarSesion(userData: { usuario: UsuarioDTO; token: string }) {
+    console.log("Iniciando sesión con:", userData);
+    usuarioActual.value = userData.usuario;
+    token.value = userData.token;
+    
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('usuario', JSON.stringify(userData.usuario));
+    localStorage.setItem('token', userData.token);
   }
-
-  // Guardar usuario en localStorage al iniciar sesión
-  async function login(email: string, password: string): Promise<boolean> {
-    try {
-      const response = await fetch("http://localhost:5190/api/Usuario/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        errorMessage.value = "Credenciales inválidas";
-        return false;
-      }
-
-      const usuario = await response.json();
-      usuarioActual.value = usuario;
-      estaAutenticado.value = true;
-      errorMessage.value = "";
-
-      // Guardar en localStorage
-      localStorage.setItem("usuario", JSON.stringify(usuario));
-      console.log("Usuario guardado en localStorage:", usuario);
-
-      return true;
-    } catch (error: any) {
-      errorMessage.value = error.message || "Error al iniciar sesión";
-      return false;
-    }
-  }
-
-  // Limpiar usuario y cerrar sesión
-  function logout() {
+  
+  // Método para cerrar sesión
+  function cerrarSesion() {
     usuarioActual.value = null;
-    estaAutenticado.value = false;
-    errorMessage.value = "";
-    localStorage.removeItem("usuario");
-    console.log("Usuario eliminado de localStorage");
+    token.value = null;
+    
+    // Limpiar localStorage
+    localStorage.removeItem('usuario');
+    localStorage.removeItem('token');
   }
-
+  
+  // Método para cargar usuario desde localStorage
+  function cargarUsuarioDesdeStorage() {
+    const savedToken = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('usuario');
+    
+    if (savedToken) {
+      token.value = savedToken;
+    }
+    
+    if (savedUser) {
+      try {
+        usuarioActual.value = JSON.parse(savedUser);
+      } catch (e) {
+        console.error('Error parsing saved user:', e);
+        localStorage.removeItem('usuario');
+      }
+    }
+  }
+  
+  // Método para actualizar datos del usuario
+  function actualizarUsuario(userData: UsuarioDTO) {
+    usuarioActual.value = userData;
+    localStorage.setItem('usuario', JSON.stringify(userData));
+  }
+  
   return {
     usuarioActual,
+    token,
     estaAutenticado,
-    errorMessage,
-    login,
-    logout,
-    cargarUsuarioDesdeStorage, // Agregamos la función para restaurar sesión
+    esAdmin,
+    iniciarSesion,
+    cerrarSesion,
+    cargarUsuarioDesdeStorage,
+    actualizarUsuario
   };
 });

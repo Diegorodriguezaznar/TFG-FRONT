@@ -1,4 +1,4 @@
-// main.ts modificado con configuración de Axios
+// main.ts
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
@@ -6,12 +6,12 @@ import { createVuetify } from "vuetify";
 import "vuetify/styles";
 import router from "./router";
 import "@mdi/font/css/materialdesignicons.css";
-import axios from 'axios'; // Importar axios
+import axios from 'axios';
 
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
-import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado"; 
+import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 // Configurar la URL base para axios
 axios.defaults.baseURL = 'http://localhost:5190/api';
@@ -21,6 +21,20 @@ axios.interceptors.response.use(
   response => response,
   error => {
     console.error('Error en petición Axios:', error);
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor para agregar token a las peticiones autenticadas
+axios.interceptors.request.use(
+  config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  error => {
     return Promise.reject(error);
   }
 );
@@ -45,6 +59,6 @@ app.config.globalProperties.$axios = axios;
 
 // Cargar usuario desde localStorage
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
-usuarioLogeadoStore.cargarUsuarioDesdeStorage(); 
+usuarioLogeadoStore.cargarUsuarioDesdeStorage();
 
 app.mount("#app");

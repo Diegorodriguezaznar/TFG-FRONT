@@ -36,7 +36,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
   // creado de usuarios
   async function createUsuario(newUser: UsuarioDTO) {
     try {
-      const response = await fetch("http://localhost:5190/api/Usuario", {
+      const response = await fetch("http://localhost:5190/api/Auth/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),

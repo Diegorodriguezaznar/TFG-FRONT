@@ -11,6 +11,23 @@ import Login from '@/components/Login.vue';
 // --------------------------- Breadcrumb ---------------------------
 const items = ref([{ title: 'Cursos', disabled: true, href: '/cursos' }]);
 
+// --------------------------- Stores ---------------------------
+const usuarioLogeadoStore = useUsuarioLogeadoStore();
+
+// --------------------------- Variables ---------------------------
+const drawer = ref(false);
+const mostrarLogin = ref(false);
+const cursos = ref([]);
+
+// --------------------------- Buscador ---------------------------
+const searchQuery = ref('');
+const cursosFiltrados = computed(() => {
+  if (!searchQuery.value) return cursos.value;
+  return cursos.value.filter(curso =>
+    curso.nombre.toLowerCase().includes(searchQuery.value.toLowerCase())
+  );
+});
+
 // --------------------------- Fetch de cursos ---------------------------
 const fetchCursos = async () => {
   try {
@@ -24,30 +41,22 @@ const fetchCursos = async () => {
 
     cursos.value = await response.json();
   } catch (error) {
-    console.error(error);
+    console.error("Error al obtener los cursos:", error);
   }
 };
 
-// --------------------------- Buscador ---------------------------
-const searchQuery = ref('');
-const cursosFiltrados = computed(() => {
-  if (!searchQuery.value) return cursos.value;
-  return cursos.value.filter(curso =>
-    curso.nombre.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
+// --------------------------- Event Handlers ---------------------------
+const handleCursoGuardado = (cursoId) => {
+  console.log(`Curso guardado: ${cursoId}`);
+  // Aquí puedes añadir lógica adicional si es necesario
+};
 
-// --------------------------- Almacenar cursos ---------------------------
-const cursos = ref([]);
+const handleCursoEliminado = (cursoId) => {
+  console.log(`Curso eliminado: ${cursoId}`);
+  // Aquí puedes añadir lógica adicional si es necesario
+};
 
-// --------------------------- Variables ---------------------------
-const drawer = ref(false);
-const mostrarLogin = ref(false); 
-
-// --------------------------- Llamada al store de usuario ---------------------------
-const usuarioLogeadoStore = useUsuarioLogeadoStore();
-
-// --------------------------- Llamada al método para obtener cursos ---------------------------
+// --------------------------- Lifecycle Hooks ---------------------------
 onMounted(fetchCursos);
 </script>
 
@@ -66,8 +75,6 @@ onMounted(fetchCursos);
       </v-breadcrumbs>
 
       <v-container class="CursosPage__Contenedor">
-
-
         <!-- --------------------------- Título de la página --------------------------- -->
         <div class="CursosPage__Header">
           <h1 class="CursosPage__Titulo">Explora nuestros cursos</h1>
@@ -78,7 +85,7 @@ onMounted(fetchCursos);
         <div class="CursosPage___contenido">
           <v-container class="CursosPage___ContenedorCursos">
             <v-row align="stretch" justify="start">
-              <!-- --------------------------- Mostrar cursos --------------------------- -->
+              <!-- --------------------------- Mostrar cursos usando el componente CardCurso --------------------------- -->
               <v-col v-for="curso in cursosFiltrados" :key="curso.idCurso" cols="12" sm="6" md="4" lg="3" class="d-flex">
                 <CardCurso 
                   :id="curso.idCurso"
@@ -86,6 +93,8 @@ onMounted(fetchCursos);
                   :subtitulo="curso.subtitulo"
                   :descripcion="curso.descripcion"
                   :imagen="curso.imagen"
+                  @guardado="handleCursoGuardado"
+                  @eliminado="handleCursoEliminado"
                 />
               </v-col>
             </v-row>
