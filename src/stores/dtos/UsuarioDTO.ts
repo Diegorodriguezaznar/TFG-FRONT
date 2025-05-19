@@ -1,10 +1,10 @@
 export interface UsuarioDTO {
-    idUsuario: number;
-    nombre: string;
-    apellido: string;
-    gmail: string;
-    telefono: string;
-    idRol: number;
-    fotoPerfil: string;
-  }
-  
+  idUsuario: number
+  nombre: string
+  apellidos?: string
+  gmail: string
+  telefono?: string
+  avatar?: string
+  idRol: number
+  contraseña: string
+}

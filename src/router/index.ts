@@ -2,12 +2,17 @@ import { createRouter, createWebHistory } from "vue-router";
 import Historial from "@/views/Historial.vue";
 import PerfilPage from "../views/PerfilPage.vue";
 import HomePage from "../views/CursosPage.vue";
-import AdminPage from "../views/AdminPage.vue";
 import ReproductorVideo from "@/views/ReproductorVideo.vue";
 import Quizzes from "../views/Quizzes.vue";
 import QuizDetalle from "../views/QuizDetalle.vue";
 import Videos from "@/views/Home.vue";
 import SubirVideos from "../views/SubirVideoPage.vue";
+
+//ADMIN
+import AdminPage from "../views/AdminPage.vue";
+
+
+
 import Login from '../views/Login.vue';
 
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
@@ -25,12 +30,32 @@ const routes = [
   // Mantenemos la ruta actual para no romper nada
   { path: "/quizz-detail", component: QuizDetalle, meta: { requiresAuth: true } },
   // Agregamos una ruta opcional con ID en los parámetros (para futura implementación)
-  { path: "/quizz-detail/:id", component: QuizDetalle, props: true, meta: { requiresAuth: true } },
-  { 
-    path: "/admin", 
+  { path: "/quizz-detail/:id", component: QuizDetalle, props: true},
+
+  {
+    path: "/admin",
     component: AdminPage,
-    meta: { requiresAuth: true, requiresAdmin: true } 
+    // meta: { requiresAuth: true, requiresAdmin: true },
+    children: [
+      {
+        path: "",
+        redirect: "/admin/usuarios"
+      },
+      {
+        path: "usuarios",
+        component: () => import("@/components/Private/AdminUsuarios.vue")
+      },
+      {
+        path: "cursos",
+        component: () => import("@/components/Private/AdminCursos.vue")
+      },
+            {
+        path: "reportes",
+        component: () => import("@/components/Private/AdminVideosReportados.vue")
+      }
+    ]
   }
+
 ];
 
 const router = createRouter({
