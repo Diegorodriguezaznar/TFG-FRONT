@@ -31,7 +31,53 @@ export const useUsuarioStore = defineStore("usuario", () => {
     }
   }
 
+////REGISTRAR USUARIO
   async function createUsuario(newUser: UsuarioDTO) {
+    try {
+
+      const response = await fetch("http://localhost:5190/api/Auth/registro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+
+      if (!response.ok) {
+        // Código para manejar errores (mantén el que ya tienes)
+        // ...
+      }
+
+      // Verificar si hay contenido para procesar
+      const contentType = response.headers.get("content-type");
+      
+      // Si no hay contenido o si no es JSON, simplemente devolvemos true para indicar éxito
+      if (!contentType || !contentType.includes("application/json") || response.status === 204) {
+        console.log("Operación exitosa, sin respuesta JSON");
+        return true;
+      }
+      
+      // Verificar si hay respuesta antes de intentar procesarla
+      const text = await response.text();
+      if (!text || text.trim() === "") {
+        console.log("Respuesta vacía, pero operación exitosa");
+        return true;
+      }
+      
+      // Si hay contenido JSON, procesarlo
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        console.warn("No se pudo procesar la respuesta como JSON:", text);
+        return true; 
+      }
+    } catch (error: any) {
+      errorMessage.value = error.message;
+      console.error("Error al registrar el usuario:", error);
+      throw error;
+    }
+  }
+  
+/////CREAR USUARIO EN ZONA PRIVADA
+async function createUsuario(newUser: UsuarioDTO) {
     try {
       console.log("Usuario que se va a enviar:", newUser);
 
@@ -74,7 +120,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
       console.error("Error al registrar el usuario:", error);
       throw error;
     }
-  }
+  }                                         
 
  async function updateUsuario(updatedUser: UsuarioDTO) {
   try {

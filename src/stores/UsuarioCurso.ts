@@ -52,70 +52,25 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
     try {
       console.log("Enviando POST a http://localhost:5190/api/UsuarioCurso:", nuevaInscripcion);
       
-      // Probar diferentes formatos de envío
-      try {
-        // Formato 1: Enviar directamente
-        const response = await fetch("http://localhost:5190/api/UsuarioCurso", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(nuevaInscripcion)
-        });
-        
-        if (response.ok) {
-          console.log("Inscripción creada con éxito (formato 1)");
-          await fetchAllInscripciones();
-          return true;
-        }
-        
-        const errorText = await response.text();
-        console.log("Error formato 1:", errorText);
-        
-        // Formato 2: Usar otra estructura
-        const datosAlternativos = {
-          IdUsuario: nuevaInscripcion.idUsuario,
-          IdCurso: nuevaInscripcion.idCurso
-        };
-        
-        const response2 = await fetch("http://localhost:5190/api/UsuarioCurso", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(datosAlternativos)
-        });
-        
-        if (response2.ok) {
-          console.log("Inscripción creada con éxito (formato 2)");
-          await fetchAllInscripciones();
-          return true;
-        }
-        
-        const errorText2 = await response2.text();
-        console.log("Error formato 2:", errorText2);
-        
-        // Formato 3: Usar estructura UsuarioCurso
-        const datosConWrapper = {
-          UsuarioCurso: {
-            IdUsuario: nuevaInscripcion.idUsuario,
-            IdCurso: nuevaInscripcion.idCurso
-          }
-        };
-        
-        const response3 = await fetch("http://localhost:5190http://localhost:5190/api/UsuarioCurso", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(datosConWrapper)
-        });
-        
-        if (response3.ok) {
-          console.log("Inscripción creada con éxito (formato 3)");
-          await fetchAllInscripciones();
-          return true;
-        }
-        
-        throw new Error("Ningún formato funcionó para crear la inscripción");
-      } catch (formatError) {
-        console.error("Error probando formatos:", formatError);
-        throw formatError;
+      // Intentar con formato directo primero
+      const response = await fetch("http://localhost:5190/api/UsuarioCurso", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nuevaInscripcion)
+      });
+      
+      if (response.ok) {
+        console.log("Inscripción creada con éxito");
+        await fetchAllInscripciones();
+        return true;
       }
+      
+      // Si falla, loguear el error para diagnóstico
+      const errorText = await response.text();
+      console.error("Error al crear inscripción:", errorText);
+      errorMessage.value = `Error al crear inscripción: ${errorText}`;
+      return false;
+      
     } catch (error: any) {
       errorMessage.value = error.message;
       console.error("Error al crear la inscripción:", error);
@@ -123,67 +78,31 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
     }
   }
 
-  // Eliminar una inscripción
   async function deleteInscripcion(idUsuario: number, idCurso: number) {
     try {
-      // Intentar varios formatos para el DELETE
-      try {
-        // Formato 1: Con query parameters
-        const urlDelete = `http://localhost:5190/api/UsuarioCurso?idUsuario=${idUsuario}&idCurso=${idCurso}`;
-        console.log("Intentando eliminar con URL:", urlDelete);
-        
-        const response = await fetch(urlDelete, {
-          method: "DELETE"
-        });
-        
-        if (response.ok) {
-          console.log("Inscripción eliminada con éxito (formato 1)");
-          // Actualizar lista
-          inscripciones.value = inscripciones.value.filter(
-            i => !(i.idUsuario === idUsuario && i.idCurso === idCurso)
-          );
-          return true;
-        }
-        
-        // Formato 2: Con cuerpo JSON
-        console.log("Intentando formato 2 para eliminar");
-        const response2 = await fetch("http://localhost:5190http://localhost:5190/api/UsuarioCurso", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idUsuario, idCurso })
-        });
-        
-        if (response2.ok) {
-          console.log("Inscripción eliminada con éxito (formato 2)");
-          // Actualizar lista
-          inscripciones.value = inscripciones.value.filter(
-            i => !(i.idUsuario === idUsuario && i.idCurso === idCurso)
-          );
-          return true;
-        }
-        
-        // Formato 3: Con IdUsuario/IdCurso
-        console.log("Intentando formato 3 para eliminar");
-        const response3 = await fetch("http://localhost:5190http://localhost:5190/api/UsuarioCurso", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ IdUsuario: idUsuario, IdCurso: idCurso })
-        });
-        
-        if (response3.ok) {
-          console.log("Inscripción eliminada con éxito (formato 3)");
-          // Actualizar lista
-          inscripciones.value = inscripciones.value.filter(
-            i => !(i.idUsuario === idUsuario && i.idCurso === idCurso)
-          );
-          return true;
-        }
-        
-        throw new Error("Ningún formato funcionó para eliminar la inscripción");
-      } catch (formatError) {
-        console.error("Error probando formatos para DELETE:", formatError);
-        throw formatError;
+      // Formato 1: Con query parameters (este es el formato que parece funcionar según el componente original)
+      const urlDelete = `http://localhost:5190/api/UsuarioCurso?idUsuario=${idUsuario}&idCurso=${idCurso}`;
+      console.log("Intentando eliminar con URL:", urlDelete);
+      
+      const response = await fetch(urlDelete, {
+        method: "DELETE"
+      });
+      
+      if (response.ok) {
+        console.log("Inscripción eliminada con éxito");
+        // Actualizar lista
+        inscripciones.value = inscripciones.value.filter(
+          i => !(i.idUsuario === idUsuario && i.idCurso === idCurso)
+        );
+        return true;
       }
+      
+      // Si falla, loguear el error para diagnóstico
+      const errorText = await response.text();
+      console.error("Error al eliminar inscripción:", errorText);
+      errorMessage.value = `Error al eliminar inscripción: ${errorText}`;
+      return false;
+      
     } catch (error: any) {
       errorMessage.value = error.message;
       console.error("Error al eliminar la inscripción:", error);
