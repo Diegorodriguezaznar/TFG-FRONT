@@ -213,7 +213,7 @@ const handleMarkerDecision = async (addMarkers) => {
   } else {
     // No se añadirán marcadores, redirigir a home
     console.log('Redirigiendo a home...');
-    router.push('/');
+    router.push('/cursos');
     resetForm();
   }
 };
@@ -252,7 +252,7 @@ const saveTimestamps = async () => {
     
     // Redirigir a home después de un tiempo
     setTimeout(() => {
-      router.push('/');
+      router.push('/cursos');
       resetForm();
     }, 2000);
     

@@ -2,6 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { useVideoStore } from '@/stores/Video'
 import type { VideoDTO } from '@/stores/dtos/VideoDTO'
+import VideoReportadoFila from '@/components/Private/VideoReportadoFila.vue'
+import ModalVideoReportado from '@/components/Private/ModalVideoReportado.vue'
+import ModalConfirmarEliminar from '@/components/Private/ModalConfirmarEliminar.vue'
 
 const videoStore = useVideoStore()
 const errorMensaje = ref('')
@@ -9,8 +12,9 @@ const mostrarError = ref(false)
 const videoSeleccionado = ref<VideoDTO | null>(null)
 const dialogDetalles = ref(false)
 const dialogConfirmarEliminar = ref(false)
+const mensajeExito = ref('')
+const mostrarExito = ref(false)
 
-// Cargar videos reportados al montar el componente
 onMounted(() => {
   cargarVideosReportados()
 })
@@ -33,11 +37,9 @@ function abrirDialogoEliminar(video: VideoDTO) {
   dialogConfirmarEliminar.value = true
 }
 
-async function confirmarAprobar() {
-  if (!videoSeleccionado.value) return
-
+async function confirmarAprobar(id: number) {
   try {
-    const resultado = await videoStore.aprobarVideo(videoSeleccionado.value.idVideo)
+    const resultado = await videoStore.aprobarVideo(id)
     if (resultado) {
       dialogDetalles.value = false
       mostrarMensajeExito('Video aprobado correctamente')
@@ -49,13 +51,12 @@ async function confirmarAprobar() {
   }
 }
 
-async function confirmarEliminar() {
-  if (!videoSeleccionado.value) return
-
+async function confirmarEliminar(id: number) {
   try {
-    const resultado = await videoStore.eliminarVideo(videoSeleccionado.value.idVideo)
+    const resultado = await videoStore.eliminarVideo(id)
     if (resultado) {
       dialogConfirmarEliminar.value = false
+      dialogDetalles.value = false
       mostrarMensajeExito('Video eliminado correctamente')
     } else {
       mostrarMensajeError('No se pudo eliminar el video')
@@ -69,10 +70,6 @@ function mostrarMensajeError(mensaje: string) {
   errorMensaje.value = mensaje
   mostrarError.value = true
 }
-
-// Variable para mensajes de éxito
-const mensajeExito = ref('')
-const mostrarExito = ref(false)
 
 function mostrarMensajeExito(mensaje: string) {
   mensajeExito.value = mensaje
@@ -107,166 +104,42 @@ function mostrarMensajeExito(mensaje: string) {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="video in videoStore.videosReportados" :key="video.idVideo">
-          <td width="120">
-            <img 
-              :src="video.miniatura || '/img/placeholder.png'" 
-              alt="Miniatura" 
-              width="100" 
-              height="56" 
-              class="rounded"
-              @error="$event.target.src = '/img/placeholder.png'"
-            />
-          </td>
-          <td>{{ video.titulo }}</td>
-          <td>{{ video.autor }}</td>
-          <td>{{ video.asignatura }}</td>
-          <td>{{ video.idCurso }}</td>
-          <td class="text-center">
-            <v-chip color="error" :text="String(video.numReportes)"></v-chip>
-          </td>
-          <td>
-            <div class="d-flex">
-              <v-btn
-                color="info"
-                variant="text"
-                icon
-                size="small"
-                class="me-2"
-                @click="verDetalles(video)"
-              >
-                <v-icon>mdi-eye</v-icon>
-              </v-btn>
-
-              <v-btn
-                color="error"
-                variant="text"
-                icon
-                size="small"
-                @click="abrirDialogoEliminar(video)"
-              >
-                <v-icon>mdi-delete</v-icon>
-              </v-btn>
-            </div>
-          </td>
-        </tr>
+        <VideoReportadoFila
+          v-for="video in videoStore.videosReportados"
+          :key="video.idVideo"
+          :video="video"
+          @ver="verDetalles"
+          @eliminar="abrirDialogoEliminar"
+        />
       </tbody>
     </v-table>
 
-    <!-- Modal de detalles del video -->
-    <v-dialog v-model="dialogDetalles" max-width="700px">
-      <v-card v-if="videoSeleccionado">
-        <v-img 
-          :src="videoSeleccionado.miniatura || '/img/placeholder.png'" 
-          height="200" 
-          cover
-          class="align-end"
-          gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-        >
-          <v-card-title class="text-white">
-            {{ videoSeleccionado.titulo }}
-          </v-card-title>
-        </v-img>
+    <ModalVideoReportado
+      :mostrar="dialogDetalles"
+      :video="videoSeleccionado"
+      @update:mostrar="dialogDetalles = $event"
+      @aprobar="confirmarAprobar"
+      @eliminar="confirmarEliminar"
+    />
 
-        <v-card-text>
-          <div class="d-flex align-center mb-2">
-            <v-chip color="error" class="me-2" :text="`${videoSeleccionado.numReportes} reportes`"></v-chip>
-            <v-chip size="small" color="primary" class="me-2">{{ videoSeleccionado.asignatura }}</v-chip>
-            <v-chip size="small" variant="outlined">Curso {{ videoSeleccionado.idCurso }}</v-chip>
-          </div>
+    <ModalConfirmarEliminar
+      :mostrar="dialogConfirmarEliminar"
+      :video="videoSeleccionado"
+      @update:mostrar="dialogConfirmarEliminar = $event"
+      @confirmar="confirmarEliminar"
+    />
 
-          <p class="text-subtitle-1 mb-1">Autor: {{ videoSeleccionado.autor }}</p>
-          <p class="text-subtitle-2 mb-4">Subido: {{ videoSeleccionado.fecha }}</p>
-          
-          <p class="text-body-1 mb-4">{{ videoSeleccionado.descripcion || 'Sin descripción disponible' }}</p>
-          
-          <v-divider class="mb-4"></v-divider>
-          
-          <h3 class="text-h6 mb-2">Información del video</h3>
-          <v-list density="compact">
-            <v-list-item>
-              <template v-slot:prepend>
-                <v-icon icon="mdi-eye"></v-icon>
-              </template>
-              <v-list-item-title>{{ videoSeleccionado.vistas }} visualizaciones</v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <template v-slot:prepend>
-                <v-icon icon="mdi-clock-outline"></v-icon>
-              </template>
-              <v-list-item-title>Duración: {{ videoSeleccionado.duracion }}</v-list-item-title>
-            </v-list-item>
-            <v-list-item>
-              <template v-slot:prepend>
-                <v-icon icon="mdi-flag"></v-icon>
-              </template>
-              <v-list-item-title>Reportes: {{ videoSeleccionado.numReportes }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
-
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" @click="confirmarAprobar">
-            <v-icon class="me-2">mdi-check</v-icon>
-            Aprobar Video
-          </v-btn>
-          <v-btn color="error" @click="abrirDialogoEliminar(videoSeleccionado)">
-            <v-icon class="me-2">mdi-delete</v-icon>
-            Eliminar Video
-          </v-btn>
-          <v-btn text @click="dialogDetalles = false">Cerrar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Modal confirmar eliminación -->
-    <v-dialog v-model="dialogConfirmarEliminar" max-width="400px">
-      <v-card>
-        <v-card-title class="text-h6">Confirmar eliminación</v-card-title>
-        <v-card-text>
-          ¿Estás seguro de que quieres eliminar el video "{{ videoSeleccionado?.titulo }}"?
-          Esta acción no se puede deshacer.
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="dialogConfirmarEliminar = false">Cancelar</v-btn>
-          <v-btn color="error" @click="confirmarEliminar">Eliminar</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Snackbar para errores -->
-    <v-snackbar
-      v-model="mostrarError"
-      :timeout="5000"
-      color="error"
-    >
+    <v-snackbar v-model="mostrarError" :timeout="5000" color="error">
       {{ errorMensaje }}
       <template v-slot:actions>
-        <v-btn
-          variant="text"
-          @click="mostrarError = false"
-        >
-          Cerrar
-        </v-btn>
+        <v-btn variant="text" @click="mostrarError = false">Cerrar</v-btn>
       </template>
     </v-snackbar>
 
-    <!-- Snackbar para mensajes de éxito -->
-    <v-snackbar
-      v-model="mostrarExito"
-      :timeout="3000"
-      color="success"
-    >
+    <v-snackbar v-model="mostrarExito" :timeout="3000" color="success">
       {{ mensajeExito }}
       <template v-slot:actions>
-        <v-btn
-          variant="text"
-          @click="mostrarExito = false"
-        >
-          Cerrar
-        </v-btn>
+        <v-btn variant="text" @click="mostrarExito = false">Cerrar</v-btn>
       </template>
     </v-snackbar>
   </section>
@@ -275,7 +148,6 @@ function mostrarMensajeExito(mensaje: string) {
 <style scoped lang="scss">
 .admin-videos-reportados {
   padding: 1rem;
-
   @media (min-width: 768px) {
     padding: 2rem;
   }

@@ -19,7 +19,7 @@ const isMobile = computed(() => mobile.value);
 
 // --------------------------- Menú ---------------------------
 const menuItems = [
-  { title: 'Inicio', icon: 'mdi-home', route: '/' },
+  { title: 'Inicio', icon: 'mdi-home', route: '/cursos' },
   { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },

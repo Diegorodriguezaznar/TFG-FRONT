@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// --------------------------- Imports ---------------------------
+import { ref, onMounted, watch } from 'vue';
+import axios from 'axios';
+
 // --------------------------- Props ---------------------------
 const props = defineProps({
   videos: {
@@ -7,6 +11,10 @@ const props = defineProps({
   }
 });
 
+// --------------------------- Variables ---------------------------
+const videosConAutores = ref<any[]>([]);
+const cargando = ref(false);
+
 // --------------------------- Emits ---------------------------
 const emit = defineEmits(['select-video']);
 
@@ -14,18 +22,119 @@ const emit = defineEmits(['select-video']);
 const selectVideo = (videoId) => {
   emit('select-video', videoId);
 };
+
+// Verificar si ya tenemos la información necesaria en los videos
+const necesitaCargarInfoAutores = () => {
+  // Si los videos ya tienen nombres de autor que no sean "Profesor", no necesitamos cargar más info
+  return props.videos.some(video => 
+    !video.autor || 
+    video.autor === 'Profesor' || 
+    (video.usuario?.nombre === 'Profesor' && video.idUsuario)
+  );
+};
+
+// Obtener sólo los nombres de autores para optimizar
+const cargarInfoAutores = async () => {
+  // Si no es necesario cargar info adicional, simplemente usar los datos existentes
+  if (!necesitaCargarInfoAutores()) {
+    console.log('VideoSuggestions - No es necesario cargar información adicional de autores');
+    videosConAutores.value = [...props.videos];
+    return;
+  }
+
+  try {
+    cargando.value = true;
+    
+    // Crear una copia de los videos para no modificar directamente los props
+    const videosTemp = JSON.parse(JSON.stringify(props.videos));
+    
+    // Crear un mapa para almacenar los nombres de los usuarios
+    const nombresUsuarios = new Map();
+    
+    // Obtener IDs únicos de usuarios que necesitan carga
+    const idsUsuarios = [...new Set(
+      videosTemp
+        .filter(video => video.idUsuario && (!video.autor || video.autor === 'Profesor'))
+        .map(video => video.idUsuario)
+    )];
+    
+    if (idsUsuarios.length === 0) {
+      // No hay IDs para cargar, usar los datos existentes
+      videosConAutores.value = [...videosTemp];
+      cargando.value = false;
+      return;
+    }
+    
+    console.log('VideoSuggestions - Cargando nombres para estos IDs:', idsUsuarios);
+    
+    // Cargar nombres individualmente - método simple pero funcional
+    const promesas = idsUsuarios.map(async (idUsuario) => {
+      try {
+        const response = await axios.get(`http://localhost:5190/api/Usuario/${idUsuario}`);
+        if (response.data && response.data.nombre) {
+          nombresUsuarios.set(idUsuario, response.data.nombre);
+        }
+      } catch (e) {
+        console.error(`Error al cargar información del usuario ${idUsuario}:`, e);
+      }
+    });
+    
+    // Esperar a que todas las promesas se resuelvan
+    await Promise.allSettled(promesas);
+    
+    // Actualizar la información de cada video con los nombres de autor
+    videosConAutores.value = videosTemp.map((video: any) => {
+      // Obtener el nombre del autor
+      let nombreAutor = video.autor;
+      
+      // Si el autor es "Profesor" o no existe, intentar obtenerlo
+      if (!nombreAutor || nombreAutor === 'Profesor') {
+        nombreAutor = nombresUsuarios.get(video.idUsuario) || video.usuario?.nombre || 'Usuario';
+      }
+      
+      return {
+        ...video,
+        autor: nombreAutor
+      };
+    });
+    
+  } catch (error) {
+    console.error('VideoSuggestions - Error al cargar información de autores:', error);
+    // Si hay un error, usar los videos originales
+    videosConAutores.value = [...props.videos];
+  } finally {
+    cargando.value = false;
+  }
+};
+
+// --------------------------- Lifecycle Hooks ---------------------------
+// Cargar la información de autores cuando el componente se monta
+onMounted(async () => {
+  if (props.videos.length > 0) {
+    await cargarInfoAutores();
+  }
+});
+
+// Observar cambios en los videos para recargar la información
+watch(() => props.videos, async (newVideos) => {
+  if (newVideos.length > 0) {
+    await cargarInfoAutores();
+  } else {
+    videosConAutores.value = [];
+  }
+}, { deep: true });
 </script>
 
 <template>
   <div class="VideoSuggestions">
-    <div v-if="videos.length === 0" class="text-center py-4">
+    <div v-if="videosConAutores.length === 0" class="text-center py-4">
       <v-icon color="grey" size="large">mdi-playlist-remove</v-icon>
       <p class="mt-2 text-body-2 text-grey">No hay videos sugeridos disponibles</p>
     </div>
     
     <div v-else class="d-flex overflow-x-auto pb-3 suggested-videos-row">
       <div 
-        v-for="video in videos" 
+        v-for="video in videosConAutores" 
         :key="video.idVideo" 
         class="VideoSuggestions__Item"
         @click="selectVideo(video.idVideo)"

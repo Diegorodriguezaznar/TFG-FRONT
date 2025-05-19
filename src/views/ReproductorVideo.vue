@@ -170,7 +170,25 @@ const motivos = [
   'Spam',
   'Otro'
 ]
-const idUsuario = 1 // ← sustituye esto si tienes auth
+const idUsuario = 2
+
+// --------------------------- Función para obtener color según asignatura ---------------------------
+const getColorForAsignatura = (asignatura: string): string => {
+  const colores: Record<string, string> = {
+    'Mates': 'blue',
+    'Lengua': 'deep-purple',
+    'Historia': 'brown',
+    'Física': 'indigo',
+    'Química': 'green',
+    'Biología': 'teal',
+    'Inglés': 'red',
+    'Arte': 'pink',
+    'Informática': 'orange',
+    'Música': 'cyan'
+  };
+  
+  return colores[asignatura] || 'grey';
+};
 
 const enviarReporte = async () => {
   const nuevoReporte: ReporteDTO = {
@@ -208,113 +226,120 @@ const enviarReporte = async () => {
       </div>
       
       <v-container v-else fluid class="pa-0 pa-sm-4">
-        <v-row>
-          <!-- Columna izquierda con el reproductor de video -->
-          <v-col cols="12" md="8">
-            <VideoPlayer :video="currentVideo" />
-          </v-col>
-          
-          <!-- Columna derecha con información del profesor -->
-          <v-col cols="12" md="4">
-            <div class="channel-card">
-              <div class="d-flex align-center mb-3">
-                <v-avatar size="50" class="mr-3">
-                  <v-img src="https://picsum.photos/seed/profesor/50/50" alt="Avatar del profesor"></v-img>
-                </v-avatar>
-                <div>
-                  <h3 class="text-h6 mb-0">{{ currentVideo.autor }}</h3>
-                  <div class="text-subtitle-2 text-grey">{{ currentVideo.asignatura }}</div>
+          <v-row>
+            <!-- Columna izquierda con el reproductor de video -->
+            <v-col cols="12" md="8">
+              <VideoPlayer :video="currentVideo" />
+            </v-col>
+            
+            <!-- Columna derecha con información del profesor -->
+            <v-col cols="12" md="4">
+              <div class="channel-card">
+                <div class="d-flex align-center mb-3">
+                  <!-- Avatar del autor con opción de imagen real o fallback como inicial -->
+                  <v-avatar size="50" class="mr-3" :color="getColorForAsignatura(currentVideo.asignatura)">
+                    <template v-if="currentVideo.avatarUrl">
+                      <v-img :src="currentVideo.avatarUrl" :alt="`Avatar de ${currentVideo.autor}`"></v-img>
+                    </template>
+                    <template v-else>
+                      <!-- Mostrar la inicial del nombre como fallback -->
+                      <span class="text-h5 text-white">{{ currentVideo.autor ? currentVideo.autor.charAt(0).toUpperCase() : 'U' }}</span>
+                    </template>
+                  </v-avatar>
+                  <div>
+                    <h3 class="text-h6 mb-0">{{ currentVideo.autor }}</h3>
+                    <div class="text-subtitle-2 text-grey">{{ currentVideo.asignatura }}</div>
+                  </div>
                 </div>
-              </div>
-              
-              <v-btn color="orange" block>Seguir</v-btn>
-              <div class="text-caption text-center mt-1">{{ currentVideo.vistas }} suscriptores</div>
-              
-              <h3 class="text-h6 font-weight-bold mt-4">{{ currentVideo.titulo }}</h3>
-              <p class="text-body-2">
-                {{ currentVideo.descripcion && currentVideo.descripcion.length > 100 
-                   ? currentVideo.descripcion.substring(0, 100) + '...' 
-                   : currentVideo.descripcion }}
-              </p>
-              
-              <!-- Secciones del video con marcas de tiempo desde la base de datos -->
-              <div v-if="marcadores.length > 0" class="video-sections mt-4">
-                <h4 class="text-subtitle-2 mb-2">
-                  <v-icon size="small" class="mr-1">mdi-bookmark-outline</v-icon>
-                  Marcadores de tiempo
-                </h4>
                 
-                <div 
-                  v-for="(marcador, index) in marcadores" 
-                  :key="index"
-                  class="section-item d-flex align-center py-1"
-                  @click="seekToTime(marcador.minutoImportante)"
+                <v-btn color="orange" block>Seguir</v-btn>
+                <div class="text-caption text-center mt-1">{{ currentVideo.vistas }} suscriptores</div>
+                
+                <h3 class="text-h6 font-weight-bold mt-4">{{ currentVideo.titulo }}</h3>
+                <p class="text-body-2">
+                  {{ currentVideo.descripcion && currentVideo.descripcion.length > 100 
+                    ? currentVideo.descripcion.substring(0, 100) + '...' 
+                    : currentVideo.descripcion }}
+                </p>
+                
+                <!-- Secciones del video con marcas de tiempo desde la base de datos -->
+                <div v-if="marcadores.length > 0" class="video-sections mt-4">
+                  <h4 class="text-subtitle-2 mb-2">
+                    <v-icon size="small" class="mr-1">mdi-bookmark-outline</v-icon>
+                    Marcadores de tiempo
+                  </h4>
+                  
+                  <div 
+                    v-for="(marcador, index) in marcadores" 
+                    :key="index"
+                    class="section-item d-flex align-center py-1"
+                    @click="seekToTime(marcador.minutoImportante)"
+                  >
+                    <span class="time-mark">{{ formatTime(marcador.minutoImportante) }}</span>
+                    <span class="ml-2">{{ marcador.titulo || `Marcador ${index + 1}` }}</span>
+                  </div>
+                  
+                  <div v-if="marcadores.length === 0 && !loadingMarcadores" class="text-center py-2 text-grey">
+                    No hay marcadores para este video
+                  </div>
+                  
+                  <div v-if="loadingMarcadores" class="text-center py-2">
+                    <v-progress-circular indeterminate size="20" color="grey" class="mr-2"></v-progress-circular>
+                    Cargando marcadores...
+                  </div>
+                </div>
+                
+                <!-- Mensaje cuando no hay marcadores -->
+                <div v-else-if="!loadingMarcadores" class="video-sections mt-4">
+                  <div class="text-center py-3 text-grey-darken-1">
+                    <v-icon size="large" class="mb-2 text-grey">mdi-bookmark-off-outline</v-icon>
+                    <p>No hay marcadores disponibles para este video</p>
+                  </div>
+                </div>
+                
+                <!-- Cargando marcadores -->
+                <div v-else class="video-sections mt-4">
+                  <div class="text-center py-3">
+                    <v-progress-circular indeterminate size="24" color="grey" class="mb-2"></v-progress-circular>
+                    <p class="text-grey-darken-1">Cargando marcadores...</p>
+                  </div>
+                </div>
+
+                <v-btn
+                  class="mt-4"
+                  color="warning"
+                  variant="outlined"
+                  prepend-icon="mdi-flag"
+                  block
+                  @click="dialogReportar = true"
                 >
-                  <span class="time-mark">{{ formatTime(marcador.minutoImportante) }}</span>
-                  <span class="ml-2">{{ marcador.titulo || `Marcador ${index + 1}` }}</span>
-                </div>
-                
-                <div v-if="marcadores.length === 0 && !loadingMarcadores" class="text-center py-2 text-grey">
-                  No hay marcadores para este video
-                </div>
-                
-                <div v-if="loadingMarcadores" class="text-center py-2">
-                  <v-progress-circular indeterminate size="20" color="grey" class="mr-2"></v-progress-circular>
-                  Cargando marcadores...
-                </div>
-              </div>
-              
-              <!-- Mensaje cuando no hay marcadores -->
-              <div v-else-if="!loadingMarcadores" class="video-sections mt-4">
-                <div class="text-center py-3 text-grey-darken-1">
-                  <v-icon size="large" class="mb-2 text-grey">mdi-bookmark-off-outline</v-icon>
-                  <p>No hay marcadores disponibles para este video</p>
-                </div>
-              </div>
-              
-              <!-- Cargando marcadores -->
-              <div v-else class="video-sections mt-4">
-                <div class="text-center py-3">
-                  <v-progress-circular indeterminate size="24" color="grey" class="mb-2"></v-progress-circular>
-                  <p class="text-grey-darken-1">Cargando marcadores...</p>
-                </div>
-              </div>
+                  Reportar vídeo
+                </v-btn>
 
-              <v-btn
-                class="mt-4"
-                color="warning"
-                variant="outlined"
-                prepend-icon="mdi-flag"
-                block
-                @click="dialogReportar = true"
-              >
-                Reportar vídeo
-              </v-btn>
+                <v-dialog v-model="dialogReportar" max-width="500px">
+                  <v-card>
+                    <v-card-title>Reportar este vídeo</v-card-title>
+                    <v-card-text>
+                      <v-radio-group v-model="motivoSeleccionado">
+                        <v-radio
+                          v-for="motivo in motivos"
+                          :key="motivo"
+                          :label="motivo"
+                          :value="motivo"
+                        />
+                      </v-radio-group>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-spacer />
+                      <v-btn text @click="dialogReportar = false">Cancelar</v-btn>
+                      <v-btn color="error" @click="enviarReporte">Enviar</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
 
-              <v-dialog v-model="dialogReportar" max-width="500px">
-                <v-card>
-                  <v-card-title>Reportar este vídeo</v-card-title>
-                  <v-card-text>
-                    <v-radio-group v-model="motivoSeleccionado">
-                      <v-radio
-                        v-for="motivo in motivos"
-                        :key="motivo"
-                        :label="motivo"
-                        :value="motivo"
-                      />
-                    </v-radio-group>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-spacer />
-                    <v-btn text @click="dialogReportar = false">Cancelar</v-btn>
-                    <v-btn color="error" @click="enviarReporte">Enviar</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-
-            </div>
-          </v-col>
-        </v-row>
+              </div>
+            </v-col>
+          </v-row>
         
         <h3 class="text-subtitle-1 font-weight-bold mb-3 mt-5 ml-2">Sugerencias</h3>
         
