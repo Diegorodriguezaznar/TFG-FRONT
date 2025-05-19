@@ -1,11 +1,13 @@
 <script setup lang="ts">
-//Imports
+// Imports
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
+import { useUsuarioCursoStore } from "@/stores/UsuarioCurso";
 
 // Stores
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
+const usuarioCursoStore = useUsuarioCursoStore();
 
 // Router
 const router = useRouter();
@@ -28,21 +30,25 @@ const mostrarMensaje = (mensaje, tipo = 'success') => {
 
 // Propiedades del curso
 const props = defineProps({
-  id: Number, 
+  id: {
+    type: Number,
+    required: true
+  },
   titulo: String,
+  subtitulo: String,
   descripcion: String,
   imagen: String
 });
 
+// Emits
+const emit = defineEmits(['guardado', 'eliminado']);
+
 // Evento para ir a la página de videos del curso
 const seleccionarCurso = () => {
   if (props.id) {
-    // Redirigimos a la página Home con el ID del curso
     router.push(`/curso/${props.id}`);
   }
 };
-
-const show = ref(false);
 
 // ID del usuario actual
 const usuarioId = computed(() => {
@@ -52,7 +58,7 @@ const usuarioId = computed(() => {
 
 // Estado de inscripción
 const estaInscrito = ref(false);
-const animacionCorazon = ref(false);
+const animacionGuardar = ref(false);
 
 // Verificar si el usuario está inscrito en este curso al cargar el componente
 onMounted(async () => {
@@ -64,10 +70,8 @@ onMounted(async () => {
 // Verificar si el usuario está inscrito en este curso
 async function verificarInscripcion() {
   try {
-    const response = await fetch(`http://localhost:5190/api/UsuarioCurso/usuario/${usuarioId.value}`);
-    
-    if (response.ok) {
-      const inscripciones = await response.json();
+    if (usuarioId.value) {
+      const inscripciones = await usuarioCursoStore.fetchInscripcionesByUsuarioId(usuarioId.value);
       estaInscrito.value = inscripciones.some(i => i.idCurso === props.id);
     }
   } catch (error) {
@@ -75,86 +79,173 @@ async function verificarInscripcion() {
   }
 }
 
-// Método para inscribirse o desinscribirse del curso
+// Método para guardar un curso
+const guardarCurso = async (event) => {
+  // Prevenir la navegación
+  event.stopPropagation();
+  
+  // Verificar login
+  if (!usuarioId.value) {
+    mostrarMensaje('Debes iniciar sesión para guardar curso', 'error');
+    router.push('/login');
+    return;
+  }
+
+  try {
+    // Añadir animación
+    animacionGuardar.value = true;
+    
+    // CREAR inscripción usando el store
+    const nuevaInscripcion = {
+      IdUsuario: usuarioId.value,
+      IdCurso: props.id
+    };
+    
+    const resultado = await usuarioCursoStore.createInscripcion(nuevaInscripcion);
+    
+    if (resultado) {
+      estaInscrito.value = true;
+      mostrarMensaje('Curso guardado correctamente', 'success');
+      emit('guardado', props.id);
+    } else {
+      console.error("Error al crear inscripción:", usuarioCursoStore.errorMessage);
+      mostrarMensaje('Error al guardar curso', 'error');
+    }
+
+    // Quitar animación después de un tiempo
+    setTimeout(() => {
+      animacionGuardar.value = false;
+    }, 500);
+    
+  } catch (error) {
+    console.error("Error al guardar curso:", error);
+    mostrarMensaje('Error en la operación', 'error');
+    animacionGuardar.value = false;
+  }
+};
+
+// Método para borrar un curso guardado
+const borrarGuardado = async (event) => {
+  // Prevenir la navegación
+  event.stopPropagation();
+  
+  // Verificar que esté inscrito
+  if (!estaInscrito.value) {
+    console.warn("No se puede borrar un curso que no está guardado");
+    return;
+  }
+  
+  try {
+    // Añadir animación
+    animacionGuardar.value = true;
+    
+    // Verificar que tenemos los datos necesarios
+    if (!usuarioId.value || !props.id) {
+      console.error("Error: Faltan datos para eliminar inscripción", { 
+        usuarioId: usuarioId.value, 
+        cursoId: props.id 
+      });
+      mostrarMensaje('Error al quitar curso guardado: Datos incompletos', 'error');
+      animacionGuardar.value = false;
+      return;
+    }
+    
+    console.log("Intentando eliminar inscripción con método POST");
+    
+    // Intentar eliminar con método POST y un campo especial para indicar eliminación
+    const response = await fetch("http://localhost:5190/api/UsuarioCurso/Eliminar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        IdUsuario: usuarioId.value,
+        IdCurso: props.id
+      })
+    });
+    
+    if (response.ok) {
+      estaInscrito.value = false;
+      mostrarMensaje('Curso quitado de guardados', 'success');
+      emit('eliminado', props.id);
+    } else {
+      // Si falla, intentar con otro endpoint
+      console.log("Primer intento falló, probando con otro endpoint");
+      
+      // Intentar con otro endpoint específico para eliminar
+      const response2 = await fetch(`http://localhost:5190/api/UsuarioCurso/Eliminar/${usuarioId.value}/${props.id}`, {
+        method: "GET" // Probar con GET ya que muchos backends permiten eliminar con GET en endpoints específicos
+      });
+      
+      if (response2.ok) {
+        estaInscrito.value = false;
+        mostrarMensaje('Curso quitado de guardados', 'success');
+        emit('eliminado', props.id);
+      } else {
+        // Si falla, intentar con método PUT
+        console.log("Segundo intento falló, probando con método PUT");
+        
+        const response3 = await fetch("http://localhost:5190/api/UsuarioCurso", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            IdUsuario: usuarioId.value,
+            IdCurso: props.id,
+            _method: "DELETE" // Algunos backends usan este patrón para emular DELETE
+          })
+        });
+        
+        if (response3.ok) {
+          estaInscrito.value = false;
+          mostrarMensaje('Curso quitado de guardados', 'success');
+          emit('eliminado', props.id);
+        } else {
+          const errorText = await response3.text();
+          console.error("Todos los intentos de eliminar fallaron. Último error:", errorText);
+          mostrarMensaje('Error al quitar curso guardado. Consulta la consola para más detalles.', 'error');
+        }
+      }
+    }
+
+    // Quitar animación después de un tiempo
+    setTimeout(() => {
+      animacionGuardar.value = false;
+    }, 500);
+    
+  } catch (error) {
+    console.error("Error al borrar guardado:", error);
+    mostrarMensaje(`Error en la operación: ${error.message}`, 'error');
+    animacionGuardar.value = false;
+  }
+};
+
+// Método que decide si guardar o borrar en función del estado
 const toggleInscripcion = async (event) => {
   // Prevenir la navegación
   event.stopPropagation();
   
   // Verificar login
   if (!usuarioId.value) {
-    mostrarMensaje('Debes iniciar sesión para marcar como favorito', 'error');
+    mostrarMensaje('Debes iniciar sesión para guardar curso', 'error');
     router.push('/login');
     return;
   }
   
-  try {
-    // Añadir animación
-    animacionCorazon.value = true;
-    
-    if (estaInscrito.value) {
-      // ELIMINAR inscripción (usando query parameters)
-      const url = `http://localhost:5190/api/UsuarioCurso?idUsuario=${usuarioId.value}&idCurso=${props.id}`;
-      console.log("Eliminando inscripción:", url);
-      
-      const response = await fetch(url, {
-        method: "DELETE"
-      });
-      
-      if (response.ok) {
-        estaInscrito.value = false;
-        // No mostramos mensaje de desincripción
-      } else {
-        const errorText = await response.text();
-        console.error("Error al eliminar inscripción:", errorText);
-        mostrarMensaje('Error al quitar favorito', 'error');
-      }
-    } else {
-      // CREAR inscripción - SIMPLIFICADO AL MÁXIMO
-      const datos = {
-        IdUsuario: usuarioId.value,
-        IdCurso: props.id
-      };
-      
-      console.log("Creando inscripción con datos:", datos);
-      
-      const response = await fetch("http://localhost:5190/api/UsuarioCurso", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datos)
-      });
-      
-      if (response.ok) {
-        estaInscrito.value = true;
-        // No mostramos mensaje de inscripción
-      } else {
-        const errorText = await response.text();
-        console.error("Error al crear inscripción:", errorText);
-        mostrarMensaje('Error al marcar como favorito', 'error');
-      }
-    }
-
-    // Quitar animación después de un tiempo
-    setTimeout(() => {
-      animacionCorazon.value = false;
-    }, 500);
-    
-  } catch (error) {
-    console.error("Error en operación:", error);
-    mostrarMensaje('Error en la operación', 'error');
-    animacionCorazon.value = false;
+  if (estaInscrito.value) {
+    await borrarGuardado(event);
+  } else {
+    await guardarCurso(event);
   }
 };
 </script>
 
 <template>
-  <div>
+  <div class="curso-card-wrapper">
     <v-hover v-slot="{ isHovering }">
       <v-card 
         class="curso-card" 
         @click="seleccionarCurso"
         :elevation="isHovering ? 8 : 2"
       >
-        <!-- Contenedor de imagen con overlay de gradiente -->
+        <!-- Contenedor de imagen -->
         <div class="curso-card-imagen-container">
           <v-img 
             :src="imagen || 'https://picsum.photos/300/200'" 
@@ -162,33 +253,47 @@ const toggleInscripcion = async (event) => {
             cover
             class="curso-card-imagen"
             :class="{ 'imagen-hover': isHovering }"
-          >
-            <!-- Overlay con gradiente -->
-            <div class="curso-card-overlay">
-              <!-- Botón de favorito -->
-              <v-btn 
-                :class="['curso-card-favorito', { 'favorito-activo': estaInscrito, 'animar': animacionCorazon }]"
-                icon
-                size="small"
-                @click.stop="toggleInscripcion($event)"
-              >
-                <v-icon>
-                  {{ estaInscrito ? 'mdi-heart' : 'mdi-heart-outline' }}
-                </v-icon>
-              </v-btn>
-            </div>
-          </v-img>
+          ></v-img>
         </div>
         
+        <!-- Título del curso -->
         <v-card-title class="curso-card-titulo">
           {{ titulo }}
         </v-card-title>
         
+        <!-- Descripción del curso -->
         <v-card-text v-if="descripcion" class="curso-card-descripcion">
           {{ descripcion }}
         </v-card-text>
         
+        <!-- Botones de acción -->
         <v-card-actions class="curso-card-acciones">
+          <!-- Botón Guardar (solo se muestra si no está guardado) -->
+          <v-btn 
+            v-if="!estaInscrito"
+            variant="flat" 
+            color="orange" 
+            @click.stop="guardarCurso($event)"
+            class="curso-card-boton-guardar"
+            :class="{ 'btn-hover': isHovering, 'animar': animacionGuardar }"
+          >
+            <v-icon left class="mr-1">mdi-bookmark-outline</v-icon>
+            Guardar
+          </v-btn>
+          
+          <!-- Botón Borrar (solo se muestra si está guardado) -->
+          <v-btn 
+            v-if="estaInscrito"
+            variant="flat" 
+            color="orange" 
+            @click.stop="borrarGuardado($event)"
+            class="curso-card-boton-guardar guardado-activo"
+            :class="{ 'btn-hover': isHovering, 'animar': animacionGuardar }"
+          >
+            <v-icon left class="mr-1">mdi-bookmark-check</v-icon>
+            Quitar
+          </v-btn>
+          
           <v-spacer></v-spacer>
           
           <v-btn 
@@ -205,7 +310,7 @@ const toggleInscripcion = async (event) => {
       </v-card>
     </v-hover>
     
-    <!-- Alerta de acción completada (solo para errores) -->
+    <!-- Snackbar para alertas -->
     <v-snackbar
       v-model="mostrarAlerta"
       :color="tipoAlerta"
@@ -227,6 +332,11 @@ const toggleInscripcion = async (event) => {
 </template>
 
 <style scoped>
+.curso-card-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
 .curso-card {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   height: 100%;
@@ -253,16 +363,6 @@ const toggleInscripcion = async (event) => {
   transform: scale(1.05);
 }
 
-.curso-card-overlay {
-  position: absolute;
-  top: 0;
-  right: 0;
-  padding: 12px;
-  display: flex;
-  justify-content: flex-end;
-  z-index: 1;
-}
-
 .curso-card-titulo {
   font-size: 1.25rem !important;
   font-weight: 700 !important;
@@ -287,18 +387,21 @@ const toggleInscripcion = async (event) => {
   padding: 8px 16px 16px 16px;
 }
 
-.curso-card-favorito {
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.curso-card-boton, .curso-card-boton-guardar {
   transition: all 0.3s ease;
+  border-radius: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  padding: 0 16px;
 }
 
-.curso-card-favorito:hover {
-  transform: scale(1.15);
+.curso-card-boton-guardar {
+  background-color: #FF9800 !important;
+  color: white !important;
 }
 
-.favorito-activo {
-  color: #f44336 !important;
+.guardado-activo {
+  background-color: #FB8C00 !important;
 }
 
 .animar {
@@ -310,19 +413,11 @@ const toggleInscripcion = async (event) => {
     transform: scale(1);
   }
   50% {
-    transform: scale(1.3);
+    transform: scale(1.1);
   }
   100% {
     transform: scale(1);
   }
-}
-
-.curso-card-boton {
-  transition: all 0.3s ease;
-  border-radius: 20px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  padding: 0 16px;
 }
 
 .btn-hover {
