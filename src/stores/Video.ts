@@ -424,6 +424,53 @@ export const useVideoStore = defineStore("video", () => {
   }
 
   // --------------------------- Datos de ejemplo para fallback ---------------------------
+  async function aprobarVideo(idVideo: number) {
+    loading.value = true;
+    try {
+      console.log(`%c👍 Aprobando video ID: ${idVideo}`, 'color: #2196f3;');
+      
+      // Usar el endpoint específico para aprobar
+      const response = await fetch(`http://localhost:5190/api/ReporteVideo/aprobar/${idVideo}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.mensaje || `Error al aprobar el video: ${response.status}`);
+      }
+      
+      // Actualizar la lista de videos reportados eliminando el que fue aprobado
+      videosReportados.value = videosReportados.value.filter(v => v.idVideo !== idVideo);
+      
+      console.log(`%c✅ Video aprobado correctamente`, 'color: #42b883;');
+      return true;
+    } catch (error: any) {
+      let message = "Error al aprobar el video";
+      
+      if (error.name === "AbortError") {
+        message = "La conexión con el servidor ha excedido el tiempo de espera";
+      } else if (
+        error instanceof TypeError &&
+        error.message.includes("Failed to fetch")
+      ) {
+        message =
+          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
+      } else {
+        message = error.message || message;
+      }
+      
+      errorMessage.value = message;
+      console.error('%c❌ Error al aprobar video:', 'color: #ff5252;', error);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  // --------------------------- Datos de ejemplo para fallback ---------------------------
   function simulateVideos(): VideoDTO[] {
     return [
       {

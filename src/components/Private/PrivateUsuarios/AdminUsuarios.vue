@@ -2,8 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { useUsuarioStore } from '@/stores/Usuario'
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO'
-import ModalEditarUsuario from '@/components/Private/ModalEditarUsuario.vue'
-import ModalCrearUsuario from '@/components/Private/ModalCrearUsuario.vue'
+import ModalEditarUsuario from '@/components/Private/PrivateUsuarios/ModalEditarUsuario.vue'
+import ModalCrearUsuario from '@/components/Private/PrivateUsuarios/ModalCrearUsuario.vue'
 
 
 const usuarioStore = useUsuarioStore()

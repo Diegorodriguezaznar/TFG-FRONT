@@ -2,9 +2,10 @@
 import { ref, onMounted } from 'vue'
 import { useVideoStore } from '@/stores/Video'
 import type { VideoDTO } from '@/stores/dtos/VideoDTO'
-import VideoReportadoFila from '@/components/Private/VideoReportadoFila.vue'
-import ModalVideoReportado from '@/components/Private/ModalVideoReportado.vue'
-import ModalConfirmarEliminar from '@/components/Private/ModalConfirmarEliminar.vue'
+import VideoReportadoFila from '@/components/Private/PrivateVideosR/VideoReportadoFila.vue'
+import ModalVideoReportado from '@/components/Private/PrivateVideosR/ModalVideoReportado.vue'
+import ModalConfirmarEliminar from '@/components/Private/PrivateVideosR/ModalConfirmarEliminar.vue'
+import ModalConfirmarAprobar from '@/components/Private/PrivateVideosR/ModalConfirmarAprobar.vue' // Nuevo componente
 
 const videoStore = useVideoStore()
 const errorMensaje = ref('')
@@ -12,10 +13,12 @@ const mostrarError = ref(false)
 const videoSeleccionado = ref<VideoDTO | null>(null)
 const dialogDetalles = ref(false)
 const dialogConfirmarEliminar = ref(false)
+const dialogConfirmarAprobar = ref(false) // Nuevo estado para el diálogo de aprobación
 const mensajeExito = ref('')
 const mostrarExito = ref(false)
 
 onMounted(() => {
+  console.log('%c📋 Componente de administración de videos reportados montado', 'color: #42b883; font-weight: bold;')
   cargarVideosReportados()
 })
 
@@ -32,6 +35,14 @@ function verDetalles(video: VideoDTO) {
   dialogDetalles.value = true
 }
 
+function abrirDialogoAprobar(id: number) {
+  const video = videoStore.videosReportados.find(v => v.idVideo === id)
+  if (video) {
+    videoSeleccionado.value = { ...video }
+    dialogConfirmarAprobar.value = true
+  }
+}
+
 function abrirDialogoEliminar(video: VideoDTO) {
   videoSeleccionado.value = { ...video }
   dialogConfirmarEliminar.value = true
@@ -40,11 +51,13 @@ function abrirDialogoEliminar(video: VideoDTO) {
 async function confirmarAprobar(id: number) {
   try {
     const resultado = await videoStore.aprobarVideo(id)
+    
     if (resultado) {
+      dialogConfirmarAprobar.value = false
       dialogDetalles.value = false
       mostrarMensajeExito('Video aprobado correctamente')
     } else {
-      mostrarMensajeError('No se pudo aprobar el video')
+      throw new Error('No se pudo aprobar el video')
     }
   } catch (error: any) {
     mostrarMensajeError(error.message || 'Error al aprobar el video')
@@ -54,12 +67,13 @@ async function confirmarAprobar(id: number) {
 async function confirmarEliminar(id: number) {
   try {
     const resultado = await videoStore.eliminarVideo(id)
+    
     if (resultado) {
       dialogConfirmarEliminar.value = false
       dialogDetalles.value = false
       mostrarMensajeExito('Video eliminado correctamente')
     } else {
-      mostrarMensajeError('No se pudo eliminar el video')
+      throw new Error('No se pudo eliminar el video')
     }
   } catch (error: any) {
     mostrarMensajeError(error.message || 'Error al eliminar el video')
@@ -114,14 +128,16 @@ function mostrarMensajeExito(mensaje: string) {
       </tbody>
     </v-table>
 
+    <!-- Modal de detalles del video -->
     <ModalVideoReportado
       :mostrar="dialogDetalles"
       :video="videoSeleccionado"
       @update:mostrar="dialogDetalles = $event"
-      @aprobar="confirmarAprobar"
-      @eliminar="confirmarEliminar"
+      @aprobar="abrirDialogoAprobar"
+      @eliminar="abrirDialogoEliminar"
     />
 
+    <!-- Modal para confirmar eliminación -->
     <ModalConfirmarEliminar
       :mostrar="dialogConfirmarEliminar"
       :video="videoSeleccionado"
@@ -129,6 +145,15 @@ function mostrarMensajeExito(mensaje: string) {
       @confirmar="confirmarEliminar"
     />
 
+    <!-- Modal para confirmar aprobación -->
+    <ModalConfirmarAprobar
+      :mostrar="dialogConfirmarAprobar"
+      :video="videoSeleccionado"
+      @update:mostrar="dialogConfirmarAprobar = $event"
+      @confirmar="confirmarAprobar"
+    />
+
+    <!-- Notificaciones -->
     <v-snackbar v-model="mostrarError" :timeout="5000" color="error">
       {{ errorMensaje }}
       <template v-slot:actions>

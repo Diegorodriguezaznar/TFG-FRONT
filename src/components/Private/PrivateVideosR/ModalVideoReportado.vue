@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
-import type { VideoDTO } from '@/stores/dtos/VideoDTO'
+import { defineProps, defineEmits, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import type { VideoDTO } from '@/stores/dtos/VideoDTO'
+import ModalListadoReportes from './ModalListadoReportes.vue'
 
 const props = defineProps<{
   mostrar: boolean
@@ -9,7 +10,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['update:mostrar', 'aprobar', 'eliminar'])
-
 const router = useRouter()
 
 function verVideo() {
@@ -17,6 +17,8 @@ function verVideo() {
     router.push(`/reproductor-video?id=${props.video.idVideo}`)
   }
 }
+
+const mostrarListadoReportes = ref(false)
 </script>
 
 <template>
@@ -35,8 +37,11 @@ function verVideo() {
       </v-img>
 
       <v-card-text>
-        <div class="d-flex align-center mb-2">
+        <div class="d-flex align-center mb-2 flex-wrap">
           <v-chip color="error" class="me-2" :text="`${video.numReportes} reportes`" />
+          <v-btn variant="text" size="small" color="primary" @click="mostrarListadoReportes = true">
+            Ver listado de reportes
+          </v-btn>
         </div>
 
         <p class="text-subtitle-1 mb-1">Autor: {{ video.autor }}</p>
@@ -45,7 +50,6 @@ function verVideo() {
         <p class="text-body-1 mb-4">{{ video.descripcion || 'Sin descripción disponible' }}</p>
 
         <v-divider class="mb-4" />
-
       </v-card-text>
 
       <v-card-actions>
@@ -56,12 +60,22 @@ function verVideo() {
         </v-btn>
         <v-btn color="error" @click="emit('eliminar', video.idVideo)">
           <v-icon class="me-2">mdi-delete</v-icon>
+          Eliminar Video
         </v-btn>
         <v-btn color="info" variant="tonal" @click="verVideo">
           <v-icon class="me-2">mdi-play-circle</v-icon>
+          Ver Video
         </v-btn>
         <v-btn text @click="emit('update:mostrar', false)">Cerrar</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <!-- Modal de listado de reportes -->
+  <ModalListadoReportes
+    v-if="video"
+    :mostrar="mostrarListadoReportes"
+    :id-video="video.idVideo"
+    @update:mostrar="mostrarListadoReportes = $event"
+  />
 </template>

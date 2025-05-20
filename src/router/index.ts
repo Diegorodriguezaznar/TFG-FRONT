@@ -11,8 +11,6 @@ import SubirVideos from "../views/SubirVideoPage.vue";
 //ADMIN
 import AdminPage from "../views/AdminPage.vue";
 
-
-
 import Login from '../views/Login.vue';
 
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
@@ -43,19 +41,18 @@ const routes = [
       },
       {
         path: "usuarios",
-        component: () => import("@/components/Private/AdminUsuarios.vue")
+        component: () => import("@/components/Private/PrivateUsuarios/AdminUsuarios.vue")
       },
       {
         path: "cursos",
-        component: () => import("@/components/Private/AdminCursos.vue")
+        component: () => import("@/components/Private/PrivateCursos/AdminCursos.vue")
       },
-            {
+      {
         path: "reportes",
-        component: () => import("@/components/Private/AdminVideosReportados.vue")
+        component: () => import("@/components/Private/PrivateVideosR/AdminVideosReportados.vue")
       }
     ]
   }
-
 ];
 
 const router = createRouter({
@@ -63,6 +60,20 @@ const router = createRouter({
   routes
 });
 
+// Guardia para limpiar la consola en cada navegación
+router.beforeEach((to, from, next) => {
+  // Limpiar la consola solo cuando cambia la ruta principal
+  // Esto evita limpiar cuando solo cambian parámetros o query params
+  if (to.path !== from.path) {
+    console.clear();
+    console.log(`%c🧭 Navegando a: ${to.path}`, 'color: #42b883; font-weight: bold;');
+  }
+  
+  // Continuar con la lógica de autenticación
+  next();
+});
+
+// Guardia para verificar autenticación
 router.beforeEach((to, from, next) => {
   if (!to.meta.requiresAuth) {
     next();
