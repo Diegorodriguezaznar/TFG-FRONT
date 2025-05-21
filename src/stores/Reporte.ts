@@ -18,7 +18,7 @@ export const useReporteStore = defineStore('reporte', () => {
     successMessage.value = ''
     
     try {
-      console.log(`%c🚩 Reportando video ID: ${nuevoReporte.idVideo} - Motivo: ${nuevoReporte.motivo}`, 'color: #ff9800;')
+      console.log(`%c Reportando video ID: ${nuevoReporte.idVideo} - Motivo: ${nuevoReporte.motivo}`, 'color: #ff9800;')
       
       const usuarioStore = useUsuarioLogeadoStore()
       
@@ -37,11 +37,11 @@ export const useReporteStore = defineStore('reporte', () => {
         throw new Error(`Error al enviar el reporte: ${response.status}. ${errorText}`)
       }
       
-      console.log('%c✅ Reporte enviado correctamente', 'color: #42b883;')
+      console.log('%c Reporte enviado correctamente', 'color: #42b883;')
       successMessage.value = "Reporte enviado correctamente. Gracias por ayudarnos a mejorar la plataforma."
       return true
     } catch (err: any) {
-      console.error('%c❌ Error al enviar reporte:', 'color: #ff5252;', err)
+      console.error('%c Error al enviar reporte:', 'color: #ff5252;', err)
       
       let message = 'Error al enviar el reporte'
       

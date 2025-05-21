@@ -1,10 +1,10 @@
-<script setup>
+<script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref, computed, onMounted } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import Header from '@/components/Layout/Header.vue';
 import Footer from '@/components/Layout/Footer.vue';
-import Sidebar from '@/components/Layout/Sidebar.vue';
+import SideBarCursos from '@/components/Layout/SideBarCursos.vue';
 import CardCurso from '@/components/CardCurso.vue';
 import Login from '@/components/Login.vue';
 
@@ -64,6 +64,7 @@ onMounted(fetchCursos);
   <v-app>
     <!-- --------------------------- Header --------------------------- -->
     <Header @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
+      <SideBarCursos v-model="drawer" />
 
     <!-- --------------------------- Contenedor principal --------------------------- -->
     <div class="CursosPage__Wrapper">

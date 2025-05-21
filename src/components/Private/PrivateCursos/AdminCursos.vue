@@ -66,15 +66,6 @@ function crearCurso() {
 
       <template #item.acciones="{ item }">
         <v-btn
-          color="primary"
-          class="me-2"
-          size="small"
-          @click="editarCurso(item)"
-        >
-          Editar
-        </v-btn>
-
-        <v-btn
           color="error"
           size="small"
           @click="abrirDialogoEliminar(item.idCurso)"

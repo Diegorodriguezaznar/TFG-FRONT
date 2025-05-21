@@ -4,11 +4,13 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCursoStore } from '@/stores/Curso';
 import { useVideoStore } from '@/stores/Video';
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado'; // Cambiado a tu store actual
 import Header from '@/components/Layout/Header.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
 import Filtros from '@/components/Home/Filtros.vue';
 import Sugerencias from '@/components/Video/Sugerencias.vue';
 import ListaVideos from '@/components/Home/ListaVideos.vue';
+import AgregarAsignaturaModal from '@/components/CrearCursos/AñadirAsignatura.vue'; // Nuevo componente
 
 // --------------------------- Route ---------------------------
 const route = useRoute();
@@ -16,6 +18,7 @@ const route = useRoute();
 // --------------------------- Stores ---------------------------
 const cursoStore = useCursoStore();
 const videoStore = useVideoStore();
+const usuarioLogeadoStore = useUsuarioLogeadoStore(); // Cambiado a tu store actual
 
 // --------------------------- Variables ---------------------------
 const drawer = ref(false);
@@ -23,6 +26,7 @@ const searchQuery = ref('');
 const filtroSeleccionado = ref('Todos'); // Comienza con 'Todos'
 const loading = computed(() => videoStore.loading || cursoStore.loading);
 const curso = computed(() => cursoStore.curso);
+const mostrarModalAsignatura = ref(false);
 
 // Verificar si estamos viendo videos de un curso específico
 const cursoId = computed(() => {
@@ -31,6 +35,15 @@ const cursoId = computed(() => {
     return isNaN(id) ? null : id;
   }
   return null;
+});
+
+// Verificar si el usuario actual es el creador del curso
+const esCreadorCurso = computed(() => {
+  if (!curso.value) return false;
+  if (!usuarioLogeadoStore.usuarioActual) return false;
+  
+  const usuarioActualId = usuarioLogeadoStore.usuarioActual.idUsuario;
+  return curso.value.idUsuarioCreador === usuarioActualId;
 });
 
 // Generar imagen de fondo para el banner (placeholder)
@@ -62,6 +75,21 @@ const cargarVideos = async () => {
     }
   } catch (error) {
     console.error("Error al cargar videos:", error);
+  }
+};
+
+// Función para abrir el modal de agregar asignatura
+const abrirModalAsignatura = () => {
+  mostrarModalAsignatura.value = true;
+};
+
+// Función para manejar la creación exitosa de una asignatura
+const asignaturaCreada = async () => {
+  // Recargar el curso para mostrar la nueva asignatura
+  if (cursoId.value) {
+    await cursoStore.fetchCursoById(cursoId.value);
+    // Resetear el filtro a 'Todos'
+    filtroSeleccionado.value = 'Todos';
   }
 };
 
@@ -117,6 +145,10 @@ watch(() => route.params.id, () => {
 
 // --------------------------- Cargar datos al montar ---------------------------
 onMounted(() => {
+  // Asegurar que el usuario esté cargado desde localStorage si es necesario
+  if (!usuarioLogeadoStore.usuarioActual) {
+    usuarioLogeadoStore.cargarUsuarioDesdeStorage();
+  }
   cargarVideos();
 });
 </script>
@@ -168,7 +200,18 @@ onMounted(() => {
                   {{ videosFiltrados.length }} videos
                 </v-chip>
                 
-                <!-- Aquí podrías agregar más chips o info del curso si lo deseas -->
+                <!-- Botón para añadir asignatura (solo visible para el creador) -->
+                <v-btn 
+                  v-if="esCreadorCurso" 
+                  color="primary" 
+                  variant="elevated" 
+                  size="small" 
+                  class="ml-2" 
+                  @click="abrirModalAsignatura"
+                >
+                  <v-icon start icon="mdi-book-plus" class="mr-1"></v-icon>
+                  Añadir asignatura
+                </v-btn>
               </div>
             </v-container>
           </div>
@@ -209,10 +252,19 @@ onMounted(() => {
         </v-container>
       </div>
     </v-main>
+
+    <!-- Modal para añadir asignatura -->
+    <AgregarAsignaturaModal
+      :mostrar="mostrarModalAsignatura"
+      :curso-id="cursoId || 0"
+      @cerrar="mostrarModalAsignatura = false"
+      @asignatura-creada="asignaturaCreada"
+    />
   </v-app>
 </template>
 
 <style scoped>
+/* Estilos sin cambios, se mantienen igual */
 .HomePage {
   background-color: #f9f9f9;
   min-height: 100vh;

@@ -25,12 +25,9 @@ const idRol = computed(() => usuarioStore.usuarioActual?.idRol ?? 1);
 // --------------------------- Menú ---------------------------
 const allMenuItems = [
   { title: 'Inicio', icon: 'mdi-home', route: '/cursos' },
-  { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
-  { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
-  { title: 'Historial', icon: 'mdi-history', route: '/historial' },
+  { title: 'Mis Cursos', icon: 'mdi-folder', route: '/mis-cursos' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
-  { title: 'Quizzes', icon: 'mdi-school-outline', route: '/quizz-time!' },
-  { title: 'Subir Video', icon: 'mdi-upload', route: '/subir-video', rolesPermitidos: [2, 3] }
+  { title: 'Crear Curso', icon: 'mdi-plus-box', route: '/crear-curso', rolesPermitidos: [2, 3] }
 ];
 
 const menuItems = computed(() =>
@@ -50,7 +47,6 @@ const drawer = computed({
   set: (value) => emit('update:modelValue', value)
 });
 </script>
-
 
 <template>
   <v-navigation-drawer
@@ -89,10 +85,10 @@ const drawer = computed({
       <div class="text-subtitle-2 font-weight-medium mb-2">Canales suscritos</div>
       <v-list density="compact" nav>
         <v-list-item
-          v-for="i in 5"
+          v-for="i in 3"
           :key="i"
-          :title="`Canal ${i}`"
-          prepend-avatar="https://picsum.photos/seed/picsum/40/40"
+          :title="`Curso ${i}`"
+          prepend-avatar="https://picsum.photos/seed/cursos/40/40"
         />
       </v-list>
     </div>

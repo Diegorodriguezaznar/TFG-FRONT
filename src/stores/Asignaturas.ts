@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import type { AsignaturaDTO } from "@/stores/dtos/AsignaturasDTO";
+import type { AsignaturaCrearDTO } from "@/stores/dtos/AsignaturaCrearDTO";
+
 
 export const useAsignaturaStore = defineStore("asignatura", () => {
   // --------------------------- Estado ---------------------------
@@ -73,11 +75,10 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
   }
 
   // --------------------------- Métodos de modificación de asignaturas ---------------------------
-  // Crear una nueva asignatura
-  async function createAsignatura(nuevaAsignatura: Omit<AsignaturaDTO, 'idAsignatura' | 'fechaCreacion'>): Promise<boolean> {
+async function createAsignatura(nuevaAsignatura: AsignaturaCrearDTO): Promise<boolean> {
     isLoading.value = true;
     clearMessages();
-    
+
     try {
       const response = await fetch("http://localhost:5190/api/Asignatura", {
         method: "POST",
@@ -101,6 +102,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
       isLoading.value = false;
     }
   }
+
 
   // Actualizar una asignatura existente
   async function updateAsignatura(asignatura: AsignaturaDTO): Promise<boolean> {
@@ -160,6 +162,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
       isLoading.value = false;
     }
   }
+  
 
   // --------------------------- Filtrado de asignaturas ---------------------------
   const asignaturasFiltradas = computed(() => (searchQuery: string) => {
