@@ -1,6 +1,7 @@
-<!-- src/components/Usuarios/CardUsuario.vue - Versión mejorada -->
+<!-- src/components/Usuarios/CardUsuario.vue - Versión completa con navegación -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useUsuarioEstadisticasStore } from '@/stores/UsuarioEstadisticas';
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
@@ -9,7 +10,8 @@ const props = defineProps<{
   usuario: UsuarioDTO;
 }>();
 
-// Store
+// Router y Store
+const router = useRouter();
 const estadisticasStore = useUsuarioEstadisticasStore();
 
 // Variables
@@ -51,8 +53,15 @@ const cargarEstadisticas = async () => {
 };
 
 const verPerfil = () => {
-  console.log(`Viendo perfil de ${nombreCompleto.value}`);
-  // Aquí implementarías la navegación al perfil del usuario
+  console.log(`Navegando al perfil de ${nombreCompleto.value}`);
+  // Navegar al perfil del usuario específico
+  router.push(`/usuario/${props.usuario.idUsuario}`);
+};
+
+const verCursos = () => {
+  console.log(`Viendo cursos de ${nombreCompleto.value}`);
+  // Navegar a los cursos del profesor
+  router.push(`/cursos?profesor=${props.usuario.idUsuario}`);
 };
 
 // Lifecycle
@@ -65,6 +74,7 @@ onMounted(() => {
   <v-card 
     class="CardUsuario elevation-2"
     hover
+    @click="verPerfil"
   >
     <!-- Header con avatar y rol -->
     <div class="CardUsuario__Header">
@@ -158,10 +168,22 @@ onMounted(() => {
         color="orange"
         size="small"
         prepend-icon="mdi-account"
-        @click="verPerfil"
-        block
+        @click.stop="verPerfil"
+        variant="elevated"
+        class="flex-grow-1 mr-1"
       >
         Ver Perfil
+      </v-btn>
+      
+      <v-btn
+        color="blue"
+        size="small"
+        prepend-icon="mdi-school"
+        @click.stop="verCursos"
+        variant="outlined"
+        class="flex-grow-1 ml-1"
+      >
+        Cursos
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -174,6 +196,7 @@ onMounted(() => {
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   border: 1px solid rgba(255, 152, 0, 0.1);
   background: linear-gradient(135deg, #ffffff 0%, #fff8f5 100%);
+  cursor: pointer;
 }
 
 .CardUsuario:hover {
@@ -199,6 +222,11 @@ onMounted(() => {
   border: 3px solid white;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   margin-bottom: 12px;
+  transition: transform 0.2s ease;
+}
+
+.CardUsuario:hover .CardUsuario__Avatar {
+  transform: scale(1.05);
 }
 
 .CardUsuario__Chips {
@@ -292,6 +320,7 @@ onMounted(() => {
 
 .CardUsuario__Actions {
   padding: 12px 20px 20px 20px;
+  gap: 8px;
 }
 
 .CardUsuario__Actions .v-btn {
@@ -299,6 +328,7 @@ onMounted(() => {
   letter-spacing: 0.5px;
   border-radius: 8px;
   text-transform: none;
+  transition: all 0.2s ease;
 }
 
 .CardUsuario__Actions .v-btn:hover {
@@ -347,5 +377,23 @@ onMounted(() => {
   .CardUsuario__StatLabel {
     font-size: 0.7rem;
   }
+
+  .CardUsuario__Actions {
+    flex-direction: column;
+  }
+  
+  .CardUsuario__Actions .v-btn {
+    width: 100%;
+    margin: 2px 0;
+  }
+}
+
+/* Estados de interacción mejorados */
+.CardUsuario__Actions .v-btn:active {
+  transform: scale(0.98);
+}
+
+.CardUsuario:active {
+  transform: translateY(-2px);
 }
 </style>
