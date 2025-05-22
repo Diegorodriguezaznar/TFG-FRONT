@@ -155,22 +155,133 @@ export const useComentarioStore = defineStore("comentario", () => {
       ? `${c.usuario.nombre} ${c.usuario.apellidos}` 
       : c.usuario?.nombre || 'Usuario';
     
-    return {
-      id: c.idComentario,
-      user: nombreCompleto,
-      avatar: `https://picsum.photos/seed/user${c.idUsuario}/40/40`,
-      content: c.texto,
-      likes: 0,  // Este valor vendrá de la API en el futuro
-      time: tiempoTexto,
-      idUsuario: c.idUsuario,
-      fechaCreacion: c.fecha
-    };
+  return {
+    id: c.idComentario,
+    user: nombreCompleto,
+    avatar: `https://picsum.photos/seed/user${c.idUsuario}/40/40`,
+    content: c.texto,
+    likes: 0,
+    time: tiempoTexto,
+    idUsuario: c.idUsuario,
+    fechaCreacion: c.fecha,
+    numeroReportes: c.numeroReportes ?? 0 
+  };
+
   }
 
-  return { 
-    fetchComentariosByVideoId, 
-    createComentario,
-    errorMessage,
-    loading
-  };
+  // --------------------------- Reportar comentario ---------------------------
+async function reportarComentario(idComentario: number): Promise<boolean> {
+  loading.value = true;
+  errorMessage.value = "";
+
+  try {
+    const response = await fetch(`http://localhost:5190/api/ComentarioVideo/reportar/${idComentario}`, {
+      method: "PUT",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error al reportar comentario: ${response.statusText}`);
+    }
+
+    return true;
+  } catch (error: any) {
+    errorMessage.value = error.message || "Error al reportar comentario";
+    console.error("Error reportando comentario", error);
+    return false;
+  } finally {
+    loading.value = false;
+  }
+}
+
+// --------------------------- Obtener comentarios reportados ---------------------------
+  async function fetchComentariosReportados(): Promise<ComentarioUI[]> {
+    loading.value = true;
+    errorMessage.value = "";
+
+    try {
+      const response = await fetch(`http://localhost:5190/api/ComentarioVideo/reportados`, {
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener comentarios reportados: ${response.statusText}`);
+      }
+
+      const comentarios = await response.json();
+      return comentarios.map((c: any) => transformarComentario(c));
+    } catch (error: any) {
+      errorMessage.value = error.message || "Error al cargar comentarios reportados";
+      console.error(error);
+      return [];
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function eliminarComentario(idComentario: number): Promise<void> {
+  loading.value = true;
+  errorMessage.value = "";
+
+  try {
+    const response = await fetch(`http://localhost:5190/api/ComentarioVideo/${idComentario}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al eliminar comentario: ${errorText}`);
+    }
+  } catch (error: any) {
+    errorMessage.value = error.message || "Error al eliminar comentario";
+    console.error("Error eliminando comentario:", error);
+    throw error;
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function quitarReporteComentario(idComentario: number): Promise<boolean> {
+  loading.value = true;
+  errorMessage.value = "";
+
+  try {
+    const response = await fetch(`http://localhost:5190/api/ComentarioVideo/quitar-reportes/${idComentario}`, {
+      method: "PUT",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al quitar los reportes del comentario.");
+    }
+
+    return true;
+  } catch (error: any) {
+    errorMessage.value = error.message || "Error quitando reporte";
+    console.error(error);
+    return false;
+  } finally {
+    loading.value = false;
+  }
+}
+
+
+
+return { 
+  fetchComentariosByVideoId, 
+  createComentario,
+  reportarComentario,
+  fetchComentariosReportados,
+  eliminarComentario,
+  quitarReporteComentario,
+  errorMessage,
+  loading
+};
+
 });

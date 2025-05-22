@@ -86,7 +86,13 @@ const routes = [
         path: "reportes",
         component: () => import("@/components/Private/PrivateVideosR/AdminVideosReportados.vue"),
         meta: { requiresAdmin: true }
+      },
+      {
+        path: "comentarios-reportados",
+        component: () => import("@/components/Private/PrivateComentariosR/AdminComentariosReportados.vue"),
+        meta: { requiresAdmin: true }
       }
+
     ]
   }
 ];
