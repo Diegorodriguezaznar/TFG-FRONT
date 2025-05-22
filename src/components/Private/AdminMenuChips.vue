@@ -26,6 +26,10 @@ function irA(ruta: string) {
       Comentarios Reportados
     </v-chip>
 
+    <v-chip color="primary" variant="elevated" @click="irA('/admin/peticiones-profesor')">
+      Peticiones de Profesor
+    </v-chip>
+
     <v-chip color="blue-darken-4" class="salir" variant="elevated" @click="irA('/')">
       Salir del panel
     </v-chip>

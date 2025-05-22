@@ -9,6 +9,7 @@ import Videos from "@/views/Home.vue";
 import SubirVideos from "../views/SubirVideoPage.vue";
 import AdminPage from "../views/AdminPage.vue";
 import Login from '../views/Login.vue';
+import PeticionProfesorPage from '../views/PeticionProfesorPage.vue';
 
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
@@ -16,6 +17,7 @@ const routes = [
   { path: "/", component: Login },
   { path: "/login", component: Login },
   { path: "/cursos", component: HomePage },
+  { path: "/peticion-profesor", component: PeticionProfesorPage },
   {
     path: "/subir-video",
     component: SubirVideos,
@@ -62,7 +64,6 @@ const routes = [
     component: QuizDetalle,
     props: true
   },
-
   {
     path: "/admin",
     component: AdminPage,
@@ -88,11 +89,15 @@ const routes = [
         meta: { requiresAdmin: true }
       },
       {
+        path: "peticiones-profesor",
+        component: () => import("@/components/Private/PrivatePeticionProfesor/AdminPeticionesProfesor.vue"),
+        meta: { requiresAdmin: true }
+      },
+      {
         path: "comentarios-reportados",
         component: () => import("@/components/Private/PrivateComentariosR/AdminComentariosReportados.vue"),
         meta: { requiresAdmin: true }
       }
-
     ]
   }
 ];
@@ -102,7 +107,7 @@ const router = createRouter({
   routes
 });
 
-//  Limpiar consola al cambiar de ruta
+// Limpiar consola al cambiar de ruta
 router.beforeEach((to, from, next) => {
   if (to.path !== from.path) {
     console.clear();
@@ -117,31 +122,27 @@ router.beforeEach((to, from, next) => {
   const usuario = usuarioLogeadoStore.usuarioActual;
   const idRol = usuario?.idRol;
 
-  // Rutas públicas
   if (!to.meta.requiresAuth) {
-    next();
+    next(); // Ruta pública
     return;
   }
 
-  // Requiere autenticación
   if (!usuarioLogeadoStore.estaAutenticado) {
-    next("/login");
+    next("/login"); // Ruta privada pero no logueado
     return;
   }
 
-  // Requiere rol específico (por ejemplo, [2, 3])
   if (to.meta.allowRoles && !to.meta.allowRoles.includes(idRol)) {
-    next("/cursos");
+    next("/cursos"); // No tiene permiso por rol
     return;
   }
 
-  // Requiere ser admin
-  if (to.meta.requiresAdmin && idRol == 3) {
-    next("/cursos");
+  if (to.meta.requiresAdmin && idRol !== 3) {
+    next("/cursos"); // No es admin
     return;
   }
 
-  next();
+  next(); // Todo bien
 });
 
 export default router;

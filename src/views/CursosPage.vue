@@ -48,6 +48,7 @@ const fetchCursos = async () => {
 // --------------------------- Event Handlers ---------------------------
 const handleCursoGuardado = (cursoId) => {
   console.log(`Curso guardado: ${cursoId}`);
+  console.log("Usuario logeado:", usuarioLogeadoStore.usuarioActual);
   // Aquí puedes añadir lógica adicional si es necesario
 };
 

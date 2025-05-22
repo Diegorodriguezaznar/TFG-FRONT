@@ -27,7 +27,8 @@ const allMenuItems = [
   { title: 'Inicio', icon: 'mdi-home', route: '/cursos' },
   { title: 'Mis Cursos', icon: 'mdi-folder', route: '/mis-cursos' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
-  { title: 'Crear Curso', icon: 'mdi-plus-box', route: '/crear-curso', rolesPermitidos: [2, 3] }
+  { title: 'Crear Curso', icon: 'mdi-plus-box', route: '/crear-curso', rolesPermitidos: [2, 3] },
+  { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
 ];
 
 const menuItems = computed(() =>
