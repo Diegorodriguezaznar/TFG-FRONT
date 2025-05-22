@@ -1,3 +1,4 @@
+<!-- src/components/Layout/Sidebar.vue - Sección actualizada del menú -->
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref, computed } from 'vue';
@@ -17,16 +18,16 @@ const isExpanded = ref(true);
 const { mobile } = useDisplay();
 const isMobile = computed(() => mobile.value);
 
-// --------------------------- Menú ---------------------------
+// --------------------------- Menú actualizado ---------------------------
 const menuItems = [
   { title: 'Inicio', icon: 'mdi-home', route: '/' },
   { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
+  { title: 'Usuarios', icon: 'mdi-account-group', route: '/usuarios' }, // Nueva opción
   { title: 'Quizzes', icon: 'mdi-school-outline', route: '/quizz-time!' },
   { title: 'Subir Video', icon: 'mdi-upload', route: '/subir-video' }
-
 ];
 
 // --------------------------- Métodos ---------------------------
@@ -67,6 +68,7 @@ const drawer = computed({
         :title="isExpanded ? item.title : ''"
         :prepend-icon="item.icon"
         class="Sidebar__MenuItem"
+        :class="{ 'Sidebar__MenuItem--usuarios': item.route === '/usuarios' }"
       ></v-list-item>
     </v-list>
     
@@ -91,10 +93,5 @@ const drawer = computed({
 .Sidebar {
   background-color: white;
   border-right: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.Sidebar__MenuItem {
-  margin-bottom: 4px;
-  border-radius: 0;
 }
 </style>
