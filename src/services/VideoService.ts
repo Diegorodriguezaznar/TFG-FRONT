@@ -1,5 +1,3 @@
-
-// VideoService.ts actualizado para utilizar el endpoint de video directamente
 import axios from 'axios';
 
 // Tipos de datos
@@ -29,6 +27,85 @@ interface VideoData {
 
 class VideoService {
   /**
+   * Intenta obtener el ID del usuario desde localStorage
+   * @returns ID del usuario o lanza un error si no se encuentra
+   */
+  private getUserId(): number {
+    try {
+      // Primero, imprimir todas las claves en localStorage para depuración
+      console.log('Todas las claves en localStorage:', Object.keys(localStorage));
+      
+      // Intentar obtener la información del usuario de 'usuario', 'user' o similares
+      let userData = null;
+      let userKey = '';
+      
+      // Buscar la clave correcta que contiene los datos del usuario
+      for (const key of Object.keys(localStorage)) {
+        if (key.toLowerCase().includes('user') || key.toLowerCase().includes('usuario')) {
+          try {
+            console.log(`Contenido de localStorage['${key}']:`, localStorage.getItem(key));
+            const data = JSON.parse(localStorage.getItem(key) || '');
+            if (data && typeof data === 'object') {
+              userData = data;
+              userKey = key;
+              break;
+            }
+          } catch (e) {
+            console.warn(`Error al parsear localStorage['${key}']:`, e);
+          }
+        }
+      }
+      
+      if (!userData) {
+        throw new Error('No se encontró información de usuario en localStorage');
+      }
+      
+      console.log(`Datos de usuario encontrados en localStorage['${userKey}']:`, userData);
+      
+      // Intentar encontrar el ID del usuario en diferentes formatos posibles
+      let userId: number | null = null;
+      
+      // Comprobar diferentes formatos de ID
+      if (typeof userData.id !== 'undefined') {
+        userId = Number(userData.id);
+      } else if (typeof userData.userId !== 'undefined') {
+        userId = Number(userData.userId);
+      } else if (typeof userData.idUsuario !== 'undefined') {
+        userId = Number(userData.idUsuario);
+      } else if (typeof userData.ID !== 'undefined') {
+        userId = Number(userData.ID);
+      }
+      
+      // Si encontramos el ID pero es NaN, intentar otras propiedades
+      if (userId === null || isNaN(userId)) {
+        // Buscar cualquier propiedad que parezca un ID
+        for (const key in userData) {
+          if (
+            key.toLowerCase().includes('id') && 
+            typeof userData[key] !== 'undefined' &&
+            (typeof userData[key] === 'number' || /^\d+$/.test(String(userData[key])))
+          ) {
+            userId = Number(userData[key]);
+            break;
+          }
+        }
+      }
+      
+      if (userId === null || isNaN(userId)) {
+        console.error('Datos de usuario encontrados pero no contienen un ID válido:', userData);
+        throw new Error('ID de usuario no encontrado o no válido');
+      }
+      
+      console.log('ID de usuario que se usará:', userId);
+      return userId;
+      
+    } catch (error) {
+      console.error('Error al obtener el ID de usuario:', error);
+      throw new Error('No se pudo obtener el ID de usuario. Asegúrate de haber iniciado sesión correctamente.');
+    }
+  }
+
+  /**
    * Sube un video completo (archivo, miniatura y metadata)
    */
   async uploadCompleteVideo(
@@ -39,6 +116,10 @@ class VideoService {
     progressCallback: (progress: number) => void = () => {}
   ): Promise<any> {
     try {
+      // Obtener el ID del usuario primero, antes de cualquier otra operación
+      // Esto lanzará un error si no hay usuario, lo que detendrá el proceso de subida
+      const userId = this.getUserId();
+      
       // Iniciar el progreso
       progressCallback(0);
       
@@ -74,13 +155,9 @@ class VideoService {
         formData.append('IdAsignatura', '1');
       }
       
-      // Obtener el ID del usuario actual del almacenamiento local si está disponible
-      const currentUser = localStorage.getItem('user') 
-        ? JSON.parse(localStorage.getItem('user') || '{}')
-        : null;
-      
-      const userId = currentUser?.id || 1; // Usar 1 como valor predeterminado si no hay usuario
+      // Usar el ID de usuario que obtuvimos
       formData.append('IdUsuario', userId.toString());
+      console.log('Usando ID de usuario del localStorage:', userId);
       
       // Imprimir en consola todos los datos que se están enviando para depuración
       console.log('Enviando datos de video:');

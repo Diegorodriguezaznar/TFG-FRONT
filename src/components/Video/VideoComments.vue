@@ -5,6 +5,8 @@ import { useComentarioStore } from '@/stores/Comentario';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import type { ComentarioUI } from '@/stores/dtos/ComentarioDTO';
 import { storeToRefs } from 'pinia';
+import ModalReportarComentario from './Modales/ModalReportarComentario.vue';
+import ModalNotificacion from './Modales/ModalReporteCorrecto.vue';
 
 // --------------------------- Stores ---------------------------
 const comentarioStore = useComentarioStore();
@@ -25,6 +27,14 @@ const newComment = ref('');
 const commentError = ref('');
 const showLoginMsg = ref(false);
 
+// Variables para los modales de reporte
+const dialogConfirmarReporte = ref(false);
+const dialogReporteExitoso = ref(false);
+const dialogErrorReporte = ref(false);
+const comentarioAReportar = ref<ComentarioUI | null>(null);
+const mensajeError = ref('');
+const cargandoReporte = ref(false);
+
 // --------------------------- Computed ---------------------------
 const usuarioActual = computed(() => usuarioLogeadoStore.usuarioActual);
 const usuarioId = computed(() => {
@@ -44,6 +54,42 @@ const cargarComentarios = async () => {
     }
   } catch (error) {
     console.error("Error al cargar comentarios:", error);
+  }
+};
+
+const abrirModalReporte = (comentario: ComentarioUI) => {
+  if (!usuarioId.value) {
+    showLoginMsg.value = true;
+    return;
+  }
+  
+  comentarioAReportar.value = comentario;
+  dialogConfirmarReporte.value = true;
+};
+
+const confirmarReporte = async () => {
+  if (!comentarioAReportar.value) return;
+  
+  cargandoReporte.value = true;
+  
+  try {
+    const exito = await comentarioStore.reportarComentario(comentarioAReportar.value.id);
+    
+    if (exito) {
+      dialogConfirmarReporte.value = false;
+      dialogReporteExitoso.value = true;
+    } else {
+      dialogConfirmarReporte.value = false;
+      mensajeError.value = 'No se pudo reportar el comentario. Inténtalo de nuevo.';
+      dialogErrorReporte.value = true;
+    }
+  } catch (error: any) {
+    dialogConfirmarReporte.value = false;
+    mensajeError.value = error.message || 'Error al reportar el comentario';
+    dialogErrorReporte.value = true;
+  } finally {
+    cargandoReporte.value = false;
+    comentarioAReportar.value = null;
   }
 };
 
@@ -200,7 +246,13 @@ onMounted(() => {
                 <v-icon size="small">mdi-thumb-down</v-icon>
               </v-btn>
               
-              <v-btn variant="text" class="text-caption ml-4">Responder</v-btn>
+              <v-btn 
+                variant="text" 
+                class="text-caption ml-4 text-red"
+                @click="abrirModalReporte(comment)"
+              >
+                Reportar
+              </v-btn>
             </div>
           </div>
         </div>
@@ -212,6 +264,34 @@ onMounted(() => {
       <v-icon color="grey" size="large">mdi-comment-text-outline</v-icon>
       <p class="mt-2 text-body-2 text-grey">No hay comentarios aún. ¡Sé el primero en comentar!</p>
     </div>
+
+    <!-- Modal de confirmación de reporte -->
+    <ModalReportarComentario
+      :mostrar="dialogConfirmarReporte"
+      :comentario="comentarioAReportar"
+      :cargando="cargandoReporte"
+      @update:mostrar="dialogConfirmarReporte = $event"
+      @confirmar="confirmarReporte"
+    />
+
+    <!-- Modal de reporte exitoso -->
+    <ModalNotificacion
+      :mostrar="dialogReporteExitoso"
+      tipo="success"
+      titulo="Reporte enviado"
+      mensaje="Gracias por reportar este comentario. Nuestro equipo lo revisará pronto."
+      @update:mostrar="dialogReporteExitoso = $event"
+    />
+
+    <!-- Modal de error en reporte --> 
+    <ModalNotificacion
+      :mostrar="dialogErrorReporte"
+      tipo="error"
+      titulo="Error al reportar"
+      :mensaje="mensajeError"
+      texto-boton="Cerrar"
+      @update:mostrar="dialogErrorReporte = $event"
+    />
   </div>
 </template>
 

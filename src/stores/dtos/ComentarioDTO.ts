@@ -4,6 +4,7 @@ export interface ComentarioDTO {
   fecha: string;
   idUsuario: number;
   idVideo: number;
+  numeroReportes?: number;
   usuario?: {
     idUsuario: number;
     nombre: string;
@@ -12,6 +13,7 @@ export interface ComentarioDTO {
     telefono?: string;
   };
 }
+
 
 // Interfaz para el formato de comentario en la UI
 export interface ComentarioUI {
@@ -23,4 +25,5 @@ export interface ComentarioUI {
   time: string;
   idUsuario: number;
   fechaCreacion: string;
+  numeroReportes?: number;
 }

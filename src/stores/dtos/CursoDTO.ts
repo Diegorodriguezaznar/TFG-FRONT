@@ -4,4 +4,6 @@ export interface CursoDTO {
   imagen: string | null;
   descripcion: string | null;
   fechaCreacion: string;
+  asignaturas: any[]; 
+  usuarioCursos: any[];
 }

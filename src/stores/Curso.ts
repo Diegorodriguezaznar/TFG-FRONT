@@ -107,13 +107,21 @@ export const useCursoStore = defineStore("curso", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
+      // Asegurar que los campos requeridos estén presentes
+      const cursoToCreate = {
+        ...newCurso,
+        // Si no se proporcionan, establecer como arrays vacíos
+        asignaturas: newCurso.asignaturas || [],
+        usuarioCursos: newCurso.usuarioCursos || []
+      };
+      
       const response = await fetch("http://localhost:5190/api/Curso", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-        body: JSON.stringify(newCurso),
+        body: JSON.stringify(cursoToCreate), // Usar el objeto con todos los campos requeridos
         signal: controller.signal
       });
       
