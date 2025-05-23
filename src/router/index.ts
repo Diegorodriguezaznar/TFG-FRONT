@@ -21,12 +21,12 @@ const routes = [
   {
     path: "/subir-video",
     component: SubirVideos,
-    meta: { requiresAuth: true, allowRoles: [2, 3] }
+    meta: { requiresAuth: true, allowRoles: [1,2, 3] }
   },
   {
     path: "/crear-curso",
     component: () => import("@/views/CrearCurso.vue"),
-    meta: { requiresAuth: true, allowRoles: [2, 3] }
+    meta: { requiresAuth: true, allowRoles: [1,2, 3] }
   },
   {
     path: "/curso/:id",

@@ -3,9 +3,13 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useVideoStore } from '@/stores/Video';
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 
 // --------------------------- Router ---------------------------
 const router = useRouter();
+const videoStore = useVideoStore();
+const usuarioLogeadoStore = useUsuarioLogeadoStore();
 
 // --------------------------- Props ---------------------------
 const props = defineProps({
@@ -137,6 +141,15 @@ const cargarInfoAutores = async () => {
   }
 };
 
+const eliminarVideo = async (idVideo: number) => {
+  const exito = await videoStore.eliminarVideoPropio(idVideo);
+  if (exito) {
+    videosConAutores.value = videosConAutores.value.filter(
+      v => v.idVideo !== idVideo && v.id !== idVideo
+    );
+  }
+};
+
 // --------------------------- Colores para asignaturas ---------------------------
 function getColorForAsignatura(asignatura: string): string {
   const colores: Record<string, string> = {
@@ -193,19 +206,19 @@ watch(() => props.videos, async (newVideos) => {
             </template>
           </v-img>
           
-          <v-card-item>
+         <v-card-item>
             <v-row no-gutters>
               <v-col cols="auto" class="mr-3">
                 <v-avatar size="36" :color="getColorForAsignatura(video.asignatura)">
                   {{ video.autor ? video.autor.charAt(0).toUpperCase() : 'U' }}
                 </v-avatar>
               </v-col>
-              
+
               <v-col>
-                <v-card-title class="text-subtitle-1 font-weight-bold px-0 py-0">
+                <v-card-title class="text-subtitle-1 font-weight-bold px-0 py-0" @click="verVideo(video)">
                   {{ video.titulo }}
                 </v-card-title>
-                
+
                 <v-card-subtitle class="px-0 py-1">
                   <div class="text-body-2">{{ video.autor }}</div>
                   <div class="text-caption text-grey">
@@ -214,7 +227,20 @@ watch(() => props.videos, async (newVideos) => {
                 </v-card-subtitle>
               </v-col>
             </v-row>
+
+            <!-- Botón Eliminar (solo si es del usuario logeado) -->
+            <v-btn
+              v-if="video.idUsuario === usuarioLogeadoStore.usuarioActual?.idUsuario"
+              class="ma-2"
+              variant="text"
+              color="error"
+              size="small"
+              @click.stop="eliminarVideo(video.idVideo || video.id)"
+            >
+              Eliminar
+            </v-btn>
           </v-card-item>
+
           
           <!-- Etiqueta de asignatura -->
           <v-chip

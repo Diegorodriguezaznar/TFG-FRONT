@@ -271,6 +271,35 @@ async function quitarReporteComentario(idComentario: number): Promise<boolean> {
   }
 }
 
+async function eliminarComentarioPropio(idComentario: number): Promise<boolean> {
+  loading.value = true;
+  errorMessage.value = "";
+
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Token no disponible");
+
+    const response = await fetch(`http://localhost:5190/api/ComentarioVideo/borrar-propio/${idComentario}`, {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al eliminar comentario propio: ${response.status} ${errorText}`);
+    }
+
+    return true;
+  } catch (error: any) {
+    errorMessage.value = error.message || "Error al eliminar comentario propio";
+    console.error("Error eliminando comentario propio:", error);
+    return false;
+  } finally {
+    loading.value = false;
+  }
+}
 
 
 return { 
@@ -279,6 +308,7 @@ return {
   reportarComentario,
   fetchComentariosReportados,
   eliminarComentario,
+  eliminarComentarioPropio,
   quitarReporteComentario,
   errorMessage,
   loading
