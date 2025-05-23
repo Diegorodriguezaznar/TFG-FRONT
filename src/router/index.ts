@@ -94,6 +94,11 @@ const routes = [
         meta: { requiresAdmin: true }
       },
       {
+        path: "estadisticas",
+        component: () => import("@/components/Private/PrivateEstadisticas/AdminEstadisticas.vue"),
+        meta: { requiresAdmin: true }
+      },
+      {
         path: "comentarios-reportados",
         component: () => import("@/components/Private/PrivateComentariosR/AdminComentariosReportados.vue"),
         meta: { requiresAdmin: true }
@@ -137,7 +142,7 @@ router.beforeEach((to, from, next) => {
     return;
   }
 
-  if (to.meta.requiresAdmin && idRol !== 3) {
+  if (to.meta.requiresAdmin && idRol == 3) {
     next("/cursos"); // No es admin
     return;
   }

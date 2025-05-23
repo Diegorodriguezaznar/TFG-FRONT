@@ -30,6 +30,10 @@ function irA(ruta: string) {
       Peticiones de Profesor
     </v-chip>
 
+    <v-chip color="primary" variant="elevated" @click="irA('/admin/estadisticas')">
+      Estadisticas
+    </v-chip>
+
     <v-chip color="blue-darken-4" class="salir" variant="elevated" @click="irA('/')">
       Salir del panel
     </v-chip>
