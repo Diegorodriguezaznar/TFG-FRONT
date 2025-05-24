@@ -7,13 +7,14 @@ import CursoResumen from '@/components/CrearCursos/CursoResumen.vue';
 // Store
 const cursoStore = useCursoStore();
 
+// Referencia al componente de datos
+const cursoDatosRef = ref();
+
 const cursoForm = ref({
   nombre: '',
   imagen: '',
   descripcion: '',
-  idUsuarioCreador: 24, // TODO: reemplazar con el ID del usuario logueado
-  asignaturas: [], // Campo requerido por el backend
-  usuarioCursos: [] // Campo requerido por el backend
+  idUsuario: 24, // TODO: reemplazar con el ID del usuario logueado
 });
 
 const cursoCreado = ref(null);
@@ -30,20 +31,28 @@ const crearCurso = async () => {
   
   loading.value = true;
   
-  const curso = await cursoStore.createCurso({
-    nombre: cursoForm.value.nombre,
-    imagen: cursoForm.value.imagen,
-    descripcion: cursoForm.value.descripcion,
-    idUsuarioCreador: cursoForm.value.idUsuarioCreador,
-    asignaturas: cursoForm.value.asignaturas,
-    usuarioCursos: cursoForm.value.usuarioCursos
-  });
+  try {
+    // Obtener el archivo del componente hijo
+    const imagenFile = cursoDatosRef.value?.selectedFile;
+    
+    // Llamar al store con los datos y el archivo
+    const curso = await cursoStore.createCurso(
+      {
+        nombre: cursoForm.value.nombre,
+        descripcion: cursoForm.value.descripcion,
+        imagen: '' // Ya no se usa
+      },
+      imagenFile // El archivo File
+    );
 
-  loading.value = false;
-  
-  if (curso) {
-    cursoCreado.value = curso;
-    showSuccess.value = true;
+    if (curso) {
+      cursoCreado.value = curso;
+      showSuccess.value = true;
+    }
+  } catch (error) {
+    console.error('Error al crear curso:', error);
+  } finally {
+    loading.value = false;
   }
 };
 </script>
@@ -62,7 +71,7 @@ const crearCurso = async () => {
           <!-- Datos del curso -->
           <v-col cols="12" md="7">
             <h3 class="text-h5 mb-4 text-primary">Detalles del curso</h3>
-            <CursoDatos v-model="cursoForm" />
+            <CursoDatos ref="cursoDatosRef" v-model="cursoForm" />
           </v-col>
 
           <!-- Vista previa -->

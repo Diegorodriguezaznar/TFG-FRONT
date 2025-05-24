@@ -103,27 +103,36 @@ export const useCursoStore = defineStore("curso", () => {
   // --------------------------- Métodos de Modificación ---------------------------
   
   // Crear un nuevo curso
-
-  async function createCurso(newCurso: Omit<CursoDTO, 'idCurso' | 'fechaCreacion' | 'idUsuario' | 'usuario'>) {
+  async function createCurso(
+    cursoData: Omit<CursoDTO, 'idCurso' | 'fechaCreacion' | 'idUsuario' | 'usuario'>,
+    imagenFile?: File
+  ) {
     loading.value = true;
 
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
-      const { token } = useUsuarioLogeadoStore();
+      const usuarioStore = useUsuarioLogeadoStore();
+
+      // Crear FormData para enviar archivo
+      const formData = new FormData();
+      formData.append('Nombre', cursoData.nombre);
+      formData.append('Descripcion', cursoData.descripcion || '');
+      formData.append('IdUsuario', usuarioStore.usuarioActual?.idUsuario?.toString() || '');
+      
+      // Agregar imagen si existe
+      if (imagenFile) {
+        formData.append('Imagen', imagenFile);
+      }
 
       const response = await fetch("http://localhost:5190/api/Curso/crear", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json",
           "Accept": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Authorization": `Bearer ${usuarioStore.token}`
+          // NO incluir Content-Type para FormData
         },
-        body: JSON.stringify({
-          nombre: newCurso.nombre,
-          descripcion: newCurso.descripcion,
-          imagen: newCurso.imagen || ""
-        }),
+        body: formData, // FormData en lugar de JSON
         signal: controller.signal
       });
 
@@ -138,8 +147,9 @@ export const useCursoStore = defineStore("curso", () => {
       cursos.value.push(createdCurso);
       return createdCurso;
     } catch (error: any) {
+      // ... mismo manejo de errores
       let message = "Error al crear el curso";
-
+      
       if (error.name === 'AbortError') {
         message = "La conexión con el servidor ha excedido el tiempo de espera";
       } else if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -155,7 +165,6 @@ export const useCursoStore = defineStore("curso", () => {
       loading.value = false;
     }
   }
-
 
   // Actualizar un curso existente
   async function updateCurso(updatedCurso: CursoDTO) {
