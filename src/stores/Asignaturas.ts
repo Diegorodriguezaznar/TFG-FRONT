@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import type { AsignaturaDTO } from "@/stores/dtos/AsignaturasDTO";
 import type { AsignaturaCrearDTO } from "@/stores/dtos/AsignaturaCrearDTO";
+import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 
 export const useAsignaturaStore = defineStore("asignatura", () => {
@@ -75,20 +76,31 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
   }
 
   // --------------------------- Métodos de modificación de asignaturas ---------------------------
-async function createAsignatura(nuevaAsignatura: AsignaturaCrearDTO): Promise<boolean> {
+
+  async function createAsignatura(nuevaAsignatura: AsignaturaCrearDTO): Promise<boolean> {
     isLoading.value = true;
     clearMessages();
 
     try {
+      const { token } = useUsuarioLogeadoStore();
+
       const response = await fetch("http://localhost:5190/api/Asignatura", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(nuevaAsignatura),
+        body: JSON.stringify({
+          nombre: nuevaAsignatura.nombre,
+          descripcion: nuevaAsignatura.descripcion,
+          idCurso: nuevaAsignatura.idCurso
+        }),
       });
 
-      if (!response.ok) throw new Error("Error al crear la asignatura");
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al crear la asignatura: ${response.status} ${errorText}`);
+      }
 
       const asignaturaCreada = await response.json();
       asignaturas.value.push(asignaturaCreada);
@@ -102,6 +114,7 @@ async function createAsignatura(nuevaAsignatura: AsignaturaCrearDTO): Promise<bo
       isLoading.value = false;
     }
   }
+
 
 
   // Actualizar una asignatura existente

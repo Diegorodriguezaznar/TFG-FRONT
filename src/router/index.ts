@@ -10,6 +10,7 @@ import SubirVideos from "../views/SubirVideoPage.vue";
 import AdminPage from "../views/AdminPage.vue";
 import Login from '../views/Login.vue';
 import PeticionProfesorPage from '../views/PeticionProfesorPage.vue';
+import CrearAsignaturas from '../views/CrearAsignaturas.vue';
 
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
@@ -18,15 +19,22 @@ const routes = [
   { path: "/login", component: Login },
   { path: "/cursos", component: HomePage },
   { path: "/peticion-profesor", component: PeticionProfesorPage },
+  { path: "/curso/:idCurso/asignaturas", component: CrearAsignaturas },
   {
-    path: "/subir-video",
+    path: "/subir-video/:idCurso",
     component: SubirVideos,
-    meta: { requiresAuth: true, allowRoles: [2, 3] }
+    props: true,
+    meta: { requiresAuth: true, allowRoles: [1,2, 3] }
   },
+    {
+    path: "/subir-video",
+    redirect: "/cursos"
+  },
+  
   {
     path: "/crear-curso",
     component: () => import("@/views/CrearCurso.vue"),
-    meta: { requiresAuth: true, allowRoles: [2, 3] }
+    meta: { requiresAuth: true, allowRoles: [1,2, 3] }
   },
   {
     path: "/curso/:id",
@@ -94,6 +102,11 @@ const routes = [
         meta: { requiresAdmin: true }
       },
       {
+        path: "estadisticas",
+        component: () => import("@/components/Private/PrivateEstadisticas/AdminEstadisticas.vue"),
+        meta: { requiresAdmin: true }
+      },
+      {
         path: "comentarios-reportados",
         component: () => import("@/components/Private/PrivateComentariosR/AdminComentariosReportados.vue"),
         meta: { requiresAdmin: true }
@@ -137,7 +150,7 @@ router.beforeEach((to, from, next) => {
     return;
   }
 
-  if (to.meta.requiresAdmin && idRol !== 3) {
+  if (to.meta.requiresAdmin && idRol == 3) {
     next("/cursos"); // No es admin
     return;
   }

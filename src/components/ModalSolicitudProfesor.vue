@@ -187,6 +187,7 @@
 import { ref, computed, watch } from 'vue'
 import { usePeticionProfesorStore } from '@/stores/PeticionProfesor'
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado'
+import axios from 'axios'
 
 // Props y emits
 const props = defineProps<{
@@ -285,30 +286,24 @@ const formatFileSize = (bytes: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
-const uploadFile = async (file: File): Promise<string> => {
-  // Simular upload - aquí deberías implementar la lógica real de upload
-  // Por ejemplo, usando FormData y enviando a tu API de upload
-  
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      // Simular URL de respuesta del servidor
-      resolve(`https://tu-servidor.com/uploads/${file.name}`)
-    }, 1000)
+const uploadFile = async (file: File): Promise<void> => {
+  const formData = new FormData()
+  formData.append('IdUsuario', usuarioLogeadoStore.usuarioActual?.idUsuario.toString() || '')
+  formData.append('Texto', motivacion.value)
+  formData.append('Documentacion', file) // La imagen
+
+  const response = await axios.post('http://localhost:5190/api/PeticionProfesor', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
   })
+
+  return response.data
 }
 
 const submitForm = async () => {
-  // Verificar autenticación antes de proceder
   if (!usuarioLogeadoStore.estaAutenticado) {
-    console.error('Usuario no autenticado')
     emit('loginRequired')
-    return
-  }
-
-  // Verificar que el usuario tenga ID
-  if (!usuarioLogeadoStore.usuarioActual?.idUsuario) {
-    console.error('Usuario sin ID válido')
-    fileError.value = 'Error de autenticación. Por favor, inicia sesión nuevamente.'
     return
   }
 
@@ -317,28 +312,25 @@ const submitForm = async () => {
   loading.value = true
   
   try {
-    // Upload file first
-    const documentacionUrl = await uploadFile(selectedFile.value)
-    
-    // Create petition
-    const success = await peticionStore.createPeticion({
-      documentacionUrl,
-      texto: motivacion.value
+    // Enviar directamente con FormData (no necesitas uploadFile separado)
+    const formData = new FormData()
+    formData.append('IdUsuario', usuarioLogeadoStore.usuarioActual?.idUsuario.toString() || '')
+    formData.append('Texto', motivacion.value)
+    formData.append('Documentacion', selectedFile.value)
+
+    const response = await axios.post('http://localhost:5190/api/PeticionProfesor', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     })
-    
-    if (success) {
+
+    if (response.data) {
       emit('success')
       resetForm()
     }
   } catch (error) {
     console.error('Error al enviar solicitud:', error)
-    
-    // Mostrar error específico al usuario
-    if (error instanceof Error) {
-      fileError.value = `Error al enviar solicitud: ${error.message}`
-    } else {
-      fileError.value = 'Error al enviar solicitud. Por favor, inténtalo de nuevo.'
-    }
+    fileError.value = 'Error al enviar solicitud. Por favor, inténtalo de nuevo.'
   } finally {
     loading.value = false
   }

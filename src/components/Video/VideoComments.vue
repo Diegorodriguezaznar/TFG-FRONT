@@ -56,6 +56,17 @@ const cargarComentarios = async () => {
     console.error("Error al cargar comentarios:", error);
   }
 };
+const eliminarComentario = async (idComentario: number) => {
+  try {
+    const exito = await comentarioStore.eliminarComentarioPropio(idComentario);
+    if (exito) {
+      comments.value = comments.value.filter(c => c.id !== idComentario);
+    }
+  } catch (error) {
+    console.error("Error eliminando comentario:", error);
+  }
+};
+
 
 const abrirModalReporte = (comentario: ComentarioUI) => {
   if (!usuarioId.value) {
@@ -253,6 +264,15 @@ onMounted(() => {
               >
                 Reportar
               </v-btn>
+              <v-btn 
+                v-if="comment.idUsuario === usuarioId" 
+                variant="text" 
+                class="text-caption ml-2 text-grey"
+                @click="eliminarComentario(comment.id)"
+              >
+                Eliminar
+              </v-btn>
+
             </div>
           </div>
         </div>

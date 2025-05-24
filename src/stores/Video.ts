@@ -423,6 +423,33 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
+    async function eliminarVideoPropio(idVideo: number): Promise<boolean> {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("Token no disponible");
+      return false;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5190/api/Video/borrar-propio/${idVideo}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al eliminar vídeo: ${response.status} ${errorText}`);
+      }
+
+      return true;
+    } catch (error: any) {
+      console.error("Error al eliminar vídeo:", error);
+      return false;
+    }
+  }
+
   // --------------------------- Datos de ejemplo para fallback ---------------------------
   async function aprobarVideo(idVideo: number) {
     loading.value = true;
@@ -445,7 +472,7 @@ export const useVideoStore = defineStore("video", () => {
       // Actualizar la lista de videos reportados eliminando el que fue aprobado
       videosReportados.value = videosReportados.value.filter(v => v.idVideo !== idVideo);
       
-      console.log(`%c✅ Video aprobado correctamente`, 'color: #42b883;');
+      console.log(`%c Video aprobado correctamente`, 'color: #42b883;');
       return true;
     } catch (error: any) {
       let message = "Error al aprobar el video";
@@ -463,7 +490,7 @@ export const useVideoStore = defineStore("video", () => {
       }
       
       errorMessage.value = message;
-      console.error('%c❌ Error al aprobar video:', 'color: #ff5252;', error);
+      console.error('%c Error al aprobar video:', 'color: #ff5252;', error);
       return false;
     } finally {
       loading.value = false;
@@ -533,6 +560,7 @@ export const useVideoStore = defineStore("video", () => {
     fetchVideosReportados,
     aprobarVideo,
     eliminarVideo,
+    eliminarVideoPropio,
     errorMessage,
   };
 });

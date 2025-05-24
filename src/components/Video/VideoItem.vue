@@ -8,11 +8,25 @@ const props = defineProps({
 });
 
 // --------------------------- Emits ---------------------------
-const emit = defineEmits(['ver-video']);
+const emit = defineEmits(['ver-video', 'eliminado']);
+
+// --------------------------- Stores ---------------------------
+import { useVideoStore } from '@/stores/Video';
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
+
+const videoStore = useVideoStore();
+const usuarioLogeadoStore = useUsuarioLogeadoStore();
 
 // --------------------------- Métodos ---------------------------
 const verVideo = () => {
   emit('ver-video', props.video.id);
+};
+
+const eliminarVideo = async () => {
+  const exito = await videoStore.eliminarVideoPropio(props.video.id);
+  if (exito) {
+    emit('eliminado', props.video.id);
+  }
 };
 
 // --------------------------- Colores para asignaturas ---------------------------
@@ -37,7 +51,6 @@ const getColorForAsignatura = (asignatura) => {
 <template>
   <v-card class="VideoItem" elevation="1" rounded="lg" @click="verVideo">
     <v-img :src="video.thumbnail" height="180" cover>
-      <!-- Duración (se podría agregar en un caso real) -->
       <template v-slot:placeholder>
         <v-row class="fill-height ma-0" align="center" justify="center">
           <v-progress-circular indeterminate color="grey-lighten-4"></v-progress-circular>
@@ -49,7 +62,7 @@ const getColorForAsignatura = (asignatura) => {
       <v-row no-gutters>
         <v-col cols="auto" class="mr-3">
           <v-avatar size="36">
-            <v-img src="https://picsum.photos/50/50"></v-img>
+            <v-img src="https://picsum.photos/seed/useravatar/50/50"></v-img>
           </v-avatar>
         </v-col>
         
@@ -69,7 +82,18 @@ const getColorForAsignatura = (asignatura) => {
         </v-col>
       </v-row>
     </v-card-item>
-    
+
+    <!-- Botón de eliminar visible solo si es del usuario -->
+    <v-btn
+      v-if="video.idUsuario === usuarioLogeadoStore.usuarioActual?.idUsuario"
+      class="ma-2"
+      color="error"
+      variant="text"
+      @click.stop="eliminarVideo"
+    >
+      Eliminar
+    </v-btn>
+
     <!-- Etiqueta de asignatura -->
     <v-chip
       variant="elevated"

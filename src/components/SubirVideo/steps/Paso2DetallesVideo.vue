@@ -1,52 +1,86 @@
+<!-- VideoDetailsStep.vue - Paso 2 optimizado -->
 <script setup lang="ts">
-// Imports esenciales
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
-import CourseSubjectSelector from './SelectorCursoAsignatura.vue';
+import { useAsignaturaStore } from '@/stores/Asignaturas';
 
-// Props y emits básicos
 const props = defineProps({
-  videoDetails: {
-    type: Object,
-    default: () => ({
-      title: '',
-      description: '',
-      thumbnail: null,
-      courseId: null,
-      subjectId: null
-    })
-  }
+  videoDetails: { type: Object, default: () => ({}) },
+  idCurso: { type: [String, Number], default: null } // Cambiar a idCurso
 });
 
 const emit = defineEmits(['details-updated']);
 
-// Variables principales
+const asignaturaStore = useAsignaturaStore();
+
 const thumbnailPreview = ref<string | null>(null);
 const isDragging = ref(false);
+const asignaturas = ref([]);
+const loading = ref(false);
+
 const details = ref({
   title: props.videoDetails.title || '',
   description: props.videoDetails.description || '',
   thumbnail: props.videoDetails.thumbnail || null,
-  courseId: props.videoDetails.courseId || null,
   subjectId: props.videoDetails.subjectId || null
 });
 
-// Métodos simplificados
+// Cargar asignaturas del curso actual
+const loadSubjects = async () => {
+  console.log('Loading subjects for idCurso:', props.idCurso); // Debug
+  
+  if (!props.idCurso) {
+    console.warn('No hay idCurso disponible para cargar asignaturas');
+    return;
+  }
+  
+  try {
+    loading.value = true;
+    await asignaturaStore.fetchAsignaturasByCurso(Number(props.idCurso));
+    asignaturas.value = asignaturaStore.asignaturas || [];
+    
+    console.log('Asignaturas cargadas:', asignaturas.value); // Debug
+  } catch (error) {
+    console.error('Error cargando asignaturas:', error);
+    asignaturas.value = [];
+  } finally {
+    loading.value = false;
+  }
+};
+
+// Watch para cargar asignaturas cuando cambie idCurso
+watch(() => props.idCurso, (newIdCurso) => {
+  if (newIdCurso) {
+    loadSubjects();
+  } else {
+    asignaturas.value = [];
+  }
+}, { immediate: true });
+
+// Manejo de miniatura
 const handleThumbnailInput = (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
-  if (file?.type.startsWith('image/')) updateThumbnail(file);
-  else if (file) alert('Por favor, selecciona una imagen válida.');
+  if (file?.type.startsWith('image/')) {
+    updateThumbnail(file);
+  } else if (file) {
+    alert('Por favor, selecciona una imagen válida.');
+  }
 };
 
 const handleThumbnailDrop = (event: DragEvent) => {
   isDragging.value = false;
   const file = event.dataTransfer?.files[0];
-  if (file?.type.startsWith('image/')) updateThumbnail(file);
-  else if (file) alert('Por favor, arrastra una imagen válida.');
+  if (file?.type.startsWith('image/')) {
+    updateThumbnail(file);
+  } else if (file) {
+    alert('Por favor, arrastra una imagen válida.');
+  }
 };
 
 const updateThumbnail = (file: File) => {
   details.value.thumbnail = file;
-  if (thumbnailPreview.value) URL.revokeObjectURL(thumbnailPreview.value);
+  if (thumbnailPreview.value) {
+    URL.revokeObjectURL(thumbnailPreview.value);
+  }
   thumbnailPreview.value = URL.createObjectURL(file);
   emitUpdate();
 };
@@ -61,46 +95,34 @@ const removeThumbnail = (event: Event) => {
   emitUpdate();
 };
 
-const handleCourseSubjectSelection = (selection: {courseId: number | null, subjectId: number | null}) => {
-  details.value.courseId = selection.courseId;
-  details.value.subjectId = selection.subjectId;
-  emitUpdate();
-};
-
 const emitUpdate = () => {
-  emit('details-updated', { ...details.value });
+  emit('details-updated', { 
+    ...details.value,
+    courseId: props.currentCourseId 
+  });
 };
 
-// Watchers y lifecycle hooks
-watch(() => props.videoDetails, (newDetails) => {
-  details.value = { 
-    ...newDetails,
-    title: newDetails.title || '',
-    description: newDetails.description || '',
-    courseId: newDetails.courseId || null,
-    subjectId: newDetails.subjectId || null,
-    thumbnail: newDetails.thumbnail || null
-  };
-  
-  if (newDetails.thumbnail && !thumbnailPreview.value) {
-    if (thumbnailPreview.value) URL.revokeObjectURL(thumbnailPreview.value);
-    thumbnailPreview.value = URL.createObjectURL(newDetails.thumbnail);
-  }
-}, { deep: true });
+// Watchers
+watch(() => details.value.title, emitUpdate);
+watch(() => details.value.description, emitUpdate);
+watch(() => details.value.subjectId, emitUpdate);
 
 onMounted(() => {
+  loadSubjects();
   if (details.value.thumbnail) {
     thumbnailPreview.value = URL.createObjectURL(details.value.thumbnail);
   }
 });
 
 onBeforeUnmount(() => {
-  if (thumbnailPreview.value) URL.revokeObjectURL(thumbnailPreview.value);
+  if (thumbnailPreview.value) {
+    URL.revokeObjectURL(thumbnailPreview.value);
+  }
 });
 </script>
 
 <template>
-  <v-sheet class="pa-4 rounded">
+  <div>
     <h2 class="text-h5 mb-2">Detalles del video</h2>
     <p class="text-subtitle-1 mb-4">Añade información sobre tu video</p>
 
@@ -108,123 +130,155 @@ onBeforeUnmount(() => {
       <!-- Columna izquierda: Miniatura -->
       <v-col cols="12" md="5">
         <v-card class="mb-4">
-          <v-card-title class="text-h6">Vista previa</v-card-title>
+          <v-card-title>Vista previa</v-card-title>
           <v-card-text>
+            <!-- Preview de miniatura -->
             <v-img
               v-if="thumbnailPreview"
               :src="thumbnailPreview"
+              height="180"
               cover
-              height="180"
-              class="rounded"
-            ></v-img>
+              class="rounded mb-3"
+            />
             
-            <v-sheet
+            <div 
               v-else
-              color="grey-lighten-3"
-              height="180"
-              class="d-flex flex-column align-center justify-center rounded"
+              class="preview-placeholder"
             >
-              <v-icon icon="mdi-image-off" size="large" class="mb-2"></v-icon>
-              <span>No hay miniatura seleccionada</span>
-            </v-sheet>
-          </v-card-text>
+              <v-icon size="large" class="mb-2">mdi-image-off</v-icon>
+              <span>Sin miniatura</span>
+            </div>
 
-          <!-- Área para subir miniatura -->
-          <v-card-text class="pt-0">
-            <v-sheet
-              rounded
-              class="thumbnail-drop-area pa-3 d-flex align-center justify-center"
-              height="70"
-              :elevation="isDragging ? 2 : 0"
-              :color="details.thumbnail ? 'grey-lighten-5' : 'grey-lighten-4'"
-              style="border: 2px dashed #ccc; cursor: pointer;"
+            <!-- Área de subida de miniatura -->
+            <div
+              class="thumbnail-upload"
+              :class="{ 'thumbnail-upload--dragging': isDragging }"
               @dragover.prevent="isDragging = true"
               @dragleave.prevent="isDragging = false"
               @drop.prevent="handleThumbnailDrop"
-              @click="$event => document.getElementById('thumbnailInput')?.click()"
+              @click="$refs.thumbnailInput?.click()"
             >
               <input 
+                ref="thumbnailInput"
                 type="file" 
-                id="thumbnailInput" 
-                style="display: none;" 
+                style="display: none" 
                 accept="image/*" 
                 @change="handleThumbnailInput"
               >
               
               <div v-if="!details.thumbnail" class="text-center">
-                <v-icon icon="mdi-image-plus" class="me-2"></v-icon>
+                <v-icon class="me-2">mdi-image-plus</v-icon>
                 <span>Subir miniatura</span>
               </div>
               
-              <div v-else class="text-center d-flex align-center">
-                <v-icon icon="mdi-check-circle" color="success" class="me-2"></v-icon>
+              <div v-else class="d-flex align-center justify-center">
+                <v-icon color="success" class="me-2">mdi-check-circle</v-icon>
                 <span>Miniatura seleccionada</span>
-                <v-btn icon="mdi-close" size="small" color="error" variant="text" class="ms-2"
-                  @click.stop="removeThumbnail"></v-btn>
+                <v-btn 
+                  icon="mdi-close" 
+                  size="small" 
+                  color="error" 
+                  variant="text" 
+                  class="ms-2"
+                  @click.stop="removeThumbnail"
+                />
               </div>
-            </v-sheet>
-            
-            <div class="text-caption mt-2 text-center">
-              JPG, PNG o GIF (máx. 2MB)
             </div>
+            
+            <p class="text-caption mt-2 text-center text-grey">
+              JPG, PNG o GIF (máx. 2MB)
+            </p>
           </v-card-text>
         </v-card>
       </v-col>
       
       <!-- Columna derecha: Formulario -->
       <v-col cols="12" md="7">
-        <v-card class="mb-4">
+        <v-card>
           <v-card-text>
-            <v-form @submit.prevent>
-              <v-text-field
-                v-model="details.title"
-                label="Título"
-                variant="outlined"
-                placeholder="Añade un título descriptivo"
-                :counter="100"
-                :rules="[v => !!v || 'El título es obligatorio']"
-                required
-                @input="emitUpdate"
-                class="mb-4"
-              ></v-text-field>
-              
-              <v-textarea
-                v-model="details.description"
-                label="Descripción"
-                variant="outlined"
-                placeholder="Describe tu video"
-                :counter="1000"
-                rows="4"
-                auto-grow
-                @input="emitUpdate"
-              ></v-textarea>
-            </v-form>
+            <!-- Título -->
+            <v-text-field
+              v-model="details.title"
+              label="Título *"
+              variant="outlined"
+              placeholder="Título descriptivo del video"
+              :counter="100"
+              maxlength="100"
+              required
+              class="mb-4"
+            />
+            
+            <!-- Descripción -->
+            <v-textarea
+              v-model="details.description"
+              label="Descripción"
+              variant="outlined"
+              placeholder="Describe tu video (opcional)"
+              :counter="500"
+              maxlength="500"
+              rows="4"
+              auto-grow
+              class="mb-4"
+            />
+            
+            <!-- Selector de asignatura -->
+            <v-select
+              v-model="details.subjectId"
+              :items="asignaturas"
+              item-title="nombre"
+              item-value="idAsignatura"
+              label="Asignatura"
+              variant="outlined"
+              placeholder="Selecciona una asignatura (opcional)"
+              :loading="loading"
+              clearable
+              prepend-inner-icon="mdi-clipboard-text"
+            >
+              <template v-slot:no-data>
+                <div class="pa-2 text-center">
+                  {{ loading ? 'Cargando asignaturas...' : 'No hay asignaturas disponibles para este curso' }}
+                </div>
+              </template>
+            </v-select>
+            
+            <!-- Debug info (remover en producción) -->
+            <div class="text-caption text-grey mt-2">
+              Debug: idCurso = {{ idCurso }}, Asignaturas encontradas: {{ asignaturas.length }}
+            </div>
           </v-card-text>
         </v-card>
-        
-        <!-- Selector de Curso y Asignatura -->
-        <CourseSubjectSelector 
-          :initialCourseId="details.courseId"
-          :initialSubjectId="details.subjectId"
-          @selection-changed="handleCourseSubjectSelection"
-        />
       </v-col>
     </v-row>
-  </v-sheet>
+  </div>
 </template>
 
 <style scoped>
-.thumbnail-drop-area {
+.preview-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 180px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.thumbnail-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.thumbnail-drop-area:hover {
+.thumbnail-upload:hover,
+.thumbnail-upload--dragging {
   border-color: #FF9800;
-  background-color: rgba(255, 152, 0, 0.05) !important;
-}
-
-/* Estilo para los campos de formulario cuando tienen foco */
-:deep(.v-field--focused .v-field__outline) {
-  border-color: #FF9800 !important;
+  background-color: rgba(255, 152, 0, 0.05);
 }
 </style>

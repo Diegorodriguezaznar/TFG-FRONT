@@ -1,10 +1,10 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router'; // Añadir useRouter aquí
+import { useRoute, useRouter } from 'vue-router';
 import { useVideoStore } from '@/stores/Video';
 import { useMarcadorVideoStore } from '@/stores/MarcadorVideo';
-import ReproductorVideo from '@/components/Video/VideoPlayer.vue'; // Falta este import
+import ReproductorVideo from '@/components/Video/VideoPlayer.vue'; 
 import ComentariosVideo from '@/components/Video/VideoComments.vue';
 import InfoCanal from '@/components/Video/PaginaDeReproductor/InfoCanal.vue';
 import MarcadoresTiempo from '@/components/Video/PaginaDeReproductor/MarcadoresTiempo.vue';
@@ -15,6 +15,9 @@ import Cabecera from '@/components/Layout/Header.vue';
 import BarraLateral from '@/components/Layout/Sidebar.vue';
 import type { VideoDTO } from '@/stores/dtos/VideoDTO';
 import type { MarcadorVideoDTO } from '@/stores/dtos/MarcadorVideoDTO';
+import { useFavoritoStore } from '@/stores/Favorito'
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado'
+
 
 // --------------------------- Route ---------------------------
 const route = useRoute();
@@ -23,6 +26,9 @@ const router = useRouter();
 // --------------------------- Store ---------------------------
 const videoStore = useVideoStore();
 const marcadorVideoStore = useMarcadorVideoStore();
+const favoritoStore = useFavoritoStore()
+const usuarioLogeadoStore = useUsuarioLogeadoStore()
+
 
 // --------------------------- Variables ---------------------------
 const sidebarOpen = ref(true);
@@ -57,6 +63,12 @@ const suggestedVideos = ref<VideoDTO[]>([]);
 const videoId = computed(() => {
   return route.query.id ? Number(route.query.id) : 1; // Default a 1 para evitar problemas
 });
+
+// Computed para verificar si es favorito
+const esFavorito = computed(() => {
+  const resultado = favoritoStore.esFavorito(currentVideo.value.idVideo)
+  return resultado
+})
 
 // --------------------------- Métodos ---------------------------
 const toggleSidebar = () => {
@@ -101,6 +113,7 @@ const loadCurrentVideo = async () => {
       if (!currentVideo.value.duracion) {
         currentVideo.value.duracion = '00:00';
       }
+      console.log('Video cargado:', currentVideo.value.idVideo)
     } else {
       error.value = 'No se encontró el video solicitado';
     }
@@ -127,6 +140,30 @@ const loadMarcadores = async () => {
   }
 };
 
+// Favoritos mejorado
+const toggleFavorito = async () => {
+  console.log('=== INICIANDO TOGGLE FAVORITO ===')
+  
+  // Verificar estado del usuario antes del toggle
+  console.log('Usuario antes del toggle:', usuarioLogeadoStore.usuario)
+  console.log('¿Está autenticado?:', usuarioLogeadoStore.estaAutenticado)
+  
+  // Si no hay usuario, intentar cargarlo con el método disponible
+  if (!usuarioLogeadoStore.usuario?.idUsuario) {
+    console.log('Intentando cargar usuario...')
+    if (typeof usuarioLogeadoStore.cargarUsuario === 'function') {
+      await usuarioLogeadoStore.cargarUsuario()
+    } else if (typeof usuarioLogeadoStore.inicializar === 'function') {
+      await usuarioLogeadoStore.inicializar()
+    } else if (typeof usuarioLogeadoStore.verificarAutenticacion === 'function') {
+      await usuarioLogeadoStore.verificarAutenticacion()
+    }
+  }
+  
+  await favoritoStore.toggleFavorito(currentVideo.value.idVideo)
+  console.log('=== FIN TOGGLE FAVORITO ===')
+}
+
 // Cargar videos sugeridos
 const loadSuggestedVideos = async () => {
   try {
@@ -142,14 +179,31 @@ const loadSuggestedVideos = async () => {
 
 // --------------------------- Ciclo de vida ---------------------------
 onMounted(async () => {
+  console.log('=== INICIANDO COMPONENTE ===')
+  
+  // Cargar usuario primero (verificar qué método existe)
+  if (typeof usuarioLogeadoStore.cargarUsuario === 'function') {
+    await usuarioLogeadoStore.cargarUsuario()
+  } else if (typeof usuarioLogeadoStore.inicializar === 'function') {
+    await usuarioLogeadoStore.inicializar()
+  } else if (typeof usuarioLogeadoStore.verificarAutenticacion === 'function') {
+    await usuarioLogeadoStore.verificarAutenticacion()
+  }
+  
+  console.log('Usuario cargado:', usuarioLogeadoStore.usuario)
+  
   await loadCurrentVideo();
   await loadMarcadores();
   await loadSuggestedVideos();
+  await favoritoStore.cargarFavoritos();
+  
+  console.log('=== COMPONENTE CARGADO ===')
 });
 
 // SOLUCIÓN: Mejorar el watcher para evitar recargas innecesarias
 watch(() => route.query.id, async (newId, oldId) => {
   if (newId !== oldId) {
+    console.log('Cambiando de video:', oldId, '->', newId)
     await loadCurrentVideo();
     await loadMarcadores();
     await loadSuggestedVideos();
@@ -175,6 +229,30 @@ watch(() => route.query.id, async (newId, oldId) => {
           <!-- Columna izquierda con el reproductor de video -->
           <v-col cols="12" md="8">
             <ReproductorVideo :video="currentVideo" />
+            <div class="d-flex justify-start mt-2">
+              <v-btn
+                icon
+                @click="toggleFavorito"
+                :class="esFavorito ? 'bg-yellow-darken-2' : 'bg-grey-lighten-1'"
+                :disabled="!usuarioLogeadoStore.usuario?.idUsuario"
+              >
+                <v-icon size="32">
+                  {{ esFavorito ? 'mdi-star' : 'mdi-star-outline' }}
+                </v-icon>
+              </v-btn>
+              
+              <!-- Info de debug temporal -->
+              <div class="ml-2 d-flex flex-column justify-center">
+                <small class="text-grey">
+                  Video: {{ currentVideo.idVideo }} | 
+                  Usuario: {{ usuarioLogeadoStore.usuario?.idUsuario || 'No logueado' }}
+                </small>
+                <small class="text-grey">
+                  Favorito: {{ esFavorito ? 'Sí' : 'No' }} | 
+                  Total: {{ favoritoStore.favoritos.length }}
+                </small>
+              </div>
+            </div>
           </v-col>
           
           <!-- Columna derecha con información del profesor -->

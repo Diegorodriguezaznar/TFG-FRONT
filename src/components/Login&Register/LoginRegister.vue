@@ -193,7 +193,7 @@
 
 <script>
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
-import { useUsuarioStore } from "@/stores/usuario";
+import { useUsuarioStore } from "@/stores/Usuario";
 
 export default {
   name: 'LoginRegister',
@@ -273,121 +273,98 @@ export default {
         
   this.loading = true;
         
+try {
+  this.loading = true;
+
+  const response = await fetch("http://localhost:5190/api/Auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      gmail: this.loginEmail,
+      contraseña: this.loginPassword
+    })
+  });
+
+  if (!response.ok) {
+    throw new Error("Credenciales incorrectas");
+  }
+
+  const data = await response.json();
+  console.log("Respuesta del login:", data);
+
+  const usuarioLogeadoStore = useUsuarioLogeadoStore();
+
+  usuarioLogeadoStore.iniciarSesion({
+    usuario: {
+      idUsuario: data.idUsuario,
+      nombre: data.nombre,
+      idRol: data.rol === "Administrador" ? 3 : data.rol === "Profesor" ? 2 : 1
+    },
+    token: data.token
+  });
+
+  this.showMessage('success', 'Inicio de sesión correcto');
+  this.$router.push('/cursos');
+} catch (error) {
+  console.error('Error al iniciar sesión:', error);
+  this.showMessage('error', 'Error al iniciar sesión: ' + (error.message || 'Error inesperado'));
+} finally {
+  this.loading = false;
+}
+
+
+},
+    
+async handleRegister() {
+  if (!this.$refs.registerForm.validate()) return;
+
+  this.loading = true;
+
   try {
-    // Usar el store para obtener todos los usuarios
-    const usuarioStore = useUsuarioStore();
-    await usuarioStore.fetchAllUsuarios();
-            
-    console.log("Usuarios obtenidos:", usuarioStore.usuarios);
-            
-    // Buscar si existe un usuario con ese email
-    const usuarioEncontrado = usuarioStore.usuarios.find(
-      usuario => usuario.gmail === this.loginEmail
-    );
-            
-    if (usuarioEncontrado) {
-      console.log("Usuario encontrado:", usuarioEncontrado);
-                
-      // Usuario encontrado, guardar en el store de usuario logeado
-      const usuarioLogeadoStore = useUsuarioLogeadoStore();
-                
-      usuarioLogeadoStore.iniciarSesion({
-        usuario: usuarioEncontrado,
-        token: "token-" + Date.now() // Token simulado
-      });
-      
-      // Verificar que se haya guardado correctamente en localStorage
-      const usuarioGuardado = localStorage.getItem('usuario');
-      const tokenGuardado = localStorage.getItem('token');
-      
-      if (usuarioGuardado && tokenGuardado) {
-        console.log("Usuario guardado en localStorage:", JSON.parse(usuarioGuardado));
-        // También puedes cargar los datos del localStorage para asegurarte
-        usuarioLogeadoStore.cargarUsuarioDesdeStorage();
-      } else {
-        console.warn("No se pudo guardar el usuario en localStorage");
-      }
-                
-      // Redireccionar a la página principal
-      this.showMessage('success', 'Inicio de sesión correcto');
-      this.$router.push('/cursos');
-    } else {
-      // Usuario no encontrado
-      this.showMessage('error', 'Correo electrónico no encontrado. Por favor, regístrate.');
+    const nuevoUsuario = {
+      nombre: this.registerNombre,
+      apellidos: this.registerApellido,
+      gmail: this.registerEmail,
+      telefono: this.registerTelefono,
+      contraseña: this.registerPassword,
+      idRol: this.selectedRol
+    };
+
+    const response = await fetch("http://localhost:5190/api/Auth/registro", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nuevoUsuario)
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error al registrar: ${response.status} ${errorText}`);
     }
+
+    const data = await response.json();
+    console.log("Registro exitoso. Respuesta del backend:", data);
+
+    // Guardar el usuario logeado automáticamente
+    const usuarioLogeadoStore = useUsuarioLogeadoStore();
+    usuarioLogeadoStore.iniciarSesion({
+      usuario: {
+        idUsuario: data.idUsuario,
+        nombre: data.nombre,
+        idRol: data.rol === "Administrador" ? 3 : data.rol === "Profesor" ? 2 : 1
+      },
+      token: data.token
+    });
+
+    this.showMessage('success', 'Registro exitoso. Sesión iniciada');
+    this.$router.push('/cursos');
   } catch (error) {
-    console.error('Error al iniciar sesión:', error);
-    this.showMessage('error', 'Error al iniciar sesión: ' + (error.message || 'Error inesperado'));
+    console.error('Error al registrarse:', error);
+    this.showMessage('error', 'Error al registrarse: ' + (error.message || 'Error inesperado'));
   } finally {
     this.loading = false;
   }
 },
-    
-    async handleRegister() {
-      if (!this.$refs.registerForm.validate()) return;
-      
-      this.loading = true;
-      console.log(this.registerPassword)
-      console.log(this.registercontraseña) 
-      try {
-        // Preparar datos para el registro - Probamos con esta estructura primero
-        const nuevoUsuario = {
-          nombre: this.registerNombre,
-          apellido: this.registerApellido,
-          gmail: this.registerEmail,
-          telefono: this.registerTelefono,
-          contraseña: this.registerPassword,
-          idRol: this.selectedRol
-        };
-        
-        console.log("Datos para registro:", JSON.stringify(nuevoUsuario));
-        
-        // Usar fetch directo para ver exactamente qué pasa
-        const response = await fetch("http://localhost:5190/api/Auth/registro", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(nuevoUsuario),
-        });
-        
-        const responseText = await response.text();
-        console.log("Respuesta del servidor:", response.status, responseText);
-        
-        if (!response.ok) {
-          throw new Error(`Error al registrar usuario: ${response.status} ${response.statusText}`);
-        }
-        
-        // Intentar parsear la respuesta como JSON
-        let usuarioCreado;
-        try {
-          usuarioCreado = JSON.parse(responseText);
-          console.log("Usuario creado:", usuarioCreado);
-        } catch (e) {
-          console.error("Error al parsear JSON:", e);
-          usuarioCreado = {
-            idUsuario: Math.floor(Math.random() * 1000) + 1,
-            nombre: this.registerNombre,
-            apellido: this.registerApellido,
-            gmail: this.registerEmail,
-            telefono: this.registerTelefono,
-            idRol: this.selectedRol
-          };
-        }
-        
-        // Mostrar mensaje de éxito
-        this.showMessage('success', 'Usuario registrado correctamente');
-        
-        // Redirigir a la página principal
-        this.$router.push('/login');
-        
-        // Limpiar formulario
-        this.resetRegisterForm();
-      } catch (error) {
-        console.error('Error detallado al registrarse:', error);
-        this.showMessage('error', 'Error al registrar usuario: ' + (error.message || 'Error inesperado'));
-      } finally {
-        this.loading = false;
-      }
-    },
+
     
     resetRegisterForm() {
       this.registerNombre = '';
