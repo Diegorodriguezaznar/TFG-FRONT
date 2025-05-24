@@ -184,7 +184,7 @@ const handleMarkerDecision = (addMarkers) => {
     isMarkersMode.value = true;
     currentStep.value = 3; // Paso de marcadores
   } else {
-    router.push(`/cursos/${currentCourseId.value}`);
+    router.push(`/cursos`);
     resetForm();
   }
 };
@@ -206,7 +206,7 @@ const saveTimestamps = async () => {
     
     await marcadorVideoStore.createMarcadoresEnLote(uploadedVideoData.value.idVideo, marcadoresDTO);
     
-    router.push(`/cursos/${currentCourseId.value}`);
+    router.push(`/cursos`);
     resetForm();
     
   } catch (error) {
@@ -217,7 +217,7 @@ const saveTimestamps = async () => {
 };
 
 const finishWithoutMarkers = () => {
-  router.push(`/cursos/${currentCourseId.value}`);
+  router.push(`/cursos`);
   resetForm();
 };
 

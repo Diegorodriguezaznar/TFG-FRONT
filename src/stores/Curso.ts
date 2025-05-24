@@ -1,6 +1,8 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { CursoDTO } from "@/stores/dtos/CursoDTO";
+ import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
+
 
 export const useCursoStore = defineStore("curso", () => {
   // --------------------------- Estado ---------------------------
@@ -101,32 +103,32 @@ export const useCursoStore = defineStore("curso", () => {
   // --------------------------- Métodos de Modificación ---------------------------
   
   // Crear un nuevo curso
-  async function createCurso(newCurso: Omit<CursoDTO, 'idCurso' | 'fechaCreacion'>) {
+
+  async function createCurso(newCurso: Omit<CursoDTO, 'idCurso' | 'fechaCreacion' | 'idUsuario' | 'usuario'>) {
     loading.value = true;
+
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
-      // Asegurar que los campos requeridos estén presentes
-      const cursoToCreate = {
-        ...newCurso,
-        // Si no se proporcionan, establecer como arrays vacíos
-        asignaturas: newCurso.asignaturas || [],
-        usuarioCursos: newCurso.usuarioCursos || []
-      };
-      
-      const response = await fetch("http://localhost:5190/api/Curso", {
+      const { token } = useUsuarioLogeadoStore();
+
+      const response = await fetch("http://localhost:5190/api/Curso/crear", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          "Accept": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(cursoToCreate), // Usar el objeto con todos los campos requeridos
+        body: JSON.stringify({
+          nombre: newCurso.nombre,
+          descripcion: newCurso.descripcion,
+          imagen: newCurso.imagen || ""
+        }),
         signal: controller.signal
       });
-      
+
       clearTimeout(timeoutId);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Error al crear el curso: ${response.status} ${response.statusText}. ${errorText}`);
@@ -137,7 +139,7 @@ export const useCursoStore = defineStore("curso", () => {
       return createdCurso;
     } catch (error: any) {
       let message = "Error al crear el curso";
-      
+
       if (error.name === 'AbortError') {
         message = "La conexión con el servidor ha excedido el tiempo de espera";
       } else if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
@@ -145,7 +147,7 @@ export const useCursoStore = defineStore("curso", () => {
       } else {
         message = error.message || message;
       }
-      
+
       errorMessage.value = message;
       console.error(message, error);
       return null;
@@ -153,6 +155,7 @@ export const useCursoStore = defineStore("curso", () => {
       loading.value = false;
     }
   }
+
 
   // Actualizar un curso existente
   async function updateCurso(updatedCurso: CursoDTO) {

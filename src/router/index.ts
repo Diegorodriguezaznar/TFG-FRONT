@@ -10,6 +10,7 @@ import SubirVideos from "../views/SubirVideoPage.vue";
 import AdminPage from "../views/AdminPage.vue";
 import Login from '../views/Login.vue';
 import PeticionProfesorPage from '../views/PeticionProfesorPage.vue';
+import CrearAsignaturas from '../views/CrearAsignaturas.vue';
 
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
@@ -18,17 +19,14 @@ const routes = [
   { path: "/login", component: Login },
   { path: "/cursos", component: HomePage },
   { path: "/peticion-profesor", component: PeticionProfesorPage },
-  
-  // NUEVA: Ruta con idCurso siguiendo tu patrón
+  { path: "/curso/:idCurso/asignaturas", component: CrearAsignaturas },
   {
     path: "/subir-video/:idCurso",
     component: SubirVideos,
     props: true,
     meta: { requiresAuth: true, allowRoles: [1,2, 3] }
   },
-  
-  // OPCIONAL: Ruta antigua redirige a cursos
-  {
+    {
     path: "/subir-video",
     redirect: "/cursos"
   },
