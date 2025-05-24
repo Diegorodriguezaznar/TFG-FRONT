@@ -1,23 +1,15 @@
-<template>
-  <v-card class="pa-4">
-    <v-card-title>Estadísticas de Usuarios por Rol</v-card-title>
-    <Bar :data="chartData" :options="chartOptions" v-if="chartData" />
-  </v-card>
-</template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Bar } from 'vue-chartjs'
+import { Pie } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   Title,
   Tooltip,
   Legend,
-  BarElement,
-  CategoryScale,
-  LinearScale,
+  ArcElement,
 } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
 interface RolEstadisticaDTO {
   rol: string
@@ -28,11 +20,12 @@ const chartData = ref<any>(null)
 
 const chartOptions = {
   responsive: true,
+  maintainAspectRatio: false,
   plugins: {
-    legend: { display: false },
+    legend: { position: 'bottom' },
     title: {
       display: true,
-      text: 'Distribución de Usuarios por Rol',
+      text: 'Distribución porcentual de usuarios por rol',
     },
   },
 }
@@ -49,8 +42,8 @@ onMounted(async () => {
       datasets: [
         {
           label: 'Usuarios',
-          backgroundColor: '#FF5500',
           data: datos.map(d => d.total),
+          backgroundColor: ['#FF5500', '#FB7C3C', '#F7A277', '#EEEEEE'],
         },
       ],
     }
@@ -59,3 +52,12 @@ onMounted(async () => {
   }
 })
 </script>
+
+<template>
+  <v-card class="pa-4">
+    <v-card-title>Proporción de Usuarios por Rol</v-card-title>
+    <div style="position: relative; height: 300px;">
+      <Pie :data="chartData" :options="chartOptions" v-if="chartData" />
+    </div>
+  </v-card>
+</template>

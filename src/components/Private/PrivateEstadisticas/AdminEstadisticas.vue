@@ -1,6 +1,7 @@
 
 <script setup lang="ts">
     import GraficoUsuarios from '@/components/Private/PrivateEstadisticas/GraficoUsuarios.vue'
+    import GraficoCursos from '@/components/Private/PrivateEstadisticas/GraficoCursos.vue'
 </script>
 
 <template>
@@ -16,6 +17,10 @@
       <v-col cols="12" md="8" offset-md="2">
         <GraficoUsuarios />
       </v-col>
+      <v-col cols="12" md="8" offset-md="2">
+        <GraficoCursos />
+      </v-col>
+
     </v-row>
   </v-container>
 </template>
