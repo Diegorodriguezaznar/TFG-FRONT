@@ -1,4 +1,4 @@
-// src/router/index.ts - Actualizado con ruta de perfil de usuario
+// src/router/index.ts - Rutas actualizadas para quizzes
 import { createRouter, createWebHistory } from "vue-router";
 import Historial from "@/views/Historial.vue";
 import PerfilPage from "../views/PerfilPage.vue";
@@ -9,7 +9,11 @@ import QuizDetalle from "../views/QuizDetalle.vue";
 import Videos from "@/views/Home.vue";
 import SubirVideos from "../views/SubirVideoPage.vue";
 import UsuariosPage from "../views/UsuariosPage.vue";
-import PerfilUsuario from "../views/PerfilUsuario.vue"; // Nueva importación
+import PerfilUsuario from "../views/PerfilUsuario.vue";
+
+// NUEVAS PÁGINAS DE QUIZZES
+import MisQuizzesPage from "../views/MisQuizzesPage.vue";
+import HacerQuizzesPage from "../views/HacerQuizzesPage.vue";
 
 //ADMIN
 import AdminPage from "../views/AdminPage.vue";
@@ -27,9 +31,11 @@ const routes = [
   { path: "/reproductor-video", component: ReproductorVideo, meta: { requiresAuth: true } },
   { path: "/historial", component: Historial, meta: { requiresAuth: true } },
   { path: "/perfil", component: PerfilPage, meta: { requiresAuth: true } },
-  { path: "/quizz-time!", component: Quizzes, meta: { requiresAuth: true } },
+  
+  // RUTAS DE QUIZZES ACTUALIZADAS
+  { path: "/quizz-time!", component: HacerQuizzesPage, meta: { requiresAuth: true } }, // Zona pública
+  
   { path: "/usuarios", component: UsuariosPage, meta: { requiresAuth: true } },
-  // Nueva ruta para el perfil de usuario específico
   { path: "/usuario/:id", component: PerfilUsuario, props: true, meta: { requiresAuth: true } },
   { path: "/quizz-detail", component: QuizDetalle, meta: { requiresAuth: true } },
   { path: "/quizz-detail/:id", component: QuizDetalle, props: true},
