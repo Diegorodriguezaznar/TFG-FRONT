@@ -18,11 +18,21 @@ const routes = [
   { path: "/login", component: Login },
   { path: "/cursos", component: HomePage },
   { path: "/peticion-profesor", component: PeticionProfesorPage },
+  
+  // NUEVA: Ruta con idCurso siguiendo tu patrón
   {
-    path: "/subir-video",
+    path: "/subir-video/:idCurso",
     component: SubirVideos,
+    props: true,
     meta: { requiresAuth: true, allowRoles: [1,2, 3] }
   },
+  
+  // OPCIONAL: Ruta antigua redirige a cursos
+  {
+    path: "/subir-video",
+    redirect: "/cursos"
+  },
+  
   {
     path: "/crear-curso",
     component: () => import("@/views/CrearCurso.vue"),

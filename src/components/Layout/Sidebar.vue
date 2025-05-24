@@ -30,7 +30,6 @@ const allMenuItems = [
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
   { title: 'Quizzes', icon: 'mdi-school-outline', route: '/quizz-time!' },
-  { title: 'Subir Video', icon: 'mdi-upload', route: '/subir-video', rolesPermitidos: [1,2, 3] },
   { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
 ];
 

@@ -46,6 +46,17 @@ const esCreadorCurso = computed(() => {
   return curso.value.idUsuarioCreador === usuarioActualId;
 });
 
+// Añadir esta computed property en tu sección de computed
+
+// Verificar si el usuario puede subir videos (roles 1, 2, 3)
+const puedeSubirVideo = computed(() => {
+  if (!usuarioLogeadoStore.usuarioActual) return false;
+  if (!cursoId.value) return false; // Solo mostrar si estamos en un curso específico
+  
+  const idRol = usuarioLogeadoStore.usuarioActual.idRol;
+  return [1, 2, 3].includes(idRol);
+});
+
 // Generar imagen de fondo para el banner (placeholder)
 const bannerImage = computed(() => {
   // Si hay un curso y tiene imagen, usar esa
@@ -189,6 +200,7 @@ onMounted(() => {
                 {{ curso.descripcion }}
               </p>
               
+              <!-- Fragmento del template donde van los botones (línea ~125 aprox) -->
               <div class="d-flex align-center">
                 <v-chip 
                   color="orange" 
@@ -199,6 +211,19 @@ onMounted(() => {
                   <v-icon start icon="mdi-play-circle" class="mr-1"></v-icon>
                   {{ videosFiltrados.length }} videos
                 </v-chip>
+                
+                <!-- Botón Subir Video (solo visible para usuarios con permisos) -->
+                <v-btn 
+                  v-if="puedeSubirVideo" 
+                  color="success" 
+                  variant="elevated" 
+                  size="small" 
+                  class="ml-2" 
+                  :to="`/subir-video/${cursoId}`"
+                >
+                  <v-icon start icon="mdi-upload" class="mr-1"></v-icon>
+                  Subir Video
+                </v-btn>
                 
                 <!-- Botón para añadir asignatura (solo visible para el creador) -->
                 <v-btn 
