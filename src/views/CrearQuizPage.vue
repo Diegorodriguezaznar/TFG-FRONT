@@ -172,65 +172,225 @@ function toggleRespuestaCorrecta(preguntaIndex: number, respuestaIndex: number) 
   preguntas.value[preguntaIndex].respuestas[respuestaIndex].esCorrecta = true;
 }
 
-// Guardar quiz
-// Quitar import de useToast y volver a usar alerts
-// import { useToast } from '@/composables/useToast';
-
-// Quitar esta línea:
-// const { success, error } = useToast();
-
-// Actualizar el método guardarQuiz para usar alerts normales
+// Guardar quiz - MEJORADO con logs detallados y mejor manejo de errores
 async function guardarQuiz() {
-  if (!usuarioActual.value || !puedeGuardar.value) return;
+  if (!usuarioActual.value || !puedeGuardar.value) {
+    alert('No se puede guardar el quiz. Verifica que hayas completado todos los campos.');
+    return;
+  }
 
   loading.value = true;
+  let quizCreado = null;
+  
   try {
-    // 1. Crear el quiz
-    const nuevoQuiz = await quizStore.createQuiz({
-      nombre: quizData.value.nombre,
-      descripcion: quizData.value.descripcion,
-      idAsignatura: quizData.value.idAsignatura!,
-      idUsuario: usuarioActual.value.idUsuario
+    console.log('=== INICIANDO CREACIÓN DE QUIZ ===');
+    console.log('Usuario actual:', usuarioActual.value);
+    console.log('Datos del quiz:', quizData.value);
+    console.log('Preguntas válidas:', preguntasValidas.value.length);
+    
+    // Mostrar todas las preguntas que se van a crear
+    preguntasValidas.value.forEach((pregunta, index) => {
+      console.log(`Pregunta ${index + 1}:`, {
+        descripcion: pregunta.descripcion,
+        respuestas: pregunta.respuestas.map(r => ({
+          texto: r.texto,
+          esCorrecta: r.esCorrecta
+        }))
+      });
     });
 
-    if (!nuevoQuiz) {
-      throw new Error('Error al crear el quiz');
+    // 1. Crear el quiz
+    console.log('Paso 1: Creando quiz...');
+    
+    // Preparar datos del quiz con validación extra
+    const datosNuevoQuiz = {
+      nombre: quizData.value.nombre,
+      descripcion: quizData.value.descripcion || '',
+      idAsignatura: quizData.value.idAsignatura!,
+      idUsuario: usuarioActual.value.idUsuario
+    };
+    
+    console.log('📋 Datos a enviar para crear quiz:', datosNuevoQuiz);
+    
+    quizCreado = await quizStore.createQuiz(datosNuevoQuiz);
+
+    if (!quizCreado) {
+      console.error('❌ No se recibió respuesta del servidor al crear quiz');
+      console.error('📋 Datos enviados:', datosNuevoQuiz);
+      throw new Error('No se pudo crear el quiz. Verifica que todos los campos estén completos y que el endpoint /api/quiz esté funcionando correctamente.');
     }
 
-    // 2. Crear las preguntas
+    console.log('✅ Quiz creado exitosamente:', quizCreado);
+    
+    // El servidor retorna { mensaje: '', quiz: { ... } }, necesitamos extraer el quiz
+    const quiz = quizCreado.quiz || quizCreado;
+    
+    // Validar que el quiz tenga un ID válido
+    if (!quiz || !quiz.idQuiz) {
+      console.error('❌ El quiz creado no tiene idQuiz:', {
+        respuestaCompleta: quizCreado,
+        quizExtraido: quiz,
+        tieneQuiz: !!quizCreado.quiz,
+        tieneIdQuiz: !!(quiz && quiz.idQuiz)
+      });
+      throw new Error('El quiz se creó pero no se recibió un ID válido. Revisa la respuesta del servidor.');
+    }
+    
+    console.log('🔍 Validando ID del quiz:', {
+      idQuiz: quiz.idQuiz,
+      tipo: typeof quiz.idQuiz,
+      esNumero: Number.isInteger(quiz.idQuiz),
+      valor: quiz.idQuiz,
+      quizCompleto: quiz
+    });
+
+    // 2. Crear las preguntas una por una
+    console.log('Paso 2: Creando preguntas...');
+    const preguntasCreadas = [];
+    
     for (let i = 0; i < preguntasValidas.value.length; i++) {
       const pregunta = preguntasValidas.value[i];
+      console.log(`📝 Creando pregunta ${i + 1}/${preguntasValidas.value.length}:`, pregunta.descripcion);
       
-      const nuevaPregunta = await preguntaStore.createPregunta({
+      // Preparar datos de la pregunta con validación extra
+      const datosNuevaPregunta = {
         descripcion: pregunta.descripcion,
         orden: i + 1,
-        idQuiz: nuevoQuiz.idQuiz
-      });
+        idQuiz: quiz.idQuiz  // Usar quiz.idQuiz en lugar de quizCreado.idQuiz
+      };
+      
+      console.log('📋 Datos a enviar para crear pregunta:', datosNuevaPregunta);
+      
+      try {
+        const nuevaPregunta = await preguntaStore.createPregunta(datosNuevaPregunta);
 
-      if (!nuevaPregunta) {
-        throw new Error(`Error al crear la pregunta ${i + 1}`);
-      }
-
-      // 3. Crear las respuestas para cada pregunta
-      for (let j = 0; j < pregunta.respuestas.length; j++) {
-        const respuesta = pregunta.respuestas[j];
+        if (!nuevaPregunta) {
+          console.error('❌ No se recibió respuesta del servidor al crear pregunta');
+          console.error('📋 Datos enviados:', datosNuevaPregunta);
+          throw new Error(`No se recibió respuesta al crear la pregunta "${pregunta.descripcion}". Verifica que el endpoint /api/pregunta esté funcionando correctamente.`);
+        }
         
-        await respuestaStore.createRespuesta({
-          texto: respuesta.texto,
-          esCorrecta: respuesta.esCorrecta,
-          orden: j + 1,
-          idPregunta: nuevaPregunta.idPregunta
-        });
+        // Validar que la pregunta tenga un ID válido
+        if (!nuevaPregunta.idPregunta) {
+          console.error('❌ La pregunta creada no tiene idPregunta:', nuevaPregunta);
+          throw new Error(`La pregunta "${pregunta.descripcion}" se creó pero no se recibió un ID válido.`);
+        }
+
+        console.log(`✅ Pregunta ${i + 1} creada exitosamente:`, nuevaPregunta);
+        preguntasCreadas.push(nuevaPregunta);
+
+        // 3. Crear las respuestas para esta pregunta
+        console.log(`📋 Creando ${pregunta.respuestas.length} respuestas para la pregunta ${i + 1}...`);
+        
+        for (let j = 0; j < pregunta.respuestas.length; j++) {
+          const respuesta = pregunta.respuestas[j];
+          
+          // Preparar datos de la respuesta con validación extra
+          const datosNuevaRespuesta = {
+            texto: respuesta.texto,
+            esCorrecta: respuesta.esCorrecta,
+            orden: j + 1,
+            idPregunta: nuevaPregunta.idPregunta
+          };
+          
+          console.log(`  ➤ Creando respuesta ${j + 1}/${pregunta.respuestas.length}:`, datosNuevaRespuesta);
+          
+          try {
+            const nuevaRespuesta = await respuestaStore.createRespuesta(datosNuevaRespuesta);
+
+            if (!nuevaRespuesta) {
+              console.error('❌ No se recibió respuesta del servidor al crear respuesta');
+              console.error('📋 Datos enviados:', datosNuevaRespuesta);
+              throw new Error(`No se recibió respuesta al crear la respuesta "${respuesta.texto}". Verifica que el endpoint /api/respuesta esté funcionando correctamente.`);
+            }
+
+            console.log(`    ✅ Respuesta ${j + 1} creada:`, nuevaRespuesta);
+          } catch (respuestaError: any) {
+            console.error(`    ❌ Error al crear respuesta ${j + 1}:`, respuestaError);
+            throw new Error(`Error al crear la respuesta ${j + 1} ("${respuesta.texto}") de la pregunta ${i + 1}: ${respuestaError.message}`);
+          }
+        }
+
+        console.log(`✅ Todas las respuestas de la pregunta ${i + 1} creadas exitosamente`);
+
+      } catch (preguntaError: any) {
+        console.error(`❌ Error al crear pregunta ${i + 1}:`, preguntaError);
+        throw new Error(`Error al crear la pregunta ${i + 1} ("${pregunta.descripcion}"): ${preguntaError.message}`);
       }
     }
 
+    console.log('🎉 === QUIZ CREADO EXITOSAMENTE ===');
+    console.log('📊 Resumen:');
+    console.log('  - Quiz ID:', quiz.idQuiz);
+    console.log('  - Nombre:', quiz.nombre || quizData.value.nombre);
+    console.log('  - Preguntas creadas:', preguntasCreadas.length);
+    console.log('  - Total respuestas:', preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0));
+
     // Éxito - mostrar alert y redirigir
-    alert('¡Quiz creado exitosamente!');
+    alert(`🎉 ¡Quiz "${quizData.value.nombre}" creado exitosamente!\n\n📊 Resumen:\n• ${preguntasCreadas.length} preguntas creadas\n• ${preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0)} respuestas añadidas`);
+    
+    // Limpiar formulario antes de redirigir
+    quizData.value = {
+      nombre: '',
+      descripcion: '',
+      idAsignatura: null,
+      idUsuario: usuarioActual.value?.idUsuario || null
+    };
+    preguntas.value = [];
+    
     router.push('/quizz-time!');
 
-  } catch (error) {
-    console.error('Error al guardar quiz:', error);
-    alert('Error al crear el quiz. Inténtalo de nuevo.');
+  } catch (error: any) {
+    console.error('💥 === ERROR AL CREAR QUIZ ===');
+    console.error('Error completo:', error);
+    console.error('Stack trace:', error.stack);
+    console.error('Quiz creado antes del error:', quizCreado);
+
+    // Determinar mensaje de error específico
+    let mensaje = 'Error desconocido al crear el quiz';
+    let sugerencia = '';
+    
+    if (error.message.includes('ID de quiz inválido')) {
+      mensaje = '🆔 Error de ID de Quiz: El ID del quiz no es válido';
+      sugerencia = '• El quiz se creó correctamente pero su ID no es válido\n• Verifica que el endpoint /api/quiz retorne un idQuiz válido\n• Revisa que el campo idQuiz en la base de datos sea auto-increment\n• Comprueba los logs del servidor backend';
+    } else if (error.message.includes('Failed to fetch') || error.message.includes('Network')) {
+      mensaje = '🌐 Error de conexión: No se pudo conectar con el servidor';
+      sugerencia = '• Verifica que el backend esté funcionando en http://localhost:5190\n• Revisa tu conexión a internet';
+    } else if (error.message.includes('500') || error.message.includes('Internal Server Error')) {
+      mensaje = '🔧 Error del servidor (500): Problema interno del backend';
+      sugerencia = '• Revisa los logs del servidor backend\n• Verifica que la base de datos esté configurada correctamente\n• Comprueba que las tablas de preguntas y respuestas existan';
+    } else if (error.message.includes('404')) {
+      mensaje = '🔍 Error 404: Endpoint no encontrado';
+      sugerencia = '• Verifica que las rutas /api/pregunta y /api/respuesta estén configuradas\n• Comprueba la URL del backend';
+    } else if (error.message.includes('400') || error.message.includes('Bad Request')) {
+      mensaje = '📝 Error de validación: Datos incorrectos enviados al servidor';
+      sugerencia = '• Revisa que todos los campos estén completos\n• Verifica que las validaciones del backend sean correctas';
+    } else if (error.message.includes('pregunta')) {
+      mensaje = `📝 Error al crear preguntas: ${error.message}`;
+      sugerencia = '• Verifica que el endpoint /api/pregunta funcione correctamente\n• Revisa los logs del servidor';
+    } else if (error.message.includes('respuesta')) {
+      mensaje = `📋 Error al crear respuestas: ${error.message}`;
+      sugerencia = '• Verifica que el endpoint /api/respuesta funcione correctamente\n• Asegúrate de que cada pregunta tenga una respuesta correcta';
+    } else if (error.message.includes('quiz')) {
+      mensaje = `🎯 Error al crear el quiz: ${error.message}`;
+      sugerencia = '• Verifica que el endpoint /api/quiz funcione correctamente';
+    } else {
+      mensaje = error.message || mensaje;
+      sugerencia = '• Revisa la consola del navegador para más detalles\n• Contacta al administrador del sistema';
+    }
+
+    // Mostrar error detallado
+    const errorCompleto = `❌ ${mensaje}\n\n💡 Sugerencias:\n${sugerencia}\n\n🔍 Revisa la consola del navegador (F12) para más información técnica.`;
+    alert(errorCompleto);
+
+    // Si se creó el quiz pero falló después, informar al usuario
+    if (quizCreado) {
+      console.warn('⚠️ ATENCIÓN: El quiz se creó pero falló al agregar preguntas/respuestas');
+      const quiz = quizCreado.quiz || quizCreado;
+      const quizId = quiz.idQuiz || 'ID desconocido';
+      const mensajeRecuperacion = `⚠️ IMPORTANTE:\n\nEl quiz "${quizData.value.nombre}" se creó exitosamente (ID: ${quizId}), pero falló al agregar las preguntas.\n\n✅ Puedes:\n• Intentar crear las preguntas manualmente\n• Eliminar el quiz incompleto desde el panel de administración\n• Contactar al administrador del sistema`;
+      alert(mensajeRecuperacion);
+    }
   } finally {
     loading.value = false;
   }
