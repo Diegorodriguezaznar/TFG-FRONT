@@ -1,10 +1,10 @@
+<!-- src/views/ResultadoQuizPage.vue - VERSIÓN SOLO FRONTEND -->
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuizStore } from '@/stores/Quiz';
 import { usePreguntaStore } from '@/stores/Pregunta';
 import { useRespuestaStore } from '@/stores/Respuesta';
-import { useResultadoQuizStore } from '@/stores/ResultadoQuiz';
 import type { PreguntaDTO } from '@/stores/dtos/PreguntaDTO';
 import type { RespuestaDTO } from '@/stores/dtos/RespuestaDTO';
 
@@ -14,7 +14,6 @@ const router = useRouter();
 const quizStore = useQuizStore();
 const preguntaStore = usePreguntaStore();
 const respuestaStore = useRespuestaStore();
-const resultadoStore = useResultadoQuizStore();
 
 // Variables reactivas
 const loading = ref(true);
@@ -24,21 +23,24 @@ const respuestasMap = ref<Map<number, RespuestaDTO[]>>(new Map());
 const showConfetti = ref(false);
 const showRevision = ref(false);
 
+// Datos del resultado (obtenidos de sessionStorage)
+const resultadoLocal = ref(null);
+
 // Computed
 const quizId = computed(() => Number(route.params.id));
-const resultado = computed(() => resultadoStore.resultadoActual);
-
-const puntuacion = computed(() => {
-  return resultado.value?.puntuacion || 0;
-});
 
 const respuestasCorrectas = computed(() => {
-  if (!resultado.value) return 0;
-  return resultado.value.respuestasUsuario.filter(r => r.esCorrecta).length;
+  if (!resultadoLocal.value) return 0;
+  return resultadoLocal.value.respuestasUsuario.filter(r => r.esCorrecta).length;
+});
+
+const respuestasIncorrectas = computed(() => {
+  if (!resultadoLocal.value) return 0;
+  return resultadoLocal.value.respuestasUsuario.filter(r => !r.esCorrecta).length;
 });
 
 const totalPreguntas = computed(() => {
-  return resultado.value?.respuestasUsuario.length || 0;
+  return resultadoLocal.value?.respuestasUsuario.length || 0;
 });
 
 const porcentaje = computed(() => {
@@ -48,11 +50,11 @@ const porcentaje = computed(() => {
 
 const nivelRendimiento = computed(() => {
   const pct = porcentaje.value;
-  if (pct >= 90) return { nivel: 'Excelente', color: 'success', icon: 'mdi-trophy' };
-  if (pct >= 75) return { nivel: 'Muy Bueno', color: 'info', icon: 'mdi-medal' };
-  if (pct >= 60) return { nivel: 'Bueno', color: 'warning', icon: 'mdi-thumb-up' };
-  if (pct >= 40) return { nivel: 'Regular', color: 'orange', icon: 'mdi-school' };
-  return { nivel: 'Necesita Mejorar', color: 'error', icon: 'mdi-book-open' };
+  if (pct >= 90) return { nivel: 'Excelente', color: 'success', icon: 'mdi-trophy', emoji: '🏆' };
+  if (pct >= 75) return { nivel: 'Muy Bueno', color: 'info', icon: 'mdi-medal', emoji: '🥈' };
+  if (pct >= 60) return { nivel: 'Bueno', color: 'warning', icon: 'mdi-thumb-up', emoji: '👍' };
+  if (pct >= 40) return { nivel: 'Regular', color: 'orange', icon: 'mdi-school', emoji: '📚' };
+  return { nivel: 'Necesita Mejorar', color: 'error', icon: 'mdi-book-open', emoji: '💪' };
 });
 
 const mensajeMotivacional = computed(() => {
@@ -66,15 +68,16 @@ const mensajeMotivacional = computed(() => {
 
 // Datos para la revisión detallada
 const revisionDetallada = computed(() => {
-  if (!resultado.value || !preguntas.value.length) return [];
+  if (!resultadoLocal.value || !preguntas.value.length) return [];
   
-  return resultado.value.respuestasUsuario.map(respUsuario => {
+  return resultadoLocal.value.respuestasUsuario.map(respUsuario => {
     const pregunta = preguntas.value.find(p => p.idPregunta === respUsuario.idPregunta);
     const respuestas = respuestasMap.value.get(respUsuario.idPregunta) || [];
     const respuestaSeleccionada = respuestas.find(r => r.idRespuesta === respUsuario.idRespuestaSeleccionada);
     const respuestaCorrecta = respuestas.find(r => r.esCorrecta);
     
     return {
+      numeroPregunta: resultadoLocal.value.respuestasUsuario.indexOf(respUsuario) + 1,
       pregunta: pregunta?.descripcion || 'Pregunta no encontrada',
       respuestaSeleccionada: respuestaSeleccionada?.texto || 'Sin respuesta',
       respuestaCorrecta: respuestaCorrecta?.texto || 'Sin respuesta correcta',
@@ -88,10 +91,18 @@ const revisionDetallada = computed(() => {
 const cargarDatos = async () => {
   loading.value = true;
   try {
-    // Verificar si hay resultado
-    if (!resultado.value) {
-      throw new Error('No se encontró el resultado del quiz');
+    console.log('📊 Cargando datos del resultado...');
+    
+    // Obtener resultado de sessionStorage
+    const resultadoKey = `quiz_resultado_${quizId.value}`;
+    const resultadoGuardado = sessionStorage.getItem(resultadoKey);
+    
+    if (!resultadoGuardado) {
+      throw new Error('No se encontró el resultado del quiz. Es posible que haya expirado.');
     }
+    
+    resultadoLocal.value = JSON.parse(resultadoGuardado);
+    console.log('✅ Resultado cargado:', resultadoLocal.value);
 
     // Cargar datos del quiz
     const quizData = await quizStore.fetchQuizCompletoById(quizId.value);
@@ -99,14 +110,17 @@ const cargarDatos = async () => {
       throw new Error('Quiz no encontrado');
     }
     quiz.value = quizData;
+    console.log('✅ Quiz cargado:', quizData.nombre);
 
     // Cargar preguntas para la revisión
     const preguntasData = await preguntaStore.fetchPreguntasByQuizId(quizId.value);
     preguntas.value = preguntasData;
+    console.log('✅ Preguntas cargadas:', preguntasData.length);
 
     // Cargar respuestas
     const respuestasData = await respuestaStore.fetchRespuestasForQuiz(preguntasData);
     respuestasMap.value = respuestasData;
+    console.log('✅ Respuestas cargadas');
 
     // Mostrar confetti si el resultado es bueno
     if (porcentaje.value >= 75) {
@@ -118,8 +132,11 @@ const cargarDatos = async () => {
       }, 500);
     }
 
+    console.log('🎉 Todos los datos cargados exitosamente');
+
   } catch (error) {
-    console.error('Error al cargar datos:', error);
+    console.error('❌ Error al cargar datos:', error);
+    alert('Error al cargar el resultado del quiz: ' + error.message);
     router.push('/quizz-time!');
   } finally {
     loading.value = false;
@@ -127,17 +144,37 @@ const cargarDatos = async () => {
 };
 
 const volverAQuizzes = () => {
-  resultadoStore.clearResultado();
+  // Limpiar datos del sessionStorage
+  const resultadoKey = `quiz_resultado_${quizId.value}`;
+  sessionStorage.removeItem(resultadoKey);
   router.push('/quizz-time!');
 };
 
 const repetirQuiz = () => {
-  resultadoStore.clearResultado();
+  // Limpiar datos del sessionStorage
+  const resultadoKey = `quiz_resultado_${quizId.value}`;
+  sessionStorage.removeItem(resultadoKey);
   router.push(`/quiz/${quizId.value}`);
 };
 
 const toggleRevision = () => {
   showRevision.value = !showRevision.value;
+};
+
+const compartirResultado = () => {
+  const mensaje = `🎯 ¡Acabo de completar el quiz "${quiz.value?.nombre}"!\n\n📊 Mi puntuación: ${porcentaje.value}% (${respuestasCorrectas.value}/${totalPreguntas.value})\n🏆 Nivel: ${nivelRendimiento.value.nivel}\n\n¡Prueba tú también! 🚀`;
+  
+  if (navigator.share) {
+    navigator.share({
+      title: `Resultado del Quiz: ${quiz.value?.nombre}`,
+      text: mensaje,
+      url: window.location.origin + `/quiz/${quizId.value}`
+    });
+  } else {
+    navigator.clipboard.writeText(mensaje).then(() => {
+      alert('📋 Resultado copiado al portapapeles!');
+    });
+  }
 };
 
 // Lifecycle
@@ -162,6 +199,12 @@ onMounted(() => {
       <v-app-bar-title class="text-h6 font-weight-bold">
         Resultado del Quiz
       </v-app-bar-title>
+      
+      <v-spacer></v-spacer>
+      
+      <v-btn icon @click="compartirResultado" color="orange">
+        <v-icon>mdi-share-variant</v-icon>
+      </v-btn>
     </v-app-bar>
 
     <!-- Contenido principal -->
@@ -177,34 +220,31 @@ onMounted(() => {
             class="mb-4"
           ></v-progress-circular>
           <p class="text-h6">Procesando resultados...</p>
+          <p class="text-body-2 text-grey">Calculando tu puntuación</p>
         </div>
       </div>
 
       <!-- Resultados -->
-      <v-container v-else class="ResultadoQuizPage__Container">
+      <v-container v-else-if="resultadoLocal" class="ResultadoQuizPage__Container">
         <!-- Header con resultados principales -->
         <v-card class="ResultadoQuizPage__Header mb-6" elevation="6">
           <div class="ResultadoQuizPage__HeaderBg">
             <v-card-text class="text-center pa-8">
-              <!-- Icono y nivel -->
-              <v-icon 
-                :color="nivelRendimiento.color" 
-                size="80" 
-                class="mb-4"
-              >
-                {{ nivelRendimiento.icon }}
-              </v-icon>
+              <!-- Emoji y nivel -->
+              <div class="text-h1 mb-4">
+                {{ nivelRendimiento.emoji }}
+              </div>
               
               <h1 class="text-h3 font-weight-bold text-white mb-2">
                 {{ nivelRendimiento.nivel }}
               </h1>
               
-              <p class="text-h5 text-white mb-4 opacity-90">
+              <p class="text-h5 text-white mb-6 opacity-90">
                 {{ mensajeMotivacional }}
               </p>
               
               <!-- Puntuación principal -->
-              <div class="ResultadoQuizPage__Score mb-4">
+              <div class="ResultadoQuizPage__Score mb-6">
                 <div class="ResultadoQuizPage__ScoreMain">
                   {{ respuestasCorrectas }} / {{ totalPreguntas }}
                 </div>
@@ -221,10 +261,18 @@ onMounted(() => {
                 width="8"
                 class="mb-4"
               >
-                <span class="text-h4 font-weight-bold">
+                <span class="text-h4 font-weight-bold text-white">
                   {{ porcentaje }}%
                 </span>
               </v-progress-circular>
+              
+              <!-- Información del quiz -->
+              <div class="mt-6">
+                <h3 class="text-h6 text-white mb-2">{{ quiz?.nombre }}</h3>
+                <p class="text-body-1 text-white opacity-80">
+                  Completado el {{ new Date().toLocaleDateString() }}
+                </p>
+              </div>
             </v-card-text>
           </div>
         </v-card>
@@ -232,37 +280,37 @@ onMounted(() => {
         <!-- Estadísticas detalladas -->
         <v-row class="mb-6">
           <v-col cols="12" md="4">
-            <v-card class="ResultadoQuizPage__StatCard" elevation="3">
+            <v-card class="ResultadoQuizPage__StatCard" elevation="3" :color="'success'" variant="tonal">
               <v-card-text class="text-center pa-6">
                 <v-icon color="success" size="48" class="mb-3">mdi-check-circle</v-icon>
                 <div class="text-h4 font-weight-bold success--text">
                   {{ respuestasCorrectas }}
                 </div>
-                <div class="text-body-1">Correctas</div>
+                <div class="text-body-1 font-weight-medium">Correctas</div>
               </v-card-text>
             </v-card>
           </v-col>
           
           <v-col cols="12" md="4">
-            <v-card class="ResultadoQuizPage__StatCard" elevation="3">
+            <v-card class="ResultadoQuizPage__StatCard" elevation="3" :color="'error'" variant="tonal">
               <v-card-text class="text-center pa-6">
                 <v-icon color="error" size="48" class="mb-3">mdi-close-circle</v-icon>
                 <div class="text-h4 font-weight-bold error--text">
-                  {{ totalPreguntas - respuestasCorrectas }}
+                  {{ respuestasIncorrectas }}
                 </div>
-                <div class="text-body-1">Incorrectas</div>
+                <div class="text-body-1 font-weight-medium">Incorrectas</div>
               </v-card-text>
             </v-card>
           </v-col>
           
           <v-col cols="12" md="4">
-            <v-card class="ResultadoQuizPage__StatCard" elevation="3">
+            <v-card class="ResultadoQuizPage__StatCard" elevation="3" :color="'info'" variant="tonal">
               <v-card-text class="text-center pa-6">
                 <v-icon color="info" size="48" class="mb-3">mdi-help-circle</v-icon>
                 <div class="text-h4 font-weight-bold info--text">
                   {{ totalPreguntas }}
                 </div>
-                <div class="text-body-1">Total</div>
+                <div class="text-body-1 font-weight-medium">Total</div>
               </v-card-text>
             </v-card>
           </v-col>
@@ -295,8 +343,19 @@ onMounted(() => {
               </v-btn>
               
               <v-btn
-                @click="volverAQuizzes"
+                @click="compartirResultado"
                 color="success"
+                size="large"
+                variant="elevated"
+                prepend-icon="mdi-share-variant"
+                class="flex-grow-1 flex-md-grow-0"
+              >
+                Compartir
+              </v-btn>
+              
+              <v-btn
+                @click="volverAQuizzes"
+                color="primary"
                 size="large"
                 variant="elevated"
                 prepend-icon="mdi-format-list-bulleted"
@@ -332,7 +391,7 @@ onMounted(() => {
                       class="mr-3"
                     >
                       <v-icon start :icon="item.esCorrecta ? 'mdi-check' : 'mdi-close'"></v-icon>
-                      Pregunta {{ index + 1 }}
+                      Pregunta {{ item.numeroPregunta }}
                     </v-chip>
                     <span class="text-body-2 text-grey">
                       {{ item.esCorrecta ? 'Correcta' : 'Incorrecta' }}

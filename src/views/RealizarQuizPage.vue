@@ -1,15 +1,13 @@
-<!-- src/views/RealizarQuizPage.vue -->
+<!-- src/views/RealizarQuizPage.vue - VERSIÓN COMPLETA CORREGIDA -->
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useQuizStore } from '@/stores/Quiz';
 import { usePreguntaStore } from '@/stores/Pregunta';
 import { useRespuestaStore } from '@/stores/Respuesta';
-import { useResultadoQuizStore } from '@/stores/ResultadoQuiz';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import type { PreguntaDTO } from '@/stores/dtos/PreguntaDTO';
 import type { RespuestaDTO } from '@/stores/dtos/RespuestaDTO';
-import type { RespuestaUsuarioDTO } from '@/stores/dtos/ResultadoQuizDTO';
 
 // Stores y router
 const route = useRoute();
@@ -17,7 +15,6 @@ const router = useRouter();
 const quizStore = useQuizStore();
 const preguntaStore = usePreguntaStore();
 const respuestaStore = useRespuestaStore();
-const resultadoStore = useResultadoQuizStore();
 const usuarioStore = useUsuarioLogeadoStore();
 
 // Variables reactivas
@@ -64,24 +61,31 @@ const totalRespuestas = computed(() => {
 const cargarQuiz = async () => {
   loading.value = true;
   try {
+    console.log('🎯 Cargando quiz con ID:', quizId.value);
+    
     // Cargar datos del quiz
     const quizData = await quizStore.fetchQuizCompletoById(quizId.value);
     if (!quizData) {
       throw new Error('Quiz no encontrado');
     }
     quiz.value = quizData;
+    console.log('✅ Quiz cargado:', quizData);
 
     // Cargar preguntas
+    console.log('📝 Cargando preguntas...');
     const preguntasData = await preguntaStore.fetchPreguntasByQuizId(quizId.value);
     if (preguntasData.length === 0) {
-      throw new Error('Este quiz no tiene preguntas');
+      throw new Error('Este quiz no tiene preguntas disponibles');
     }
     preguntas.value = preguntasData;
     quiz.value.totalPreguntas = preguntasData.length;
+    console.log('✅ Preguntas cargadas:', preguntasData.length);
 
     // Cargar respuestas para todas las preguntas
+    console.log('📋 Cargando respuestas...');
     const respuestasData = await respuestaStore.fetchRespuestasForQuiz(preguntasData);
     respuestasMap.value = respuestasData;
+    console.log('✅ Respuestas cargadas para', respuestasData.size, 'preguntas');
 
     // Verificar que todas las preguntas tengan respuestas
     for (const pregunta of preguntasData) {
@@ -89,10 +93,31 @@ const cargarQuiz = async () => {
       if (!respuestas || respuestas.length === 0) {
         throw new Error(`La pregunta "${pregunta.descripcion}" no tiene respuestas disponibles`);
       }
+      
+      // Verificar que haya al menos una respuesta correcta
+      const tieneRespuestaCorrecta = respuestas.some(r => r.esCorrecta);
+      if (!tieneRespuestaCorrecta) {
+        console.warn(`⚠️ La pregunta "${pregunta.descripcion}" no tiene respuesta correcta marcada`);
+      }
     }
 
+    console.log('🎉 Quiz completamente cargado y listo');
   } catch (error) {
-    console.error('Error al cargar quiz:', error);
+    console.error('❌ Error al cargar quiz:', error);
+    
+    // Mostrar mensaje de error más específico
+    let mensaje = 'Error al cargar el quiz';
+    if (error.message.includes('no encontrado')) {
+      mensaje = 'El quiz que buscas no existe o no está disponible';
+    } else if (error.message.includes('no tiene preguntas')) {
+      mensaje = 'Este quiz no tiene preguntas configuradas. Contacta al profesor.';
+    } else if (error.message.includes('no tiene respuestas')) {
+      mensaje = 'Algunas preguntas no tienen respuestas configuradas. Contacta al profesor.';
+    } else if (error.message.includes('Failed to fetch')) {
+      mensaje = 'Error de conexión. Verifica tu conexión a internet.';
+    }
+    
+    alert(mensaje);
     router.push('/quizz-time!');
   } finally {
     loading.value = false;
@@ -102,6 +127,11 @@ const cargarQuiz = async () => {
 const seleccionarRespuesta = (idRespuesta: number) => {
   if (!preguntaActualData.value) return;
   respuestasUsuario.value.set(preguntaActualData.value.idPregunta, idRespuesta);
+  console.log('📌 Respuesta seleccionada:', {
+    pregunta: preguntaActualData.value.idPregunta,
+    respuesta: idRespuesta,
+    totalRespuestas: respuestasUsuario.value.size
+  });
 };
 
 const siguientePregunta = () => {
@@ -126,13 +156,20 @@ const finalizarQuiz = () => {
   showConfirmDialog.value = true;
 };
 
+// MÉTODO SIMPLIFICADO - SOLO FRONTEND
 const confirmarFinalizacion = async () => {
-  if (!quiz.value || !usuarioActual.value) return;
+  if (!quiz.value || !usuarioActual.value) {
+    alert('Error: No se pudo obtener la información del usuario o del quiz');
+    return;
+  }
 
   loading.value = true;
   try {
-    // Construir respuestas del usuario
-    const respuestasUsuarioArray: RespuestaUsuarioDTO[] = [];
+    console.log('🏁 Finalizando quiz (solo frontend)...');
+    console.log('📊 Respuestas del usuario:', respuestasUsuario.value);
+    
+    // Construir respuestas del usuario con validación de correctitud
+    const respuestasUsuarioArray = [];
     
     for (const pregunta of preguntas.value) {
       const idRespuestaSeleccionada = respuestasUsuario.value.get(pregunta.idPregunta);
@@ -145,33 +182,69 @@ const confirmarFinalizacion = async () => {
           idRespuestaSeleccionada,
           esCorrecta: respuestaSeleccionada?.esCorrecta || false
         });
+      } else {
+        // Si no hay respuesta, marcar como incorrecta
+        respuestasUsuarioArray.push({
+          idPregunta: pregunta.idPregunta,
+          idRespuestaSeleccionada: 0, // Sin respuesta
+          esCorrecta: false
+        });
       }
     }
 
-    // Calcular puntuación
-    const puntuacion = resultadoStore.calcularPuntuacion(respuestasUsuarioArray);
+    console.log('📝 Respuestas procesadas:', respuestasUsuarioArray);
 
-    // Guardar resultado
+    // Calcular estadísticas
+    const respuestasCorrectas = respuestasUsuarioArray.filter(r => r.esCorrecta).length;
+    const puntuacion = Math.round((respuestasCorrectas / respuestasUsuarioArray.length) * 100);
+    
+    console.log('🎯 Estadísticas:', {
+      total: respuestasUsuarioArray.length,
+      correctas: respuestasCorrectas,
+      incorrectas: respuestasUsuarioArray.length - respuestasCorrectas,
+      puntuacion: puntuacion
+    });
+
+    // Crear objeto de resultado
     const resultado = {
       idQuiz: quiz.value.idQuiz,
       idUsuario: usuarioActual.value.idUsuario,
+      nombreQuiz: quiz.value.nombre,
       puntuacion,
       fechaRealizacion: new Date().toISOString(),
-      respuestasUsuario: respuestasUsuarioArray
+      tiempoTotal: Math.round((new Date().getTime() - tiempoInicio.value.getTime()) / 1000), // en segundos
+      respuestasUsuario: respuestasUsuarioArray,
+      estadisticas: {
+        correctas: respuestasCorrectas,
+        incorrectas: respuestasUsuarioArray.length - respuestasCorrectas,
+        total: respuestasUsuarioArray.length,
+        porcentaje: puntuacion
+      }
     };
 
-    const guardado = await resultadoStore.saveResultadoQuiz(resultado);
+    console.log('💾 Resultado final:', resultado);
+
+    // Guardar en sessionStorage (temporal para la sesión)
+    const resultadoKey = `quiz_resultado_${quizId.value}`;
+    sessionStorage.setItem(resultadoKey, JSON.stringify(resultado));
     
-    if (guardado) {
-      // Navegar a resultados
-      router.push(`/quiz/${quizId.value}/resultado`);
-    } else {
-      throw new Error('Error al guardar el resultado');
-    }
+    // También guardar un backup en localStorage (opcional)
+    const backupKey = `quiz_backup_${quizId.value}_${Date.now()}`;
+    localStorage.setItem(backupKey, JSON.stringify(resultado));
+    
+    console.log('✅ Resultado guardado en sessionStorage');
+    console.log('🔑 Clave:', resultadoKey);
+
+    // Simular un pequeño delay para mejor UX
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Navegar a la página de resultados
+    console.log('🎉 Navegando a resultados...');
+    router.push(`/quiz/${quizId.value}/resultado`);
 
   } catch (error) {
-    console.error('Error al finalizar quiz:', error);
-    alert('Error al guardar el resultado. Inténtalo de nuevo.');
+    console.error('❌ Error al finalizar quiz:', error);
+    alert('Error al procesar el resultado. Por favor, inténtalo de nuevo.');
   } finally {
     loading.value = false;
     showConfirmDialog.value = false;
@@ -179,7 +252,13 @@ const confirmarFinalizacion = async () => {
 };
 
 const salirQuiz = () => {
-  router.push('/quizz-time!');
+  if (totalRespuestas.value > 0) {
+    if (confirm('¿Estás seguro de que quieres salir? Se perderá tu progreso.')) {
+      router.push('/quizz-time!');
+    }
+  } else {
+    router.push('/quizz-time!');
+  }
 };
 
 // Auto-save del progreso cada 30 segundos
@@ -187,18 +266,32 @@ let autoSaveInterval: number;
 
 // Lifecycle
 onMounted(() => {
+  console.log('🚀 Componente RealizarQuiz montado');
+  console.log('🆔 Quiz ID desde ruta:', quizId.value);
+  console.log('👤 Usuario actual:', usuarioActual.value);
+  
+  // Verificar que el usuario esté logueado
+  if (!usuarioActual.value) {
+    alert('Debes iniciar sesión para realizar un quiz');
+    router.push('/login');
+    return;
+  }
+  
   cargarQuiz();
   tiempoInicio.value = new Date();
   
-  // Auto-save cada 30 segundos
+  // Auto-save cada 30 segundos (opcional)
   autoSaveInterval = setInterval(() => {
-    // Aquí podrías implementar auto-save del progreso si lo deseas
-    console.log('Auto-save del progreso:', totalRespuestas.value, 'de', preguntas.value.length);
+    if (totalRespuestas.value > 0) {
+      console.log('💾 Auto-save del progreso:', totalRespuestas.value, 'de', preguntas.value.length);
+      // Aquí podrías implementar auto-save del progreso si lo deseas
+    }
   }, 30000);
 });
 
 // Cleanup
 onUnmounted(() => {
+  console.log('🧹 Limpiando recursos del componente');
   if (autoSaveInterval) {
     clearInterval(autoSaveInterval);
   }
@@ -251,6 +344,7 @@ onUnmounted(() => {
             class="mb-4"
           ></v-progress-circular>
           <p class="text-h6">Cargando quiz...</p>
+          <p class="text-body-2 text-grey">Preparando preguntas y respuestas</p>
         </div>
       </div>
 
@@ -311,6 +405,13 @@ onUnmounted(() => {
                     <p class="text-h6 font-weight-bold">
                       {{ totalRespuestas }} / {{ preguntas.length }}
                     </p>
+                    <v-progress-linear
+                      :model-value="(totalRespuestas / preguntas.length) * 100"
+                      color="orange"
+                      height="8"
+                      rounded
+                      class="mt-2"
+                    ></v-progress-linear>
                   </div>
                 </v-card-text>
               </v-card>
@@ -358,6 +459,17 @@ onUnmounted(() => {
                       </template>
                     </v-radio>
                   </v-radio-group>
+
+                  <!-- Indicador de respuesta sin seleccionar -->
+                  <v-alert
+                    v-if="!puedeAvanzar && !esUltimaPregunta"
+                    type="info"
+                    variant="tonal"
+                    class="mt-4"
+                  >
+                    <v-icon start>mdi-information</v-icon>
+                    Selecciona una respuesta para continuar
+                  </v-alert>
                 </v-card-text>
 
                 <!-- Botones de navegación -->
@@ -402,6 +514,21 @@ onUnmounted(() => {
           </v-row>
         </v-container>
       </div>
+
+      <!-- Estado de error -->
+      <div v-else class="d-flex justify-center align-center" style="height: 80vh;">
+        <v-card class="pa-8 text-center" max-width="500">
+          <v-icon color="error" size="64" class="mb-4">mdi-alert-circle</v-icon>
+          <h3 class="text-h5 mb-4">Error al cargar el quiz</h3>
+          <p class="text-body-1 mb-4">
+            No se pudo cargar el quiz solicitado. Puede que no exista o no tenga preguntas configuradas.
+          </p>
+          <v-btn color="orange" variant="elevated" @click="router.push('/quizz-time!')">
+            <v-icon start>mdi-arrow-left</v-icon>
+            Volver a Quizzes
+          </v-btn>
+        </v-card>
+      </div>
     </v-main>
 
     <!-- Dialog de confirmación -->
@@ -423,11 +550,13 @@ onUnmounted(() => {
             variant="tonal"
             class="mb-4"
           >
-            Aún tienes preguntas sin responder. ¿Estás seguro de que quieres continuar?
+            <v-icon start>mdi-alert</v-icon>
+            Aún tienes {{ preguntas.length - totalRespuestas }} preguntas sin responder. 
+            Las preguntas sin respuesta se marcarán como incorrectas.
           </v-alert>
           
           <p class="text-body-2 text-grey">
-            Una vez finalizado, no podrás modificar tus respuestas.
+            Una vez finalizado, podrás ver tu puntuación y revisar las respuestas.
           </p>
         </v-card-text>
         
@@ -442,6 +571,7 @@ onUnmounted(() => {
             variant="elevated"
             :loading="loading"
           >
+            <v-icon start>mdi-check</v-icon>
             Sí, finalizar
           </v-btn>
         </v-card-actions>
