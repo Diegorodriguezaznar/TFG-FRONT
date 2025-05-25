@@ -10,7 +10,7 @@ const asignaturaStore = useAsignaturaStore();
 // --------------------------- Props y Emits ---------------------------
 const props = defineProps({
   filtroActual: {
-    type: String || Number,
+    type: [String, Number],
     default: 'Todos'
   },
   cursoId: {

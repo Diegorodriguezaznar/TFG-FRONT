@@ -30,6 +30,7 @@ const allMenuItems = [
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
   { title: 'Quizzes', icon: 'mdi-school-outline', route: '/quizz-time!' },
+  { title: 'MarIAno', icon: 'mdi-robot-outline', route: '/ia' },
   { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
 ];
 
@@ -50,7 +51,6 @@ const drawer = computed({
   set: (value) => emit('update:modelValue', value)
 });
 </script>
-
 
 <template>
   <v-navigation-drawer
@@ -78,7 +78,7 @@ const drawer = computed({
         :to="item.route"
         :title="isExpanded ? item.title : ''"
         :prepend-icon="item.icon"
-        class="Sidebar__MenuItem"
+        :class="['Sidebar__MenuItem', item.title === 'MarIAno' && 'Sidebar__MarIAno']"
       />
     </v-list>
     
@@ -108,5 +108,17 @@ const drawer = computed({
 .Sidebar__MenuItem {
   margin-bottom: 4px;
   border-radius: 0;
+}
+
+/* ------------------ MarIAno personalizado ------------------ */
+.Sidebar__MarIAno {
+  color: #ff6600 !important;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  border-left: 4px solid #f88112;
+}
+
+.Sidebar__MarIAno .v-icon {
+  color: #e08105 !important;
 }
 </style>

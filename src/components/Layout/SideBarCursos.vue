@@ -20,23 +20,24 @@ const isMobile = computed(() => mobile.value);
 
 // --------------------------- Usuario y Rol ---------------------------
 const usuarioStore = useUsuarioLogeadoStore();
-const idRol = computed(() => usuarioStore.usuarioActual?.idRol ?? 1);
 
-// --------------------------- Menú ---------------------------
 const allMenuItems = [
   { title: 'Inicio', icon: 'mdi-home', route: '/cursos' },
   { title: 'Mis Cursos', icon: 'mdi-folder', route: '/mis-cursos' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
-  { title: 'Crear Curso', icon: 'mdi-plus-box', route: '/crear-curso', rolesPermitidos: [1,2, 3] },
+  { title: 'Crear Curso', icon: 'mdi-plus-box', route: '/crear-curso', rolesPermitidos: [2, 3] },
   { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
 ];
 
-const menuItems = computed(() =>
-  allMenuItems.filter(item => {
+const menuItems = computed(() => {
+  const rol = usuarioStore.usuarioActual?.idRol;
+  if (!rol) return []; // mientras no esté cargado, oculta el menú (puedes cambiarlo por un loader si quieres)
+  return allMenuItems.filter(item => {
     if (!item.rolesPermitidos) return true;
-    return item.rolesPermitidos.includes(idRol.value);
-  })
-);
+    return item.rolesPermitidos.includes(rol);
+  });
+});
+
 
 // --------------------------- Métodos ---------------------------
 const toggleSidebar = () => {
@@ -67,7 +68,7 @@ const drawer = computed({
     <v-divider></v-divider>
     
     <!-- Menú de navegación -->
-    <v-list density="compact" nav>
+<v-list v-if="usuarioStore.usuarioActual" density="compact" nav>
       <v-list-item
         v-for="item in menuItems"
         :key="item.title"
@@ -84,7 +85,7 @@ const drawer = computed({
     <!-- Sección de canales suscritos (simplificado) -->
     <div v-if="isExpanded" class="px-3 py-2">
       <div class="text-subtitle-2 font-weight-medium mb-2">Canales suscritos</div>
-      <v-list density="compact" nav>
+<v-list v-if="usuarioStore.usuarioActual" density="compact" nav>
         <v-list-item
           v-for="i in 3"
           :key="i"

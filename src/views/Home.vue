@@ -155,6 +155,8 @@ onMounted(() => {
   if (!usuarioLogeadoStore.usuarioActual) {
     usuarioLogeadoStore.cargarUsuarioDesdeStorage();
   }
+    console.log('👀 Usuario desde localStorage:', JSON.stringify(JSON.parse(localStorage.getItem('usuario-logeado')), null, 2));
+
   cargarVideos();
 });
 </script>
