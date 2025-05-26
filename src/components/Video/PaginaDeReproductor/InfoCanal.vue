@@ -42,8 +42,6 @@ const getColorForAsignatura = (asignatura: string): string => {
       </div>
     </div>
     
-    <v-btn color="orange" block>Seguir</v-btn>
-    <div class="text-caption text-center mt-1">{{ video.vistas }} suscriptores</div>
     
     <h3 class="text-h6 font-weight-bold mt-4">{{ video.titulo }}</h3>
     <p class="text-body-2">

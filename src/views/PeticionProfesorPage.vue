@@ -1,175 +1,12 @@
-<template>
-  <div class="convertirse-profesor">
-    <!-- Hero Section -->
-    <v-container fluid class="hero-section">
-      <v-row justify="center" align="center" class="text-center">
-        <v-col cols="12" md="8">
-          <h1 class="hero-title">
-            <v-icon class="mr-3" color="primary" size="48">mdi-school</v-icon>
-            Conviértete en Profesor
-          </h1>
-          <p class="hero-subtitle">
-            Únete a nuestra comunidad educativa y comparte tu conocimiento con estudiantes de todo el mundo
-          </p>
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <!-- Steps Section -->
-    <v-container class="steps-section">
-      <v-row justify="center">
-        <v-col cols="12" md="10">
-          <h2 class="section-title text-center mb-8">¿Cómo convertirse en profesor?</h2>
-          
-          <v-stepper 
-            v-model="currentStep" 
-            alt-labels 
-            class="custom-stepper"
-            elevation="0"
-          >
-            <v-stepper-header>
-              <v-stepper-item 
-                v-for="(step, index) in steps" 
-                :key="index"
-                :complete="currentStep > index + 1"
-                :value="index + 1"
-                :color="currentStep === index + 1 ? 'primary' : 'grey'"
-              >
-                <template v-slot:icon>
-                  <v-icon>{{ step.icon }}</v-icon>
-                </template>
-                {{ step.title }}
-              </v-stepper-item>
-            </v-stepper-header>
-
-            <v-stepper-window>
-              <v-stepper-window-item 
-                v-for="(step, index) in steps" 
-                :key="index"
-                :value="index + 1"
-              >
-                <v-card class="step-card" elevation="2">
-                  <v-card-text class="pa-6">
-                    <div class="step-content">
-                      <v-avatar class="step-avatar mb-4" size="80" color="primary">
-                        <v-icon size="40" color="white">{{ step.icon }}</v-icon>
-                      </v-avatar>
-                      <h3 class="step-title mb-3">{{ step.title }}</h3>
-                      <p class="step-description">{{ step.description }}</p>
-                      <v-chip-group class="mt-4">
-                        <v-chip 
-                          v-for="requirement in step.requirements" 
-                          :key="requirement"
-                          color="primary" 
-                          variant="outlined"
-                          size="small"
-                        >
-                          {{ requirement }}
-                        </v-chip>
-                      </v-chip-group>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-stepper-window-item>
-            </v-stepper-window>
-
-            <v-stepper-actions>
-              <template v-slot:prev>
-                <v-btn 
-                  v-if="currentStep > 1"
-                  variant="outlined"
-                  @click="currentStep--"
-                  prepend-icon="mdi-chevron-left"
-                >
-                  Anterior
-                </v-btn>
-              </template>
-              
-              <template v-slot:next>
-                <v-btn 
-                  v-if="currentStep < steps.length"
-                  color="primary"
-                  @click="currentStep++"
-                  append-icon="mdi-chevron-right"
-                >
-                  Siguiente
-                </v-btn>
-              </template>
-            </v-stepper-actions>
-          </v-stepper>
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <!-- Benefits Section -->
-    <v-container fluid class="benefits-section">
-      <v-container>
-        <v-row justify="center">
-          <v-col cols="12" md="10">
-            <h2 class="section-title text-center mb-8 white--text">Beneficios de ser profesor</h2>
-            <v-row>
-              <v-col 
-                v-for="(benefit, index) in benefits" 
-                :key="index"
-                cols="12" 
-                md="4"
-              >
-                <v-card class="benefit-card h-100" elevation="4">
-                  <v-card-text class="text-center pa-6">
-                    <v-avatar size="60" color="primary" class="mb-4">
-                      <v-icon size="30" color="white">{{ benefit.icon }}</v-icon>
-                    </v-avatar>
-                    <h4 class="benefit-title mb-3">{{ benefit.title }}</h4>
-                    <p class="benefit-description">{{ benefit.description }}</p>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-container>
-
-    <!-- CTA Section -->
-    <v-container class="cta-section">
-      <v-row justify="center">
-        <v-col cols="12" md="8" class="text-center">
-          <v-card class="cta-card" elevation="8">
-            <v-card-text class="pa-8">
-              <v-icon size="60" color="primary" class="mb-4">mdi-rocket-launch</v-icon>
-              <h2 class="cta-title mb-4">¿Listo para comenzar?</h2>
-              <p class="cta-description mb-6">
-                Envía tu solicitud ahora y únete a nuestra comunidad de educadores profesionales
-              </p>
-              <v-btn 
-                color="primary" 
-                size="x-large"
-                elevation="4"
-                class="cta-button"
-                @click="openModal"
-              >
-                <v-icon left>mdi-account-star</v-icon>
-                Conviértete en Profesor
-              </v-btn>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
-    </v-container>
-
-    <!-- Modal Component -->
-    <ModalSolicitudProfesor 
-      :dialog="showModal" 
-      @close="closeModal"
-      @success="handleSuccess"
-    />
-  </div>
-</template>
-
 <script setup lang="ts">
+// --------------------------- Imports ---------------------------
 import { ref } from 'vue'
+import Header from '@/components/Layout/Header.vue'
+import Sidebar from '@/components/Layout/Sidebar.vue'
 import ModalSolicitudProfesor from '@/components/ModalSolicitudProfesor.vue'
 
+// --------------------------- Variables ---------------------------
+const drawer = ref(false)
 const currentStep = ref(1)
 const showModal = ref(false)
 
@@ -228,9 +65,178 @@ const closeModal = () => {
 
 const handleSuccess = () => {
   showModal.value = false
-  // Aquí puedes agregar lógica adicional como mostrar un mensaje de éxito
 }
 </script>
+
+<template>
+  <v-app>
+    <Header @toggle-sidebar="drawer = !drawer" />
+    <Sidebar v-model="drawer" />
+
+    <v-main class="convertirse-profesor">
+      <!-- Todo el contenido original que ya tenías -->
+      <!-- Hero Section -->
+      <v-container fluid class="hero-section">
+        <v-row justify="center" align="center" class="text-center">
+          <v-col cols="12" md="8">
+            <h1 class="hero-title">
+              <v-icon class="mr-3" color="primary" size="48">mdi-school</v-icon>
+              Conviértete en Profesor
+            </h1>
+            <p class="hero-subtitle">
+              Únete a nuestra comunidad educativa y comparte tu conocimiento con estudiantes de todo el mundo
+            </p>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <!-- Steps Section -->
+      <v-container class="steps-section">
+        <v-row justify="center">
+          <v-col cols="12" md="10">
+            <h2 class="section-title text-center mb-8">¿Cómo convertirse en profesor?</h2>
+
+            <v-stepper v-model="currentStep" alt-labels class="custom-stepper" elevation="0">
+              <v-stepper-header>
+                <v-stepper-item 
+                  v-for="(step, index) in steps" 
+                  :key="index"
+                  :complete="currentStep > index + 1"
+                  :value="index + 1"
+                  :color="currentStep === index + 1 ? 'primary' : 'grey'"
+                >
+                  <template v-slot:icon>
+                    <v-icon>{{ step.icon }}</v-icon>
+                  </template>
+                  {{ step.title }}
+                </v-stepper-item>
+              </v-stepper-header>
+
+              <v-stepper-window>
+                <v-stepper-window-item 
+                  v-for="(step, index) in steps" 
+                  :key="index"
+                  :value="index + 1"
+                >
+                  <v-card class="step-card" elevation="2">
+                    <v-card-text class="pa-6">
+                      <div class="step-content">
+                        <v-avatar class="step-avatar mb-4" size="80" color="primary">
+                          <v-icon size="40" color="white">{{ step.icon }}</v-icon>
+                        </v-avatar>
+                        <h3 class="step-title mb-3">{{ step.title }}</h3>
+                        <p class="step-description">{{ step.description }}</p>
+                        <v-chip-group class="mt-4">
+                          <v-chip 
+                            v-for="requirement in step.requirements" 
+                            :key="requirement"
+                            color="primary" 
+                            variant="outlined"
+                            size="small"
+                          >
+                            {{ requirement }}
+                          </v-chip>
+                        </v-chip-group>
+                      </div>
+                    </v-card-text>
+                  </v-card>
+                </v-stepper-window-item>
+              </v-stepper-window>
+
+              <v-stepper-actions>
+                <template v-slot:prev>
+                  <v-btn 
+                    v-if="currentStep > 1"
+                    variant="outlined"
+                    @click="currentStep--"
+                    prepend-icon="mdi-chevron-left"
+                  >
+                    Anterior
+                  </v-btn>
+                </template>
+
+                <template v-slot:next>
+                  <v-btn 
+                    v-if="currentStep < steps.length"
+                    color="primary"
+                    @click="currentStep++"
+                    append-icon="mdi-chevron-right"
+                  >
+                    Siguiente
+                  </v-btn>
+                </template>
+              </v-stepper-actions>
+            </v-stepper>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <!-- Benefits Section -->
+      <v-container fluid class="benefits-section">
+        <v-container>
+          <v-row justify="center">
+            <v-col cols="12" md="10">
+              <h2 class="section-title text-center mb-8 white--text">Beneficios de ser profesor</h2>
+              <v-row>
+                <v-col 
+                  v-for="(benefit, index) in benefits" 
+                  :key="index"
+                  cols="12" 
+                  md="4"
+                >
+                  <v-card class="benefit-card h-100" elevation="4">
+                    <v-card-text class="text-center pa-6">
+                      <v-avatar size="60" color="primary" class="mb-4">
+                        <v-icon size="30" color="white">{{ benefit.icon }}</v-icon>
+                      </v-avatar>
+                      <h4 class="benefit-title mb-3">{{ benefit.title }}</h4>
+                      <p class="benefit-description">{{ benefit.description }}</p>
+                    </v-card-text>
+                  </v-card>
+                </v-col>
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-container>
+
+      <!-- CTA Section -->
+      <v-container class="cta-section">
+        <v-row justify="center">
+          <v-col cols="12" md="8" class="text-center">
+            <v-card class="cta-card" elevation="8">
+              <v-card-text class="pa-8">
+                <v-icon size="60" color="primary" class="mb-4">mdi-rocket-launch</v-icon>
+                <h2 class="cta-title mb-4">¿Listo para comenzar?</h2>
+                <p class="cta-description mb-6">
+                  Envía tu solicitud ahora y únete a nuestra comunidad de educadores profesionales
+                </p>
+                <v-btn 
+                  color="primary" 
+                  size="x-large"
+                  elevation="4"
+                  class="cta-button"
+                  @click="openModal"
+                >
+                  <v-icon left>mdi-account-star</v-icon>
+                  Conviértete en Profesor
+                </v-btn>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+
+      <!-- Modal -->
+      <ModalSolicitudProfesor 
+        :dialog="showModal" 
+        @close="closeModal"
+        @success="handleSuccess"
+      />
+    </v-main>
+  </v-app>
+</template>
+
 
 <style lang="scss" scoped>
 .convertirse-profesor {
