@@ -19,7 +19,7 @@ const router = useRouter();
 // Obtener el ID del quiz desde los query params (como está configurado en Quizzes.vue)
 const quizId = computed(() => {
   if (route.query.id) {
-    return parseInt(route.query.id);
+    return parseInt(route.query.id);  
   }
   return null;
 });
