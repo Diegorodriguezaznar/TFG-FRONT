@@ -1,13 +1,9 @@
 <script setup lang="ts">
-// --------------------------- Imports ---------------------------
-import { ref, computed, watch, onMounted } from 'vue';
+import { computed, watch, onMounted } from 'vue';
 import { useAsignaturaStore } from '@/stores/Asignaturas';
-import type { AsignaturaDTO } from '@/stores/dtos/AsignaturasDTO';
 
-// --------------------------- Stores ---------------------------
 const asignaturaStore = useAsignaturaStore();
 
-// --------------------------- Props y Emits ---------------------------
 const props = defineProps({
   filtroActual: {
     type: [String, Number],
@@ -21,15 +17,11 @@ const props = defineProps({
 
 const emit = defineEmits(['filtro-seleccionado']);
 
-// --------------------------- Estado local ---------------------------
 const loading = computed(() => asignaturaStore.isLoading);
 
-// --------------------------- Asignaturas/filtros computados ---------------------------
 const asignaturas = computed(() => {
-  // Siempre incluimos la opción "Todos"
   const opciones = [{ idAsignatura: 'Todos', nombre: 'Todos' }];
   
-  // Agregamos cada asignatura del store
   if (asignaturaStore.asignaturas && asignaturaStore.asignaturas.length > 0) {
     asignaturaStore.asignaturas.forEach(asignatura => {
       opciones.push({
@@ -42,7 +34,6 @@ const asignaturas = computed(() => {
   return opciones;
 });
 
-// --------------------------- Cargar asignaturas del curso ---------------------------
 const cargarAsignaturas = async () => {
   if (props.cursoId) {
     await asignaturaStore.fetchAsignaturasByCurso(props.cursoId);
@@ -51,19 +42,16 @@ const cargarAsignaturas = async () => {
   }
 };
 
-// --------------------------- Métodos ---------------------------
 const seleccionarFiltro = (filtro: any) => {
   emit('filtro-seleccionado', filtro);
 };
 
-// --------------------------- Observar cambios en el curso ---------------------------
 watch(() => props.cursoId, (newValue) => {
   if (newValue) {
     cargarAsignaturas();
   }
 });
 
-// --------------------------- Cargar datos al montar ---------------------------
 onMounted(() => {
   cargarAsignaturas();
 });

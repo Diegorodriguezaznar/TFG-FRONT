@@ -1,44 +1,37 @@
 <script setup lang="ts">
-// --------------------------- Imports ---------------------------
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useVideoStore } from '@/stores/Video';
 import { useMarcadorVideoStore } from '@/stores/MarcadorVideo';
+import { useFavoritoStore } from '@/stores/Favorito';
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import ReproductorVideo from '@/components/Video/VideoPlayer.vue'; 
 import ComentariosVideo from '@/components/Video/VideoComments.vue';
 import InfoCanal from '@/components/Video/PaginaDeReproductor/InfoCanal.vue';
 import MarcadoresTiempo from '@/components/Video/PaginaDeReproductor/MarcadoresTiempo.vue';
 import ReportarVideo from '@/components/Video/PaginaDeReproductor/ReportarVideo.vue';
-import VideosSugeridos from '@/components/Video/PaginaDeReproductor/VideosSugeridos.vue';
 import CargandoVideo from '@/components/Video/PaginaDeReproductor/CargaVideo.vue';
 import Cabecera from '@/components/Layout/Header.vue';
 import BarraLateral from '@/components/Layout/Sidebar.vue';
 import type { VideoDTO } from '@/stores/dtos/VideoDTO';
 import type { MarcadorVideoDTO } from '@/stores/dtos/MarcadorVideoDTO';
-import { useFavoritoStore } from '@/stores/Favorito'
-import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado'
 
-
-// --------------------------- Route ---------------------------
 const route = useRoute();
 const router = useRouter();
 
-// --------------------------- Store ---------------------------
 const videoStore = useVideoStore();
 const marcadorVideoStore = useMarcadorVideoStore();
-const favoritoStore = useFavoritoStore()
-const usuarioLogeadoStore = useUsuarioLogeadoStore()
+const favoritoStore = useFavoritoStore();
+const usuarioLogeadoStore = useUsuarioLogeadoStore();
 
-
-// --------------------------- Variables ---------------------------
 const sidebarOpen = ref(true);
 const searchQuery = ref('');
 const loading = ref(true);
 const error = ref('');
 const marcadores = ref<MarcadorVideoDTO[]>([]);
 const loadingMarcadores = ref(false);
+const loadingFavorito = ref(false);
 
-// Inicializar currentVideo con valores por defecto para evitar errores durante la carga
 const currentVideo = ref<VideoDTO>({
   idVideo: 0,
   titulo: 'Cargando...',
@@ -53,24 +46,19 @@ const currentVideo = ref<VideoDTO>({
   idCurso: 0,
   vistas: '0',
   fecha: 'Cargando...',
-  duracion: '00:00' 
+  duracion: '00:00',
+  contadorLikes: 0
 });
 
-// Lista de videos sugeridos
-const suggestedVideos = ref<VideoDTO[]>([]);
-
-// ID del video desde la URL
 const videoId = computed(() => {
-  return route.query.id ? Number(route.query.id) : 1; // Default a 1 para evitar problemas
+  return route.query.id ? Number(route.query.id) : 1;
 });
 
-// Computed para verificar si es favorito
 const esFavorito = computed(() => {
-  const resultado = favoritoStore.esFavorito(currentVideo.value.idVideo)
-  return resultado
-})
+  if (!currentVideo.value.idVideo) return false;
+  return favoritoStore.esFavorito(currentVideo.value.idVideo);
+});
 
-// --------------------------- Métodos ---------------------------
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value;
 };
@@ -79,7 +67,6 @@ const updateSearch = (query: string) => {
   searchQuery.value = query;
 };
 
-// SOLUCIÓN DEFINITIVA: Usar el router de Vue en lugar de window.location
 const handleVideoSelect = (videoId: number) => {
   router.push({ 
     path: '/reproductor-video', 
@@ -87,20 +74,16 @@ const handleVideoSelect = (videoId: number) => {
   });
 };
 
-// Ir a un tiempo específico del video
 const seekToTime = (time: number) => {
   const videoElement = document.querySelector('video');
   if (videoElement) {
     videoElement.currentTime = time;
-    // Si el video estaba pausado, iniciarlo
     if (videoElement.paused) {
       videoElement.play();
     }
   }
 };
 
-// --------------------------- Cargar datos ---------------------------
-// Cargar el video actual
 const loadCurrentVideo = async () => {
   loading.value = true;
   error.value = '';
@@ -109,23 +92,22 @@ const loadCurrentVideo = async () => {
     const video = await videoStore.fetchVideoById(videoId.value);
     if (video) {
       currentVideo.value = video;
-      // Si no tiene duración, asignar un valor por defecto
       if (!currentVideo.value.duracion) {
         currentVideo.value.duracion = '00:00';
       }
-      console.log('Video cargado:', currentVideo.value.idVideo)
+      if (currentVideo.value.contadorLikes === undefined) {
+        currentVideo.value.contadorLikes = 0;
+      }
     } else {
       error.value = 'No se encontró el video solicitado';
     }
   } catch (err: any) {
     error.value = err.message || 'Error al cargar el video';
-    console.error('Error al cargar el video:', err);
   } finally {
     loading.value = false;
   }
 };
 
-// Cargar marcadores del video
 const loadMarcadores = async () => {
   if (!videoId.value) return;
   
@@ -140,147 +122,107 @@ const loadMarcadores = async () => {
   }
 };
 
-// Favoritos mejorado
 const toggleFavorito = async () => {
-  console.log('=== INICIANDO TOGGLE FAVORITO ===')
-  
-  // Verificar estado del usuario antes del toggle
-  console.log('Usuario antes del toggle:', usuarioLogeadoStore.usuario)
-  console.log('¿Está autenticado?:', usuarioLogeadoStore.estaAutenticado)
-  
-  // Si no hay usuario, intentar cargarlo con el método disponible
-  if (!usuarioLogeadoStore.usuario?.idUsuario) {
-    console.log('Intentando cargar usuario...')
-    if (typeof usuarioLogeadoStore.cargarUsuario === 'function') {
-      await usuarioLogeadoStore.cargarUsuario()
-    } else if (typeof usuarioLogeadoStore.inicializar === 'function') {
-      await usuarioLogeadoStore.inicializar()
-    } else if (typeof usuarioLogeadoStore.verificarAutenticacion === 'function') {
-      await usuarioLogeadoStore.verificarAutenticacion()
-    }
+  if (!usuarioLogeadoStore.estaAutenticado) {
+    alert('Debes iniciar sesión para marcar favoritos');
+    return;
   }
   
-  await favoritoStore.toggleFavorito(currentVideo.value.idVideo)
-  console.log('=== FIN TOGGLE FAVORITO ===')
-}
-
-// Cargar videos sugeridos
-const loadSuggestedVideos = async () => {
+  if (!currentVideo.value.idVideo) return;
+  
+  loadingFavorito.value = true;
+  
   try {
-    const videos = await videoStore.fetchAllVideos();
-    // Filtrar para excluir el video actual y limitar a 8 videos
-    suggestedVideos.value = videos
-      .filter(v => v.idVideo !== videoId.value)
-      .slice(0, 8);
-  } catch (err: any) {
-    console.error('Error al cargar videos sugeridos:', err);
+    const resultado = await favoritoStore.toggleFavorito(currentVideo.value.idVideo);
+    
+    if (resultado) {
+      currentVideo.value.contadorLikes = (currentVideo.value.contadorLikes || 0) + 1;
+    } else {
+      currentVideo.value.contadorLikes = Math.max(0, (currentVideo.value.contadorLikes || 1) - 1);
+    }
+    
+  } catch (error: any) {
+    alert('Error: ' + error.message);
+  } finally {
+    loadingFavorito.value = false;
   }
 };
 
-// --------------------------- Ciclo de vida ---------------------------
 onMounted(async () => {
-  console.log('=== INICIANDO COMPONENTE ===')
-  
-  // Cargar usuario primero (verificar qué método existe)
-  if (typeof usuarioLogeadoStore.cargarUsuario === 'function') {
-    await usuarioLogeadoStore.cargarUsuario()
-  } else if (typeof usuarioLogeadoStore.inicializar === 'function') {
-    await usuarioLogeadoStore.inicializar()
-  } else if (typeof usuarioLogeadoStore.verificarAutenticacion === 'function') {
-    await usuarioLogeadoStore.verificarAutenticacion()
-  }
-  
-  console.log('Usuario cargado:', usuarioLogeadoStore.usuarioActual)
-  
+  await usuarioLogeadoStore.cargarUsuarioDesdeStorage();
   await loadCurrentVideo();
   await loadMarcadores();
-  await loadSuggestedVideos();
-  await favoritoStore.cargarFavoritos();
   
-  console.log('=== COMPONENTE CARGADO ===')
+  if (usuarioLogeadoStore.estaAutenticado && usuarioLogeadoStore.usuarioActual?.idUsuario) {
+    await favoritoStore.cargarFavoritos();
+  }
 });
 
-// SOLUCIÓN: Mejorar el watcher para evitar recargas innecesarias
 watch(() => route.query.id, async (newId, oldId) => {
   if (newId !== oldId) {
-    console.log('Cambiando de video:', oldId, '->', newId)
     await loadCurrentVideo();
     await loadMarcadores();
-    await loadSuggestedVideos();
   }
 });
 </script>
 
 <template>
   <v-app>
-    <!-- Cabecera -->
     <Cabecera @toggle-sidebar="toggleSidebar" @update-search="updateSearch" />
-    
-    <!-- Barra lateral -->
     <BarraLateral v-model="sidebarOpen" />
     
-    <!-- Contenido principal -->
     <v-main>
-      <!-- Componente de carga o error -->
       <CargandoVideo v-if="loading || error" :error="error" />
       
       <v-container v-else fluid class="pa-0 pa-sm-4">
         <v-row>
-          <!-- Columna izquierda con el reproductor de video -->
           <v-col cols="12" md="8">
             <ReproductorVideo :video="currentVideo" />
-            <div class="d-flex justify-start mt-2">
-              <v-btn
-                icon
-                @click="toggleFavorito"
-                :class="esFavorito ? 'bg-yellow-darken-2' : 'bg-grey-lighten-1'"
-                :disabled="!usuarioLogeadoStore.usuario?.idUsuario"
-              >
-                <v-icon size="32">
-                  {{ esFavorito ? 'mdi-star' : 'mdi-star-outline' }}
-                </v-icon>
-              </v-btn>
-              
-              <!-- Info de debug temporal -->
-              <div class="ml-2 d-flex flex-column justify-center">
-                <small class="text-grey">
-                  Video: {{ currentVideo.idVideo }} | 
-                  Usuario: {{ usuarioLogeadoStore.usuario?.idUsuario || 'No logueado' }}
-                </small>
-                <small class="text-grey">
-                  Favorito: {{ esFavorito ? 'Sí' : 'No' }} | 
-                  Total: {{ favoritoStore.favoritos.length }}
-                </small>
+            
+            <div class="d-flex justify-start mt-4">
+              <div class="d-flex flex-column align-center">
+                <v-btn
+                  class="ma-1 favorite-btn"
+                  :class="{ 'favorite-active': esFavorito }"
+                  variant="elevated"
+                  :color="esFavorito ? 'yellow-darken-2' : 'grey-lighten-2'"
+                  :loading="loadingFavorito"
+                  :disabled="!usuarioLogeadoStore.estaAutenticado || loadingFavorito"
+                  @click="toggleFavorito"
+                  size="large"
+                >
+                  <v-icon size="28">
+                    {{ esFavorito ? 'mdi-star' : 'mdi-star-outline' }}
+                  </v-icon>
+                </v-btn>
+
+                <span class="text-caption text-grey-darken-1 mt-1">
+                  {{ currentVideo.contadorLikes || 0 }} me gusta
+                </span>
               </div>
+            </div>
+
+            <div v-if="!usuarioLogeadoStore.estaAutenticado" class="mt-3">
+              <v-alert type="info" variant="tonal" class="text-body-2">
+                <v-icon start>mdi-information</v-icon>
+                Inicia sesión para marcar videos como favoritos
+              </v-alert>
             </div>
           </v-col>
           
-          <!-- Columna derecha con información del profesor -->
           <v-col cols="12" md="4">
             <div class="tarjeta-canal">
-              <!-- Información del canal -->
               <InfoCanal :video="currentVideo" />
-              
-              <!-- Marcadores de tiempo -->
               <MarcadoresTiempo 
                 :marcadores="marcadores" 
                 :loading-marcadores="loadingMarcadores" 
                 @seek="seekToTime" 
               />
-              
-              <!-- Botón para reportar video -->
               <ReportarVideo :id-video="currentVideo.idVideo" />
             </div>
           </v-col>
         </v-row>
         
-        <!-- Videos sugeridos -->
-        <VideosSugeridos 
-          :videos="suggestedVideos" 
-          @seleccionar-video="handleVideoSelect" 
-        />
-        
-        <!-- Comentarios -->
         <v-row>
           <v-col cols="12">
             <ComentariosVideo :video-id="videoId" />
@@ -290,3 +232,21 @@ watch(() => route.query.id, async (newId, oldId) => {
     </v-main>
   </v-app>
 </template>
+
+<style scoped>
+.favorite-btn {
+  transition: all 0.3s ease;
+}
+
+.favorite-btn.favorite-active {
+  transform: scale(1.1);
+}
+
+.favorite-btn:hover {
+  transform: scale(1.05);
+}
+
+.favorite-btn:disabled {
+  opacity: 0.6;
+}
+</style>

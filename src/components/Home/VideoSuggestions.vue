@@ -1,9 +1,7 @@
 <script setup lang="ts">
-// --------------------------- Imports ---------------------------
 import { ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 
-// --------------------------- Props ---------------------------
 const props = defineProps({
   videos: {
     type: Array,
@@ -11,21 +9,16 @@ const props = defineProps({
   }
 });
 
-// --------------------------- Variables ---------------------------
+const emit = defineEmits(['select-video']);
+
 const videosConAutores = ref<any[]>([]);
 const cargando = ref(false);
 
-// --------------------------- Emits ---------------------------
-const emit = defineEmits(['select-video']);
-
-// --------------------------- Métodos ---------------------------
 const selectVideo = (videoId) => {
   emit('select-video', videoId);
 };
 
-// Verificar si ya tenemos la información necesaria en los videos
 const necesitaCargarInfoAutores = () => {
-  // Si los videos ya tienen nombres de autor que no sean "Profesor", no necesitamos cargar más info
   return props.videos.some(video => 
     !video.autor || 
     video.autor === 'Profesor' || 
@@ -33,11 +26,8 @@ const necesitaCargarInfoAutores = () => {
   );
 };
 
-// Obtener sólo los nombres de autores para optimizar
 const cargarInfoAutores = async () => {
-  // Si no es necesario cargar info adicional, simplemente usar los datos existentes
   if (!necesitaCargarInfoAutores()) {
-    console.log('VideoSuggestions - No es necesario cargar información adicional de autores');
     videosConAutores.value = [...props.videos];
     return;
   }
@@ -45,13 +35,9 @@ const cargarInfoAutores = async () => {
   try {
     cargando.value = true;
     
-    // Crear una copia de los videos para no modificar directamente los props
     const videosTemp = JSON.parse(JSON.stringify(props.videos));
-    
-    // Crear un mapa para almacenar los nombres de los usuarios
     const nombresUsuarios = new Map();
     
-    // Obtener IDs únicos de usuarios que necesitan carga
     const idsUsuarios = [...new Set(
       videosTemp
         .filter(video => video.idUsuario && (!video.autor || video.autor === 'Profesor'))
@@ -59,15 +45,11 @@ const cargarInfoAutores = async () => {
     )];
     
     if (idsUsuarios.length === 0) {
-      // No hay IDs para cargar, usar los datos existentes
       videosConAutores.value = [...videosTemp];
       cargando.value = false;
       return;
     }
     
-    console.log('VideoSuggestions - Cargando nombres para estos IDs:', idsUsuarios);
-    
-    // Cargar nombres individualmente - método simple pero funcional
     const promesas = idsUsuarios.map(async (idUsuario) => {
       try {
         const response = await axios.get(`http://localhost:5190/api/Usuario/${idUsuario}`);
@@ -79,15 +61,11 @@ const cargarInfoAutores = async () => {
       }
     });
     
-    // Esperar a que todas las promesas se resuelvan
     await Promise.allSettled(promesas);
     
-    // Actualizar la información de cada video con los nombres de autor
     videosConAutores.value = videosTemp.map((video: any) => {
-      // Obtener el nombre del autor
       let nombreAutor = video.autor;
       
-      // Si el autor es "Profesor" o no existe, intentar obtenerlo
       if (!nombreAutor || nombreAutor === 'Profesor') {
         nombreAutor = nombresUsuarios.get(video.idUsuario) || video.usuario?.nombre || 'Usuario';
       }
@@ -99,23 +77,19 @@ const cargarInfoAutores = async () => {
     });
     
   } catch (error) {
-    console.error('VideoSuggestions - Error al cargar información de autores:', error);
-    // Si hay un error, usar los videos originales
+    console.error('Error al cargar información de autores:', error);
     videosConAutores.value = [...props.videos];
   } finally {
     cargando.value = false;
   }
 };
 
-// --------------------------- Lifecycle Hooks ---------------------------
-// Cargar la información de autores cuando el componente se monta
 onMounted(async () => {
   if (props.videos.length > 0) {
     await cargarInfoAutores();
   }
 });
 
-// Observar cambios en los videos para recargar la información
 watch(() => props.videos, async (newVideos) => {
   if (newVideos.length > 0) {
     await cargarInfoAutores();
@@ -126,21 +100,20 @@ watch(() => props.videos, async (newVideos) => {
 </script>
 
 <template>
-  <div class="VideoSuggestions">
-    <div v-if="videosConAutores.length === 0" class="text-center py-4">
+  <div class="video-suggestions">
+    <div v-if="videosConAutores.length === 0" class="video-suggestions__empty">
       <v-icon color="grey" size="large">mdi-playlist-remove</v-icon>
-      <p class="mt-2 text-body-2 text-grey">No hay videos sugeridos disponibles</p>
+      <p class="video-suggestions__empty-text">No hay videos sugeridos disponibles</p>
     </div>
     
-    <div v-else class="d-flex overflow-x-auto pb-3 suggested-videos-row">
+    <div v-else class="video-suggestions__scroll">
       <div 
         v-for="video in videosConAutores" 
         :key="video.idVideo" 
-        class="VideoSuggestions__Item"
+        class="video-suggestions__item"
         @click="selectVideo(video.idVideo)"
       >
-        <!-- Miniatura del video -->
-        <div class="VideoSuggestions__Thumbnail">
+        <div class="video-suggestions__thumbnail">
           <v-img 
             :src="video.miniatura" 
             width="210"
@@ -149,19 +122,14 @@ watch(() => props.videos, async (newVideos) => {
             cover
           ></v-img>
           
-          <!-- Duración -->
-          <div v-if="video.duracion" class="VideoSuggestions__Duration">
+          <div v-if="video.duracion" class="video-suggestions__duration">
             {{ video.duracion }}
           </div>
         </div>
         
-        <!-- Información del video -->
-        <div class="VideoSuggestions__Info">
-          <div class="VideoSuggestions__Title">{{ video.titulo }}</div>
-          
-          <div class="VideoSuggestions__Channel">
-            {{ video.autor }}
-          </div>
+        <div class="video-suggestions__info">
+          <div class="video-suggestions__title">{{ video.titulo }}</div>
+          <div class="video-suggestions__channel">{{ video.autor }}</div>
         </div>
       </div>
     </div>
@@ -169,83 +137,112 @@ watch(() => props.videos, async (newVideos) => {
 </template>
 
 <style scoped>
-.VideoSuggestions__Item {
+.video-suggestions {
+  width: 100%;
+}
+
+.video-suggestions__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.video-suggestions__empty-text {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.video-suggestions__scroll {
+  display: flex;
+  overflow-x: auto;
+  padding-bottom: 0.75rem;
+  gap: 1rem;
+  scrollbar-width: thin;
+}
+
+.video-suggestions__scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.video-suggestions__scroll::-webkit-scrollbar-thumb {
+  background-color: #FF9800;
+  border-radius: 3px;
+}
+
+.video-suggestions__item {
   width: 210px;
   min-width: 210px;
-  margin-right: 16px;
   cursor: pointer;
-  transition: transform 0.2s;
-  background-color: #0f3670;
-  border: 1px solid #0812ff;
-  border-radius: 8px;
-  padding: 8px;
+  transition: all 0.3s ease;
+  background-color: white;
+  border: 2px solid #FF9800;
+  border-radius: 12px;
+  padding: 12px;
   overflow: hidden;
 }
 
-.VideoSuggestions__Item:hover {
+.video-suggestions__item:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(8, 18, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(255, 152, 0, 0.15);
+  border-color: #F57C00;
 }
 
-.VideoSuggestions__Thumbnail {
+.video-suggestions__thumbnail {
   position: relative;
   margin-bottom: 8px;
-  border-radius: 4px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
-.VideoSuggestions__Duration {
+.video-suggestions__duration {
   position: absolute;
-  bottom: 4px;
-  right: 4px;
-  background-color: rgba(255, 158, 12, 0.7);
+  bottom: 6px;
+  right: 6px;
+  background-color: rgba(0, 0, 0, 0.8);
   color: white;
-  padding: 1px 4px;
-  border-radius: 2px;
-  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
-.VideoSuggestions__Info {
+.video-suggestions__info {
   padding: 0 4px;
 }
 
-.VideoSuggestions__Title {
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 1.2;
-  margin-bottom: 4px;
+.video-suggestions__title {
+  font-weight: 600;
+  font-size: 0.875rem;
+  line-height: 1.3;
+  margin-bottom: 6px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: #ffffff;
+  color: #333;
 }
 
-.VideoSuggestions__Channel {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
+.video-suggestions__channel {
+  font-size: 0.75rem;
+  color: #666;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.suggested-videos-row {
-  scrollbar-width: thin;
-}
-
-.suggested-videos-row::-webkit-scrollbar {
-  height: 6px;
-}
-
-.suggested-videos-row::-webkit-scrollbar-thumb {
-  background-color: #ff9e0c;
-  border-radius: 3px;
-}
-
-@media (max-width: 600px) {
-  .VideoSuggestions__Item {
+@media (max-width: 640px) {
+  .video-suggestions__item {
     width: 180px;
     min-width: 180px;
+    padding: 10px;
+  }
+  
+  .video-suggestions__scroll {
+    gap: 0.75rem;
   }
 }
 </style>
