@@ -10,6 +10,8 @@ import UsuariosPage from "../views/UsuariosPage.vue";
 import PerfilUsuario from "../views/PerfilUsuario.vue";
 import Login from '../views/Login.vue';
 import AdminPage from "@/views/AdminPage.vue";
+import VideosFavoritos from '../views/FavoritosPage.vue'
+
 
 // === PÁGINAS DE QUIZZES NUEVAS ===
 import HacerQuizzesPage from "../views/HacerQuizzesPage.vue";
@@ -137,6 +139,11 @@ const routes = [
     path: "/quizz-detail/:id",
     component: QuizDetalle,
     props: true
+  },
+  {
+    path: '/favoritos',
+    component: VideosFavoritos,
+    name: 'VideosFavoritos', 
   },
   {
     path: '/ranking',

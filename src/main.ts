@@ -37,14 +37,28 @@ axios.interceptors.request.use(
 
 // --------------------------- Bootstrap App ---------------------------
 (async () => {
+  console.log('🚀 Iniciando aplicación...');
+  
   const pinia = createPinia();
   pinia.use(piniaPluginPersistedstate); 
   const app = createApp(App);
   app.use(pinia);
 
-  // Cargar usuario desde localStorage ANTES del router
-  const usuarioLogeadoStore = useUsuarioLogeadoStore();
-  await usuarioLogeadoStore.cargarUsuarioDesdeStorage(); // Asegúrate de que este método sea async
+  // 🔑 CRÍTICO: Cargar usuario desde localStorage ANTES del router
+  console.log('👤 Cargando usuario desde localStorage...');
+  try {
+    const usuarioLogeadoStore = useUsuarioLogeadoStore();
+    await usuarioLogeadoStore.cargarUsuarioDesdeStorage();
+    
+    if (usuarioLogeadoStore.estaAutenticado) {
+      console.log('✅ Usuario cargado exitosamente:', usuarioLogeadoStore.usuarioActual?.nombre);
+      console.log('🔑 Token presente:', !!usuarioLogeadoStore.token);
+    } else {
+      console.log('ℹ️ No hay usuario autenticado guardado');
+    }
+  } catch (error) {
+    console.error('❌ Error al cargar usuario:', error);
+  }
 
   const vuetify = createVuetify({
     components,
@@ -58,4 +72,7 @@ axios.interceptors.request.use(
   app.config.globalProperties.$axios = axios;
 
   app.mount("#app");
-})();
+  console.log('✅ Aplicación montada exitosamente');
+})().catch(error => {
+  console.error('💥 Error fatal al iniciar la aplicación:', error);
+});
