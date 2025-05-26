@@ -180,23 +180,90 @@ export const useQuizStore = defineStore("quiz", () => {
     }
   }
 
-  // Eliminar quiz
-  async function deleteQuiz(idQuiz: number): Promise<boolean> {
+  // MÉTODO MEJORADO: Eliminar quiz con ID de usuario
+  async function deleteQuiz(idQuiz: number, idUsuario?: number): Promise<boolean> {
+    loading.value = true;
+    errorMessage.value = "";
+    
     try {
-      const response = await fetch(`http://localhost:5190/api/quiz/${idQuiz}`, {
-        method: "DELETE"
-      });
+      console.log(`🗑️ Eliminando quiz ID: ${idQuiz}, Usuario ID: ${idUsuario}`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      if (!response.ok) throw new Error("Error al eliminar el quiz");
+      // Preparar body con ID de usuario si es necesario
+      const requestBody = idUsuario ? { idUsuario } : undefined;
+      
+      let response;
+      try {
+        response = await fetch(`http://localhost:5190/api/quiz/${idQuiz}`, {
+          method: "DELETE",
+          signal: controller.signal,
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: requestBody ? JSON.stringify(requestBody) : undefined
+        });
+      } catch (error) {
+        // Fallback con endpoint alternativo
+        response = await fetch(`http://localhost:5190/api/Quiz/${idQuiz}`, {
+          method: "DELETE",
+          signal: controller.signal,
+          headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+          },
+          body: requestBody ? JSON.stringify(requestBody) : undefined
+        });
+      }
 
-      // Actualizar la lista local
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        let errorMessage = `Error ${response.status}: ${response.statusText}`;
+        
+        try {
+          if (contentType && contentType.includes("application/json")) {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.title || JSON.stringify(errorData);
+          } else {
+            const errorText = await response.text();
+            errorMessage = errorText || errorMessage;
+          }
+        } catch (e) {
+          console.warn("No se pudo parsear el error del servidor");
+        }
+        
+        throw new Error(`Error al eliminar el quiz: ${errorMessage}`);
+      }
+
+      console.log(`✅ Quiz ${idQuiz} eliminado exitosamente del servidor`);
+
+      // Eliminar de la lista local
       quizzes.value = quizzes.value.filter(q => q.idQuiz !== idQuiz);
       
+      console.log(`✅ Quiz ${idQuiz} eliminado de la lista local`);
+      
       return true;
+      
     } catch (error: any) {
-      errorMessage.value = error.message;
-      console.error("Error al eliminar el quiz:", error);
+      let message = "Error al eliminar el quiz";
+      
+      if (error.name === 'AbortError') {
+        message = "La conexión con el servidor ha excedido el tiempo de espera";
+      } else if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+        message = "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
+      } else {
+        message = error.message || message;
+      }
+      
+      errorMessage.value = message;
+      console.error("Error al eliminar quiz:", error);
       return false;
+    } finally {
+      loading.value = false;
     }
   }
 

@@ -1,4 +1,4 @@
-<!-- src/views/HacerQuizzesPage.vue -->
+<!-- src/views/HacerQuizzesPage.vue - COMPLETO CON MODAL -->
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -6,6 +6,7 @@ import { useQuizStore } from '@/stores/Quiz';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import Header from '@/components/Layout/Header.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
+import QuizInfoModal from '@/components/Quizz/QuizInfoModal.vue';
 import type { QuizCompletaDTO } from '@/stores/dtos/QuizCompletaDTO';
 
 // Stores y router
@@ -18,6 +19,10 @@ const drawer = ref(false);
 const searchQuery = ref('');
 const loading = ref(true);
 const selectedFilter = ref('Todos');
+
+// Variables del modal
+const showQuizModal = ref(false);
+const selectedQuizId = ref<number | null>(null);
 
 // Filtros disponibles
 const filters = ['Todos', 'Mis Quizzes', 'Más Recientes', 'Más Populares'];
@@ -67,7 +72,16 @@ const updateSearch = (query: string) => {
   searchQuery.value = query;
 };
 
-const realizarQuiz = (quiz: QuizCompletaDTO) => {
+// MÉTODO PARA ABRIR MODAL
+const abrirModalQuiz = (quiz: QuizCompletaDTO) => {
+  console.log('📊 Abriendo modal para quiz:', quiz.nombre);
+  selectedQuizId.value = quiz.idQuiz;
+  showQuizModal.value = true;
+};
+
+// Método directo para ir al quiz (botón de acción rápida)
+const realizarQuizDirecto = (quiz: QuizCompletaDTO) => {
+  console.log('🎯 Navegando directamente al quiz:', quiz.nombre);
   router.push(`/quiz/${quiz.idQuiz}`);
 };
 
@@ -84,6 +98,19 @@ const cargarQuizzes = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+// Manejar eliminación de quiz desde el modal
+const handleQuizDeleted = (quizId: number) => {
+  console.log('🗑️ Quiz eliminado, recargando lista...');
+  // Recargar la lista de quizzes
+  cargarQuizzes();
+};
+
+// Cerrar modal
+const cerrarModal = () => {
+  showQuizModal.value = false;
+  selectedQuizId.value = null;
 };
 
 // Lifecycle
@@ -201,7 +228,7 @@ onMounted(() => {
                 elevation="3"
                 rounded="xl"
                 hover
-                @click="realizarQuiz(quiz)"
+                @click="abrirModalQuiz(quiz)"
               >
                 <!-- Header del quiz con gradiente -->
                 <div class="QuizCard__Header">
@@ -240,19 +267,30 @@ onMounted(() => {
                   </div>
                 </v-card-text>
                 
-                <!-- Botón de acción -->
-                <v-card-actions class="pt-0">
+                <!-- Botones de acción -->
+                <v-card-actions class="pt-0 px-4 pb-4">
+                  <!-- Botón principal: Abrir modal -->
                   <v-btn
-                    @click.stop="realizarQuiz(quiz)"
+                    @click.stop="abrirModalQuiz(quiz)"
+                    color="info"
+                    variant="elevated"
+                    size="large"
+                    class="QuizCard__ActionBtn flex-grow-1 mr-2"
+                  >
+                    <v-icon start>mdi-information</v-icon>
+                    Ver Info
+                  </v-btn>
+                  
+                  <!-- Botón secundario: Realizar directamente -->
+                  <v-btn
+                    @click.stop="realizarQuizDirecto(quiz)"
                     color="orange"
                     variant="elevated"
                     size="large"
-                    block
-                    rounded="pill"
-                    class="QuizCard__ActionBtn"
+                    class="QuizCard__ActionBtn flex-grow-1"
                   >
                     <v-icon start>mdi-play</v-icon>
-                    Realizar Quiz
+                    Realizar
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -261,6 +299,14 @@ onMounted(() => {
         </div>
       </v-container>
     </v-main>
+
+    <!-- Modal de información del quiz -->
+    <QuizInfoModal
+      v-model="showQuizModal"
+      :quiz-id="selectedQuizId"
+      @quiz-deleted="handleQuizDeleted"
+      @quiz-updated="cargarQuizzes"
+    />
   </v-app>
 </template>
 
@@ -390,17 +436,13 @@ onMounted(() => {
 }
 
 .QuizCard__ActionBtn {
-  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%) !important;
-  color: white !important;
   font-weight: 600;
   letter-spacing: 0.5px;
   transition: all 0.2s ease;
-  margin: 0 16px 16px 16px;
 }
 
 .QuizCard__ActionBtn:hover {
   transform: scale(1.02);
-  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
 }
 
 @keyframes fadeIn {
@@ -436,6 +478,10 @@ onMounted(() => {
   .QuizzesPage__Filters {
     overflow-x: auto;
     padding-bottom: 8px;
+  }
+  
+  .QuizCard__ActionBtn {
+    font-size: 0.875rem;
   }
 }
 </style>
