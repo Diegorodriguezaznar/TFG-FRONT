@@ -54,7 +54,8 @@ export const useVideoStore = defineStore("video", () => {
         duracion: v.duracion,
         vistas: Math.floor(Math.random() * 10) + "K",
         fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
-        numReportes: v.numReportes || 0
+        numReportes: v.numReportes || 0,
+        contadorLikes: v.contadorLikes || 0 
       }));
 
       return videos.value;
@@ -128,7 +129,8 @@ export const useVideoStore = defineStore("video", () => {
         duracion: v.duracion,
         vistas: Math.floor(Math.random() * 10) + "K",
         fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
-        numReportes: v.numReportes || 0
+        numReportes: v.numReportes || 0,
+        contadorLikes: v.contadorLikes || 0 
       }));
 
       return videosFiltradosPorCurso.value;
@@ -199,7 +201,8 @@ export const useVideoStore = defineStore("video", () => {
         duracion: v.duracion,
         vistas: Math.floor(Math.random() * 10) + "K",
         fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
-        numReportes: v.numReportes || 0
+        numReportes: v.numReportes || 0,
+        contadorLikes: v.contadorLikes || 0 
       };
 
       return video.value;
@@ -273,7 +276,8 @@ export const useVideoStore = defineStore("video", () => {
           duracion: v.duracion,
           vistas: Math.floor(Math.random() * 10) + "K",
           fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
-          numReportes: v.numReportes || 0
+          numReportes: v.numReportes || 0,
+          contadorLikes: v.contadorLikes || 0 
         }))
         .sort((a: VideoDTO, b: VideoDTO) => (b.numReportes || 0) - (a.numReportes || 0));
 

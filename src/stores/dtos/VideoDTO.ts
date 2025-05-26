@@ -13,5 +13,6 @@ export interface VideoDTO {
   duracion: string;
   vistas: string;
   fecha: string;
-  numReportes?: number; 
+  numReportes?: number;
+  contadorLikes?: number; 
 }

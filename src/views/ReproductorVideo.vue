@@ -176,6 +176,19 @@ const loadSuggestedVideos = async () => {
     console.error('Error al cargar videos sugeridos:', err);
   }
 };
+const toggleFavoritoAnimado = async () => {
+  // Guardar estado previo
+  const estabaEnFavoritos = esFavorito.value;
+
+  await toggleFavorito();
+
+  // Cambiar contador local sin recargar
+  if (estabaEnFavoritos) {
+    currentVideo.value.contadorLikes = Math.max(0, (currentVideo.value.contadorLikes || 1) - 1);
+  } else {
+    currentVideo.value.contadorLikes = (currentVideo.value.contadorLikes || 0) + 1;
+  }
+};
 
 // --------------------------- Ciclo de vida ---------------------------
 onMounted(async () => {
@@ -230,22 +243,51 @@ watch(() => route.query.id, async (newId, oldId) => {
           <v-col cols="12" md="8">
             <ReproductorVideo :video="currentVideo" />
             <div class="d-flex justify-start mt-2">
-              <v-btn
-                icon
-                @click="toggleFavorito"
-                :class="esFavorito ? 'bg-yellow-darken-2' : 'bg-grey-lighten-1'"
-                :disabled="!usuarioLogeadoStore.usuario?.idUsuario"
-              >
-                <v-icon size="32">
-                  {{ esFavorito ? 'mdi-star' : 'mdi-star-outline' }}
-                </v-icon>
-              </v-btn>
+            <!-- Botón de like funcional -->
+            <div class="d-flex justify-start mt-2">
+          <!-- Botón de favoritos NUEVO -->
+          <div class="d-flex flex-column align-center">
+            <v-btn
+              class="ma-1 favorite-btn"
+              :class="{ 'favorite-active': esFavorito }"
+              variant="elevated"
+              :color="esFavorito ? 'yellow-darken-2' : 'grey-lighten-2'"
+              :loading="loadingFavorito"
+              @click="handleFavoritoClick"
+              size="large"
+            >
+              <v-icon size="28">
+                {{ esFavorito ? 'mdi-star' : 'mdi-star-outline' }}
+              </v-icon>
+            </v-btn>
+
+            <span class="text-caption text-grey-darken-1 mt-1">
+              {{ currentVideo.contadorLikes || 0 }} me gusta
+            </span>
+          </div>
+
+          <!-- Información de estado para debug -->
+          <div class="ml-3 d-flex flex-column justify-center">
+            <v-chip size="x-small" color="info" class="ma-1">
+              Video: {{ currentVideo.idVideo }}
+            </v-chip>
+            <v-chip size="x-small" :color="usuarioLogeadoStore.usuarioActual?.idUsuario ? 'success' : 'error'" class="ma-1">
+              Usuario: {{ usuarioLogeadoStore.usuarioActual?.idUsuario || 'Sin login' }}
+            </v-chip>
+            <v-chip size="x-small" :color="esFavorito ? 'warning' : 'default'" class="ma-1">
+              Favorito: {{ esFavorito ? 'Sí' : 'No' }}
+            </v-chip>
+          </div>
+        </div>
+
+
+
               
               <!-- Info de debug temporal -->
               <div class="ml-2 d-flex flex-column justify-center">
                 <small class="text-grey">
                   Video: {{ currentVideo.idVideo }} | 
-                  Usuario: {{ usuarioLogeadoStore.usuario?.idUsuario || 'No logueado' }}
+                  Usuario: {{ usuarioLogeadoStore.usuarioActual?.idUsuario || 'No logueado' }}
                 </small>
                 <small class="text-grey">
                   Favorito: {{ esFavorito ? 'Sí' : 'No' }} | 
@@ -290,3 +332,20 @@ watch(() => route.query.id, async (newId, oldId) => {
     </v-main>
   </v-app>
 </template>
+<style lang="css">
+.like-toggle {
+  transition: transform 0.2s ease;
+}
+.like-toggle--active {
+  color: #ffca28 !important;
+  transform: scale(1.2);
+}
+
+.animated-icon {
+  transition: transform 0.2s ease;
+}
+
+.like-toggle:hover .animated-icon {
+  transform: scale(1.15);
+}
+</style>
