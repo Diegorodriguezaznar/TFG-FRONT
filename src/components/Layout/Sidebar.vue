@@ -28,6 +28,7 @@ const esAdmin = computed(() => idRol.value === 1);
 // Menú base
 const menuItemsBase = [
   { title: 'Inicio', icon: 'mdi-home', route: '/cursos' },
+  { title: 'Mis Cursos', icon: 'mdi-bookmark-multiple', route: '/mis-cursos' },
   { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },
@@ -97,6 +98,7 @@ const drawer = computed({
         :class="[
           'Sidebar__MenuItem',
           item.title === 'MarIAno' && 'Sidebar__MarIAno',
+          item.title === 'Mis Cursos' && 'Sidebar__MisCursos',
           item.color === 'orange' && 'Sidebar__MenuItem--profesor',
           item.color === 'red' && 'Sidebar__MenuItem--admin'
         ]"
@@ -178,5 +180,29 @@ const drawer = computed({
 
 .Sidebar__MarIAno .v-icon {
   color: #e08105 !important;
+}
+
+/* ------------------ Mis Cursos personalizado ------------------ */
+.Sidebar__MisCursos {
+  background: rgba(255, 152, 0, 0.08) !important;
+  color: #FF9800 !important;
+  font-weight: 600;
+  border-left: 4px solid #FF9800;
+  margin: 2px 8px;
+  border-radius: 8px;
+}
+
+.Sidebar__MisCursos:hover {
+  background: rgba(255, 152, 0, 0.15) !important;
+  transform: translateX(2px);
+  transition: all 0.2s ease;
+}
+
+.Sidebar__MisCursos .v-icon {
+  color: #FF9800 !important;
+}
+
+.Sidebar__MisCursos .v-list-item__content {
+  color: #FF9800 !important;
 }
 </style>

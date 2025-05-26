@@ -1,4 +1,4 @@
-// src/router/index.ts - ARCHIVO COMPLETO PARA COPIAR
+// src/router/index.ts - ARCHIVO COMPLETO ACTUALIZADO
 import { createRouter, createWebHistory } from "vue-router";
 import Historial from "@/views/Historial.vue";
 import PerfilPage from "../views/PerfilPage.vue";
@@ -25,6 +25,9 @@ import QuizDetalle from "../views/QuizDetalle.vue";
 import PeticionProfesorPage from '../views/PeticionProfesorPage.vue';
 import CrearAsignaturas from '../views/CrearAsignaturas.vue';
 
+// === NUEVA PÁGINA MIS CURSOS ===
+import MisCursosPage from '../views/MisCursosPage.vue';
+
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 const routes = [
@@ -41,6 +44,14 @@ const routes = [
   { path: "/perfil", component: PerfilPage, meta: { requiresAuth: true } },
   { path: "/usuarios", component: UsuariosPage, meta: { requiresAuth: true } },
   { path: "/usuario/:id", component: PerfilUsuario, props: true, meta: { requiresAuth: true } },
+  
+  // === NUEVA RUTA MIS CURSOS ===
+  { 
+    path: "/mis-cursos", 
+    component: MisCursosPage, 
+    meta: { requiresAuth: true },
+    name: 'mis-cursos'
+  },
   
   // === SISTEMA DE QUIZZES COMPLETO ===
   { 
@@ -75,9 +86,6 @@ const routes = [
   { path: "/quizz-detail/:id", component: QuizDetalle, props: true, meta: { requiresAuth: true } },
 
   // === PANEL DE ADMINISTRACIÓN ===
-
-  { path: "/login", component: Login },
-  { path: "/cursos", component: HomePage },
   { path: "/peticion-profesor", component: PeticionProfesorPage },
   { path: "/curso/:idCurso/asignaturas", component: CrearAsignaturas },
   {
@@ -86,7 +94,7 @@ const routes = [
     props: true,
     meta: { requiresAuth: true, allowRoles: [2, 3] }
   },
-    {
+  {
     path: "/subir-video",
     redirect: "/cursos"
   },
@@ -95,48 +103,10 @@ const routes = [
     name: 'ChatIA',
     component: () => import('@/views/ChatIA.vue') 
   },
-
-  
   {
     path: "/crear-curso",
     component: () => import("@/views/CrearCurso.vue"),
     meta: { requiresAuth: true, allowRoles: [2, 3] }
-  },
-  {
-    path: "/curso/:id",
-    component: Videos,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/reproductor-video",
-    component: ReproductorVideo,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/historial",
-    component: Historial,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/perfil",
-    component: PerfilPage,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/quizz-time!",
-    component: Quizzes,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/quizz-detail",
-    component: QuizDetalle,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/quizz-detail/:id",
-    component: QuizDetalle,
-    props: true
   },
   {
     path: '/ranking',
@@ -144,7 +114,6 @@ const routes = [
     component: () => import('@/views/RankingAportaciones.vue'),
     meta: { requiresAuth: true, adminOnly: true }
   },
-
   {
     path: "/admin",
     component: AdminPage,
@@ -192,8 +161,6 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 });
-
-
 
 router.beforeEach((to, from, next) => {
   if (to.path !== from.path) {
