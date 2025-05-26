@@ -209,6 +209,29 @@ async function createUsuario(newUser: UsuarioDTO) {
     }
   }
 
+    async function aceptarUsuarioComoProfesor(idUsuario: number): Promise<boolean> {
+    try {
+      const response = await fetch(`http://localhost:5190/api/Usuario/${idUsuario}/aceptar-profesor`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Error al actualizar el rol: ${errorText}`);
+      }
+
+      return true;
+    } catch (error: any) {
+      errorMessage.value = error.message || "Error al aceptar usuario como profesor";
+      console.error("Error al aceptar usuario:", error);
+      return false;
+    }
+  }
+
+
   return {
     usuarios,
     usuario,
@@ -217,6 +240,7 @@ async function createUsuario(newUser: UsuarioDTO) {
     createUsuario,
     updateUsuario,
     deleteUsuario,
+    aceptarUsuarioComoProfesor,
     errorMessage
   };
 });

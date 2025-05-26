@@ -38,6 +38,14 @@ const esAdmin = computed(() => {
 // --------------------------- Menú base ---------------------------
 const menuItemsBase = [
   { title: 'Inicio', icon: 'mdi-home', route: '/' },
+
+// --------------------------- Usuario y Rol ---------------------------
+const usuarioStore = useUsuarioLogeadoStore();
+const idRol = computed(() => usuarioStore.usuarioActual?.idRol ?? 1);
+
+// --------------------------- Menú ---------------------------
+const allMenuItems = [
+  { title: 'Inicio', icon: 'mdi-home', route: '/cursos' },
   { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
   { title: 'Historial', icon: 'mdi-history', route: '/historial' },
@@ -74,6 +82,17 @@ const menuItems = computed(() => {
   return items;
 });
 
+  { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
+];
+
+const menuItems = computed(() =>
+  allMenuItems.filter(item => {
+    if (!item.rolesPermitidos) return true;
+    return item.rolesPermitidos.includes(idRol.value);
+  })
+);
+
+
 // --------------------------- Métodos ---------------------------
 const toggleSidebar = () => {
   isExpanded.value = !isExpanded.value;
@@ -84,6 +103,7 @@ const drawer = computed({
   set: (value) => emit('update:modelValue', value)
 });
 </script>
+
 
 <template>
   <v-navigation-drawer
@@ -113,6 +133,7 @@ const drawer = computed({
         :prepend-icon="item.icon"
         :color="item.color"
         class="Sidebar__MenuItem"
+
         :class="{ 
           'Sidebar__MenuItem--profesor': item.color === 'orange',
           'Sidebar__MenuItem--admin': item.color === 'red'
@@ -125,6 +146,8 @@ const drawer = computed({
           </v-tooltip>
         </template>
       </v-list-item>
+
+      />
     </v-list>
     
     <v-divider class="my-2"></v-divider>
@@ -160,7 +183,7 @@ const drawer = computed({
           :key="i"
           :title="`Canal ${i}`"
           prepend-avatar="https://picsum.photos/seed/picsum/40/40"
-        ></v-list-item>
+        />
       </v-list>
     </div>
   </v-navigation-drawer>
