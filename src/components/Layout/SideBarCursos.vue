@@ -31,7 +31,7 @@ const allMenuItems = [
 
 const menuItems = computed(() => {
   const rol = usuarioStore.usuarioActual?.idRol;
-  if (!rol) return []; // mientras no esté cargado, oculta el menú (puedes cambiarlo por un loader si quieres)
+  if (!rol) return []; 
   return allMenuItems.filter(item => {
     if (!item.rolesPermitidos) return true;
     return item.rolesPermitidos.includes(rol);

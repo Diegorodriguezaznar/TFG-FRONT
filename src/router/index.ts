@@ -9,6 +9,7 @@ import SubirVideos from "../views/SubirVideoPage.vue";
 import UsuariosPage from "../views/UsuariosPage.vue";
 import PerfilUsuario from "../views/PerfilUsuario.vue";
 import Login from '../views/Login.vue';
+import AdminPage from "@/views/AdminPage.vue";
 
 // === PÁGINAS DE QUIZZES NUEVAS ===
 import HacerQuizzesPage from "../views/HacerQuizzesPage.vue";
@@ -21,9 +22,6 @@ import Quizzes from "../views/Quizzes.vue";
 import QuizDetalle from "../views/QuizDetalle.vue";
 
 // ADMIN
-import AdminPage from "../views/AdminPage.vue";
-import AdminPage from "../views/AdminPage.vue";
-import Login from '../views/Login.vue';
 import PeticionProfesorPage from '../views/PeticionProfesorPage.vue';
 import CrearAsignaturas from '../views/CrearAsignaturas.vue';
 
@@ -140,6 +138,12 @@ const routes = [
     component: QuizDetalle,
     props: true
   },
+  {
+    path: '/ranking',
+    name: 'RankingAportaciones',
+    component: () => import('@/views/RankingAportaciones.vue'),
+    meta: { requiresAuth: true, adminOnly: true }
+  },
 
   {
     path: "/admin",
@@ -190,11 +194,7 @@ const router = createRouter({
 });
 
 
-// === GUARDS DE NAVEGACIÓN ===
-router.beforeEach((to, from, next) => {
-  // Si la ruta no requiere autenticación, permitir acceso
 
-// Limpiar consola al cambiar de ruta
 router.beforeEach((to, from, next) => {
   if (to.path !== from.path) {
     console.clear();
@@ -205,75 +205,46 @@ router.beforeEach((to, from, next) => {
 
 // Protección por autenticación y roles
 router.beforeEach((to, from, next) => {
+  console.clear();
+  console.log(`%c Estas en: ${to.path}`, 'color: #42b883; font-weight: bold;');
+
   const usuarioLogeadoStore = useUsuarioLogeadoStore();
   const usuario = usuarioLogeadoStore.usuarioActual;
-  const idRol = usuario?.idRol;
+  const idRol = usuario?.idRol || usuario?.rol?.idRol || usuario?.rol?.id;
 
-
+  // Ruta pública
   if (!to.meta.requiresAuth) {
-    next(); // Ruta pública
+    next();
     return;
   }
 
-
-  const usuarioLogeadoStore = useUsuarioLogeadoStore();
-  
-  // Verificar si el usuario está autenticado
-
-  if (!usuarioLogeadoStore.estaAutenticado) {
-    next("/login"); // Ruta privada pero no logueado
-    return;
-  }
-
-  
-  const usuario = usuarioLogeadoStore.usuarioActual;
-  
-  if (!usuario) {
+  // No autenticado
+  if (!usuarioLogeadoStore.estaAutenticado || !usuario) {
     next("/login");
     return;
   }
-  
-  // === VERIFICAR PERMISOS DE ADMINISTRADOR ===
-  if (to.meta.requiresAdmin) {
-    const idRol = usuario.idRol || 
-                (usuario.rol && usuario.rol.idRol) || 
-                (usuario.rol && usuario.rol.id);
-    
-    if (idRol !== 1) {
-      alert('No tienes permisos de administrador');
-      next("/cursos");
-      return;
-    }
-  }
-  
-  // === VERIFICAR PERMISOS PARA CREAR QUIZZES (ROLES 2 Y 3) ===
-  if (to.meta.requiresQuizCreator) {
-    const idRol = usuario.idRol || 
-                (usuario.rol && usuario.rol.idRol) || 
-                (usuario.rol && usuario.rol.id);
-    
-    if (idRol !== 2 && idRol !== 3) {
-      alert('No tienes permisos para crear quizzes. Solo profesores y gestores pueden crear quizzes.');
-      next("/quizz-time!");
-      return;
-    }
-  }
-  
-  // Si todas las verificaciones pasan, permitir acceso
-  next();
 
+  // Requiere admin
+  if (to.meta.requiresAdmin && idRol !== 1) {
+    alert("No tienes permisos de administrador");
+    next("/peticion-profesor");
+    return;
+  }
 
+  // Requiere creador de quizzes (roles 2 y 3)
+  if (to.meta.requiresQuizCreator && !(idRol === 2 || idRol === 3)) {
+    alert("No tienes permisos para crear quizzes. Solo profesores y gestores pueden crear quizzes.");
+    next("/quizz-time!");
+    return;
+  }
+
+  // Permisos por rol específico
   if (to.meta.allowRoles && !to.meta.allowRoles.includes(idRol)) {
-    next("/cursos"); // No tiene permiso por rol
+    next("/peticion-profesor");
     return;
   }
 
-  if (to.meta.requiresAdmin && idRol == 3) {
-    next("/cursos"); // No es admin
-    return;
-  }
-
-  next(); // Todo bien
+  next();
 });
 
 export default router;

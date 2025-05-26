@@ -268,104 +268,116 @@ export default {
       };
     },
     
-   async handleLogin() {
-  if (!this.$refs.loginForm.validate()) return;
-        
-  this.loading = true;
-        
-try {
-  this.loading = true;
+    async handleLogin() {
+      if (!this.$refs.loginForm.validate()) return;
+            
+      this.loading = true;
+            
+      try {
+        const response = await fetch("http://localhost:5190/api/Auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            gmail: this.loginEmail,
+            contraseña: this.loginPassword
+          })
+        });
 
-  const response = await fetch("http://localhost:5190/api/Auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      gmail: this.loginEmail,
-      contraseña: this.loginPassword
-    })
-  });
+        if (!response.ok) {
+          throw new Error("Credenciales incorrectas");
+        }
 
-  if (!response.ok) {
-    throw new Error("Credenciales incorrectas");
-  }
+        const data = await response.json();
+        console.log("🔍 Respuesta completa del login:", data);
 
-  const data = await response.json();
-  console.log("Respuesta del login:", data);
+        const usuarioLogeadoStore = useUsuarioLogeadoStore();
 
-  const usuarioLogeadoStore = useUsuarioLogeadoStore();
+        // ✅ SOLUCIÓN: Usar directamente data.idRol del backend
+        const usuario = {
+          idUsuario: data.idUsuario,
+          nombre: data.nombre,
+          gmail: this.loginEmail, 
+          idRol: data.idRol, 
+          rol: data.rol
+        };
 
-  usuarioLogeadoStore.iniciarSesion({
-    usuario: {
-      idUsuario: data.idUsuario,
-      nombre: data.nombre,
-      idRol: data.rol === "Administrador" ? 3 : data.rol === "Profesor" ? 2 : 1
+        console.log("🔍 Usuario que se guardará:", usuario);
+        console.log("🔍 idRol específico:", usuario.idRol);
+
+        usuarioLogeadoStore.iniciarSesion({
+          usuario: usuario,
+          token: data.token
+        });
+
+        this.showMessage('success', 'Inicio de sesión correcto');
+        this.$router.push('/cursos');
+      } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        this.showMessage('error', 'Error al iniciar sesión: ' + (error.message || 'Error inesperado'));
+      } finally {
+        this.loading = false;
+      }
     },
-    token: data.token
-  });
+        
+    async handleRegister() {
+      if (!this.$refs.registerForm.validate()) return;
 
-  this.showMessage('success', 'Inicio de sesión correcto');
-  this.$router.push('/cursos');
-} catch (error) {
-  console.error('Error al iniciar sesión:', error);
-  this.showMessage('error', 'Error al iniciar sesión: ' + (error.message || 'Error inesperado'));
-} finally {
-  this.loading = false;
-}
+      this.loading = true;
 
+      try {
+        const nuevoUsuario = {
+          nombre: this.registerNombre,
+          apellidos: this.registerApellido,
+          gmail: this.registerEmail,
+          telefono: this.registerTelefono,
+          contraseña: this.registerPassword,
+          idRol: this.selectedRol
+        };
 
-},
-    
-async handleRegister() {
-  if (!this.$refs.registerForm.validate()) return;
+        const response = await fetch("http://localhost:5190/api/Auth/registro", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nuevoUsuario)
+        });
 
-  this.loading = true;
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Error al registrar: ${response.status} ${errorText}`);
+        }
 
-  try {
-    const nuevoUsuario = {
-      nombre: this.registerNombre,
-      apellidos: this.registerApellido,
-      gmail: this.registerEmail,
-      telefono: this.registerTelefono,
-      contraseña: this.registerPassword,
-      idRol: this.selectedRol
-    };
+        const data = await response.json();
+        console.log("🔍 Respuesta completa del registro:", data);
 
-    const response = await fetch("http://localhost:5190/api/Auth/registro", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(nuevoUsuario)
-    });
+        // ✅ SOLUCIÓN: Usar directamente data.idRol del backend
+        const usuario = {
+          idUsuario: data.idUsuario,
+          nombre: data.nombre,
+          gmail: this.registerEmail, // Del formulario
+          apellidos: this.registerApellido, // Del formulario
+          telefono: this.registerTelefono, // Del formulario
+          idRol: data.idRol, // ✅ Usar directamente el idRol del backend
+          rol: data.rol
+        };
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error al registrar: ${response.status} ${errorText}`);
-    }
+        console.log("🔍 Usuario registrado que se guardará:", usuario);
+        console.log("🔍 idRol específico:", usuario.idRol);
 
-    const data = await response.json();
-    console.log("Registro exitoso. Respuesta del backend:", data);
+        const usuarioLogeadoStore = useUsuarioLogeadoStore();
+        usuarioLogeadoStore.iniciarSesion({
+          usuario: usuario,
+          token: data.token
+        });
 
-    // Guardar el usuario logeado automáticamente
-    const usuarioLogeadoStore = useUsuarioLogeadoStore();
-    usuarioLogeadoStore.iniciarSesion({
-      usuario: {
-        idUsuario: data.idUsuario,
-        nombre: data.nombre,
-        idRol: data.rol === "Administrador" ? 3 : data.rol === "Profesor" ? 2 : 1
-      },
-      token: data.token
-    });
+        this.showMessage('success', 'Registro exitoso. Sesión iniciada');
+        this.$router.push('/cursos');
+      } catch (error) {
+        console.error('Error al registrarse:', error);
+        this.showMessage('error', 'Error al registrarse: ' + (error.message || 'Error inesperado'));
+      } finally {
+        this.loading = false;
+      }
+    },
 
-    this.showMessage('success', 'Registro exitoso. Sesión iniciada');
-    this.$router.push('/cursos');
-  } catch (error) {
-    console.error('Error al registrarse:', error);
-    this.showMessage('error', 'Error al registrarse: ' + (error.message || 'Error inesperado'));
-  } finally {
-    this.loading = false;
-  }
-},
-
-    
     resetRegisterForm() {
       this.registerNombre = '';
       this.registerApellido = '';
