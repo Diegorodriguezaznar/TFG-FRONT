@@ -52,6 +52,8 @@ const allMenuItems = [
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
   { title: 'Usuarios', icon: 'mdi-account-group', route: '/usuarios' },
   { title: 'Quizzes', icon: 'mdi-school-outline', route: '/quizz-time!' },
+  { title: 'MarIAno', icon: 'mdi-robot-outline', route: '/ia' },
+
   { title: 'Subir Video', icon: 'mdi-upload', route: '/subir-video' }
 ];
 
@@ -104,7 +106,6 @@ const drawer = computed({
 });
 </script>
 
-
 <template>
   <v-navigation-drawer
     v-model="drawer"
@@ -130,7 +131,9 @@ const drawer = computed({
         :value="item.title"
         :to="item.route"
         :title="isExpanded ? item.title : ''"
-        :prepend-icon="item.icon"
+        :prepend-icon="item.icon" 
+        :class="['Sidebar__MenuItem', item.title === 'MarIAno' && 'Sidebar__MarIAno']"
+
         :color="item.color"
         class="Sidebar__MenuItem"
 
@@ -146,7 +149,7 @@ const drawer = computed({
           </v-tooltip>
         </template>
       </v-list-item>
-
+ 
       />
     </v-list>
     
@@ -218,5 +221,17 @@ const drawer = computed({
 .Sidebar__MenuItem {
   margin: 1px 4px;
   border-radius: 6px;
+}
+
+/* ------------------ MarIAno personalizado ------------------ */
+.Sidebar__MarIAno {
+  color: #ff6600 !important;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  border-left: 4px solid #f88112;
+}
+
+.Sidebar__MarIAno .v-icon {
+  color: #e08105 !important;
 }
 </style>

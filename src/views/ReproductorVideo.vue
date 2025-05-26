@@ -190,7 +190,7 @@ onMounted(async () => {
     await usuarioLogeadoStore.verificarAutenticacion()
   }
   
-  console.log('Usuario cargado:', usuarioLogeadoStore.usuario)
+  console.log('Usuario cargado:', usuarioLogeadoStore.usuarioActual)
   
   await loadCurrentVideo();
   await loadMarcadores();

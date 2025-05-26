@@ -86,17 +86,23 @@ const routes = [
     path: "/subir-video/:idCurso",
     component: SubirVideos,
     props: true,
-    meta: { requiresAuth: true, allowRoles: [1,2, 3] }
+    meta: { requiresAuth: true, allowRoles: [2, 3] }
   },
     {
     path: "/subir-video",
     redirect: "/cursos"
   },
+  {
+    path: '/ia',
+    name: 'ChatIA',
+    component: () => import('@/views/ChatIA.vue') 
+  },
+
   
   {
     path: "/crear-curso",
     component: () => import("@/views/CrearCurso.vue"),
-    meta: { requiresAuth: true, allowRoles: [1,2, 3] }
+    meta: { requiresAuth: true, allowRoles: [2, 3] }
   },
   {
     path: "/curso/:id",
