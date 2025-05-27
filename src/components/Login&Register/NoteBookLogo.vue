@@ -13,28 +13,6 @@ export default {
 }
 </script>
 
-<style scoped>
-.logo-container {
-  padding: 16px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.logo-text {
-  font-size: 24px;
-  font-weight: bold;
-  background: linear-gradient(to right, #FF6F00, #FFA000);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
+<style lang="scss" scoped>
+@import "@/assets/sass/layout/NoteBookLogo";
 </style>

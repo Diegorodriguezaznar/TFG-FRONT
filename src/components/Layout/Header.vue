@@ -1,14 +1,10 @@
 <script setup lang="ts">
-// --------------------------- Imports ---------------------------
 import { ref } from 'vue';
 
-// --------------------------- Variables ---------------------------
 const searchQuery = ref('');
 
-// --------------------------- Emits ---------------------------
 const emit = defineEmits(['toggle-sidebar', 'update-search']);
 
-// --------------------------- Métodos ---------------------------
 const toggleSidebar = () => {
   emit('toggle-sidebar');
 };
@@ -20,18 +16,15 @@ const updateSearch = () => {
 
 <template>
   <v-app-bar app color="white" elevation="1" class="Header">
-    <!-- Botón para abrir el sidebar -->
-    <v-btn icon @click="toggleSidebar" class="Header__BtnMenu">
+    <v-btn icon @click="toggleSidebar" class="Header__btn-menu">
       <v-icon>mdi-menu</v-icon>
     </v-btn>
     
-    <!-- Logo -->
-    <div class="Header__Logo">
-      <v-icon color="orange" size="x-large" class="mr-2">mdi-play-box</v-icon>
-      <span class="text-h6 font-weight-bold">AcademIQ Play</span>
+    <div class="Header__logo">
+      <v-icon color="orange" size="x-large" class="Header__icono">mdi-play-box</v-icon>
+      <span class="Header__texto">AcademIQ Play</span>
     </div>
     
-    <!-- Buscador -->
     <v-text-field
       v-model="searchQuery"
       density="compact"
@@ -41,12 +34,11 @@ const updateSearch = () => {
       append-inner-icon="mdi-magnify"
       @click:append-inner="updateSearch"
       @keyup.enter="updateSearch"
-      class="Header__Buscador"
+      class="Header__buscador"
       bg-color="grey-lighten-4"
-    ></v-text-field>
+    />
     
-    <!-- Icono de usuario -->
-    <v-btn icon class="Header__BtnUsuario" to="/perfil">
+    <v-btn icon class="Header__btn-usuario" to="/perfil">
       <v-avatar color="primary" size="32">
         <v-icon color="white">mdi-account</v-icon>
       </v-avatar>
@@ -54,37 +46,6 @@ const updateSearch = () => {
   </v-app-bar>
 </template>
 
-<style scoped>
-.Header {
-  padding: 0 16px;
-  display: flex;
-  align-items: center;
-}
-
-.Header__Logo {
-  display: flex;
-  align-items: center;
-  min-width: 140px;
-  margin-right: 16px;
-}
-
-.Header__Buscador {
-  max-width: 600px;
-  flex-grow: 1;
-  margin: 0 16px;
-}
-
-@media (max-width: 600px) {
-  .Header__Buscador {
-    margin: 0 8px;
-  }
-  
-  .Header__Logo span {
-    display: none;
-  }
-  
-  .Header__Logo {
-    min-width: unset;
-  }
-}
+<style lang="scss" scoped>
+@import "@/assets/sass/layout/Header";
 </style>

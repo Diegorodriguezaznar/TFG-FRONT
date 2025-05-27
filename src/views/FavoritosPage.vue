@@ -13,28 +13,37 @@ const toggleSidebar = () => {
 };
 
 const updateSearch = (query: string) => {
-  // Podrías implementar búsqueda aquí si quisieras
+  // Búsqueda implementada en componente hijo
 };
 
 onMounted(async () => {
-  // Cargar usuario desde localStorage si no está cargado
   await usuarioLogeadoStore.cargarUsuarioDesdeStorage();
 });
 </script>
 
 <template>
   <v-app>
-    <!-- Cabecera -->
     <Cabecera @toggle-sidebar="toggleSidebar" @update-search="updateSearch" />
-    
-    <!-- Barra lateral -->
     <BarraLateral v-model="sidebarOpen" />
     
-    <!-- Contenido principal -->
     <v-main>
-      <v-container class="pa-4">
+      <v-container class="FavoritosPage">
         <ListaVideosFavoritos />
       </v-container>
     </v-main>
   </v-app>
 </template>
+
+<style lang="scss" scoped>
+.FavoritosPage {
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 2rem;
+  }
+}
+</style>

@@ -10,6 +10,7 @@ export const useFavoritoStore = defineStore('favorito', {
   }),
 
   actions: {
+    // GET - Cargar favoritos del usuario
     async cargarFavoritos() {
       const usuarioLogeadoStore = useUsuarioLogeadoStore()
       
@@ -28,13 +29,13 @@ export const useFavoritoStore = defineStore('favorito', {
         
         this.favoritos = res.data
       } catch (err: any) {
-        console.error('Error al cargar favoritos:', err.response?.data || err.message)
         this.favoritos = []
       } finally {
         this.loading = false
       }
     },
 
+    // Verificar si un video es favorito
     esFavorito(idVideo: number | string): boolean {
       if (!idVideo) return false
       
@@ -45,6 +46,7 @@ export const useFavoritoStore = defineStore('favorito', {
       return this.favoritos.some(v => Number(v.idVideo) === idVideoNum)
     },
 
+    // POST - Toggle favorito
     async toggleFavorito(idVideo: number | string) {
       const usuarioLogeadoStore = useUsuarioLogeadoStore()
       
@@ -98,13 +100,13 @@ export const useFavoritoStore = defineStore('favorito', {
         try {
           await this.cargarFavoritos()
         } catch (reloadErr) {
-          console.error('Error al recargar favoritos después del fallo:', reloadErr)
         }
         
         throw err
       }
     },
 
+    // Limpiar lista de favoritos
     limpiarFavoritos() {
       this.favoritos = []
     }

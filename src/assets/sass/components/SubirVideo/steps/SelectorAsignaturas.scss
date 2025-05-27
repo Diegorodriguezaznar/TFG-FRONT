@@ -1,0 +1,65 @@
+.CursoAsignaturaSelector {
+  margin-bottom: 1rem;
+  background-color: #f5f5f5;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 0;
+  }
+
+  &__icono {
+    margin-right: 0.5rem;
+  }
+
+  &__titulo {
+    font-size: 1rem;
+    font-weight: 500;
+
+    @media (min-width: 768px) {
+      font-size: 1.125rem;
+    }
+  }
+
+  &__contenido {
+    padding: 1rem;
+  }
+
+  &__selectores {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+
+    @media (min-width: 640px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__campo {
+    width: 100%;
+  }
+
+  &__no-data {
+    padding: 0.5rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.875rem;
+  }
+
+  &__alerta {
+    margin-top: 0.5rem;
+  }
+
+  // Estilos deep para mantener consistencia de colores
+  :deep(.v-field--focused .v-field__outline) {
+    border-color: #FF9800 !important;
+  }
+
+  :deep(.v-field--error .v-field__outline) {
+    border-color: #d32f2f !important;
+  }
+
+  :deep(.v-selection-control--dirty .v-selection-control__input > .v-icon) {
+    color: #FF9800 !important;
+  }
+}

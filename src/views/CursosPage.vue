@@ -1,25 +1,18 @@
 <script setup lang="ts">
-// --------------------------- Imports ---------------------------
 import { ref, computed, onMounted } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import Header from '@/components/Layout/Header.vue';
 import Footer from '@/components/Layout/Footer.vue';
 import SideBarCursos from '@/components/Layout/SideBarCursos.vue';
 import CardCurso from '@/components/CardCurso.vue';
-import Login from '@/components/Login.vue';
 
-// --------------------------- Breadcrumb ---------------------------
 const items = ref([{ title: 'Cursos', disabled: true, href: '/cursos' }]);
-
-// --------------------------- Stores ---------------------------
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
 
-// --------------------------- Variables ---------------------------
 const drawer = ref(false);
 const mostrarLogin = ref(false);
 const cursos = ref([]);
 
-// --------------------------- Buscador ---------------------------
 const searchQuery = ref('');
 const cursosFiltrados = computed(() => {
   if (!searchQuery.value) return cursos.value;
@@ -28,7 +21,6 @@ const cursosFiltrados = computed(() => {
   );
 });
 
-// --------------------------- Fetch de cursos ---------------------------
 const fetchCursos = async () => {
   try {
     const response = await fetch("http://localhost:5190/api/Curso", {
@@ -41,54 +33,42 @@ const fetchCursos = async () => {
 
     cursos.value = await response.json();
   } catch (error) {
-    console.error("Error al obtener los cursos:", error);
+    // Error manejado silenciosamente
   }
 };
 
-// --------------------------- Event Handlers ---------------------------
 const handleCursoGuardado = (cursoId) => {
-  console.log(`Curso guardado: ${cursoId}`);
-  console.log("Usuario logeado:", usuarioLogeadoStore.usuarioActual);
-  // Aquí puedes añadir lógica adicional si es necesario
+  // Lógica de curso guardado
 };
 
 const handleCursoEliminado = (cursoId) => {
-  console.log(`Curso eliminado: ${cursoId}`);
-  // Aquí puedes añadir lógica adicional si es necesario
+  // Lógica de curso eliminado
 };
 
-// --------------------------- Lifecycle Hooks ---------------------------
 onMounted(fetchCursos);
 </script>
 
 <template>
   <v-app>
-    <!-- --------------------------- Header --------------------------- -->
     <Header @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
-      <SideBarCursos v-model="drawer" />
+    <SideBarCursos v-model="drawer" />
 
-    <!-- --------------------------- Contenedor principal --------------------------- -->
-    <div class="CursosPage__Wrapper">
-      <!-- --------------------------- Breadcrumb --------------------------- -->
-      <v-breadcrumbs class="CursosPage___Breadcrumb" :items="items">
+    <div class="CursosPage">
+      <v-breadcrumbs class="CursosPage__Breadcrumb" :items="items">
         <template v-slot:prepend>
           <v-icon icon="mdi-book-open-variant" size="small"></v-icon>
         </template>
       </v-breadcrumbs>
 
-      <v-container class="CursosPage__Contenedor">
-        <!-- --------------------------- Título de la página --------------------------- -->
+      <v-container class="CursosPage__Container">
         <div class="CursosPage__Header">
-          <h1 class="CursosPage__Titulo">Explora nuestros cursos</h1>
-          <p class="CursosPage__Subtitulo">Encuentra los mejores cursos para impulsar tu carrera</p>
+          <h1 class="CursosPage__Title">Explora nuestros cursos</h1>
         </div>
 
-        <!-- --------------------------- Contenido --------------------------- -->
-        <div class="CursosPage___contenido">
-          <v-container class="CursosPage___ContenedorCursos">
+        <div class="CursosPage__Content">
+          <v-container class="CursosPage__Grid">
             <v-row align="stretch" justify="start">
-              <!-- --------------------------- Mostrar cursos usando el componente CardCurso --------------------------- -->
-              <v-col v-for="curso in cursosFiltrados" :key="curso.idCurso" cols="12" sm="6" md="4" lg="3" class="d-flex">
+              <v-col v-for="curso in cursosFiltrados" :key="curso.idCurso" cols="12" sm="6" md="4" lg="3" class="CursosPage__GridItem">
                 <CardCurso 
                   :id="curso.idCurso"
                   :titulo="curso.nombre"
@@ -105,10 +85,8 @@ onMounted(fetchCursos);
       </v-container>
     </div>
     
-    <!-- --------------------------- Footer --------------------------- -->
     <Footer />
 
-    <!-- --------------------------- Login Modal --------------------------- -->
     <Login 
       v-if="mostrarLogin" 
       :mostrar="mostrarLogin" 
@@ -118,73 +96,5 @@ onMounted(fetchCursos);
 </template>
 
 <style lang="scss" scoped>
-.CursosPage__Wrapper {
-  min-height: calc(100vh - 64px - 64px); // Altura total - header - footer
-  background-color: #f5f7fa;
-  padding-bottom: 24px;
-}
-
-.CursosPage___Breadcrumb {
-  background-color: transparent;
-  padding: 16px 24px 0;
-}
-
-.CursosPage__Contenedor {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.CursosPage__Header {
-  text-align: center;
-  padding: 24px 0 40px;
-}
-
-.CursosPage__Titulo {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 8px;
-  background: linear-gradient(90deg, #3f51b5 0%, #2196f3 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.CursosPage__Subtitulo {
-  font-size: 1.25rem;
-  color: #607d8b;
-  margin: 0 auto;
-  max-width: 600px;
-}
-
-.CursosPage___contenido {
-  padding-top: 16px;
-}
-
-.CursosPage___ContenedorCursos {
-  width: 100%;
-}
-
-/* Media queries para mejor responsividad */
-@media (max-width: 960px) {
-  .CursosPage__Titulo {
-    font-size: 2rem;
-  }
-  
-  .CursosPage__Subtitulo {
-    font-size: 1.1rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .CursosPage__Header {
-    padding: 16px 0 24px;
-  }
-  
-  .CursosPage__Titulo {
-    font-size: 1.75rem;
-  }
-  
-  .CursosPage__Subtitulo {
-    font-size: 1rem;
-  }
-}
+@import "@/assets/sass/pages/CursosPage";
 </style>

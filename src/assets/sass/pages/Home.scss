@@ -1,146 +1,127 @@
-/* Mobile first approach */
-.HomePage__Contenedor {
-display: flex;
-flex-direction: column;
-gap: 15px;
-min-height: 100vh;
-padding-top: 40px;
-padding-left: 0;
-padding-right: 0;
-max-width: 100%;
-}
+.HomePage {
+  background-color: #f9f9f9;
+  min-height: 100vh;
 
-.HomePage__LogoContenedor {
-margin-top: 15%;
-display: flex;
-justify-content: center;
-padding: 10px 15px;
-margin-bottom: 15px;
-}
+  &__Container {
+    padding: 1rem;
+    max-width: 100%;
 
-.HomePage__Logo {
-max-width: 200px;
-height: auto;
-}
+    @media (min-width: 768px) {
+      padding-top: 1rem;
+      max-width: 1800px;
+    }
+  }
 
-.HomePage__Contenido {
-flex: 1;
-display: flex;
-justify-content: center;
-align-items: center;
-flex-direction: column;
-width: 100%;
-padding: 0;
-max-width: 100%;
-}
+  &__Banner {
+    position: relative;
+    height: 220px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 
-.HomePage__Seccion {
-width: 100%;
-}
+    @media (min-width: 600px) {
+      height: 300px;
+    }
+  }
 
-.HomePage__Divider {
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 30px;
-margin: 30px 15px;
-width: calc(100% - 30px);
-}
+  &__BannerOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.5) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
 
-.HomePage__Stepper {
-max-width: 100%;
-min-height: 200px;
-flex-grow: 1;
-}
+  &__BannerContent {
+    padding-bottom: 1rem;
 
-.HomePage__StepperCard {
-display: flex;
-flex-direction: column;
-align-items: center;
-text-align: center;
-padding: 0 10px;
-}
+    @media (min-width: 600px) {
+      padding-bottom: 2rem;
+    }
+  }
 
-.homepage__card-content {
-display: flex;
-justify-content: center;
-width: 100%;
-margin-top: 8px;
-}
+  &__Breadcrumbs {
+    color: white !important;
+    padding: 0;
 
-.HomePage__StepperIcon {
-margin: 0 auto;
-transform: scale(0.9);
-}
+    :deep(.v-breadcrumbs-item--disabled) {
+      opacity: 0.8;
+      color: white !important;
+    }
 
-/* Tablet (576px y superior) */
-@media (min-width: 576px) {
-.HomePage__Contenedor {
-    gap: 18px;
-    padding-top: 60px;
-}
+    :deep(.v-breadcrumbs-item) {
+      color: white !important;
+    }
+  }
 
-.HomePage__LogoContenedor {
-    margin-top: 2%;
-    margin-bottom: 20px;
-}
+  &__Title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0.5rem;
 
-.HomePage__Logo {
-    max-width: 250px;
-}
+    @media (min-width: 768px) {
+      font-size: 2.5rem;
+    }
+  }
 
-.HomePage__Divider {
-    gap: 40px;
-    margin: 40px 30px;
-    width: calc(100% - 60px);
-}
+  &__Description {
+    font-size: 1rem;
+    color: white;
+    margin-bottom: 1rem;
+    max-width: 100%;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 
-.HomePage__Stepper {
-    min-height: 220px;
-}
-}
+    @media (min-width: 768px) {
+      font-size: 1.25rem;
+      max-width: 800px;
+    }
+  }
 
-/* Desktop (768px y superior) */
-@media (min-width: 768px) {
-.HomePage__Contenedor {
-    padding-top: 70px;
-}
+  &__Actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
 
-.HomePage__LogoContenedor {
-    margin-top: 1%;
-    margin-bottom: 25px;
-}
+    @media (min-width: 576px) {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
 
-.HomePage__Logo {
-    max-width: 300px;
-}
+  &__VideoCount {
+    margin-right: 0;
 
-.HomePage__Divider {
-    flex-direction: row;
-    gap: 50px;
-    margin: 50px 5%;
-    width: 90%;
-}
+    @media (min-width: 576px) {
+      margin-right: 0.5rem;
+    }
+  }
 
-.HomePage__Stepper {
-    max-width: 600px;
-    min-height: 250px;
-}
+  &__UploadButton,
+  &__AddSubjectButton {
+    margin-left: 0;
 
-.HomePage__StepperIcon {
-    transform: scale(1);
-}
+    @media (min-width: 576px) {
+      margin-left: 0.5rem;
+    }
+  }
 
-.HomePage__CardContent {
-    margin-top: 10px;
-}
-}
+  &__Loading {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0;
+  }
 
-/* Large Desktop (1200px y superior) */
-@media (min-width: 1200px) {
-.HomePage__Logo {
-    margin-top: 2%;
-    max-width: 350px;
-}
+  &__Divider {
+    margin: 0.5rem 0;
+  }
+
+  &__NoVideos {
+    margin-top: 1rem;
+  }
 }

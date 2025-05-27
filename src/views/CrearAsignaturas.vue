@@ -26,7 +26,7 @@ const crearAsignatura = async () => {
 
   const dto: AsignaturaCrearDTO = {
     nombre: nombre.value.trim(),
-    descripcion: "", // si más adelante se usa
+    descripcion: "",
     idCurso
   };
 
@@ -51,18 +51,18 @@ onMounted(() => {
     <v-main>
       <Sidebar v-model="drawer" />
 
-      <v-container class="mt-6">
-        <v-card class="mx-auto my-8" max-width="700" elevation="3">
-          <v-card-title class="text-h4 d-flex align-center py-4 primary">
-            <v-icon size="32" class="me-3" color="white">mdi-book-plus</v-icon>
-            <span class="white--text">Añadir asignatura al curso</span>
+      <v-container class="AsignaturaCrear">
+        <v-card class="AsignaturaCrear__Card">
+          <v-card-title class="AsignaturaCrear__Header">
+            <v-icon size="32" class="AsignaturaCrear__Icon">mdi-book-plus</v-icon>
+            <span class="AsignaturaCrear__Title">Añadir asignatura al curso</span>
           </v-card-title>
 
-          <v-card-text class="pa-6">
+          <v-card-text class="AsignaturaCrear__Content">
             <v-alert
               v-if="success"
               type="success"
-              class="mb-4"
+              class="AsignaturaCrear__Alert"
               dismissible
               @click:close="success = false"
             >
@@ -76,9 +76,10 @@ onMounted(() => {
                 required
                 variant="outlined"
                 color="primary"
+                class="AsignaturaCrear__Input"
               />
 
-              <v-card-actions class="pt-4">
+              <v-card-actions class="AsignaturaCrear__Actions">
                 <v-spacer />
                 <v-btn
                   type="submit"
@@ -86,7 +87,7 @@ onMounted(() => {
                   :disabled="!isFormValid"
                   :loading="loading"
                   prepend-icon="mdi-content-save"
-                  class="text-none"
+                  class="AsignaturaCrear__Button"
                 >
                   Crear asignatura
                 </v-btn>
@@ -97,14 +98,12 @@ onMounted(() => {
       </v-container>
     </v-main>
 
-    <v-footer app height="64" class="bg-grey-lighten-4 d-flex align-center justify-center">
-      <span class="text-body-2">&copy; {{ new Date().getFullYear() }} AcademIQ</span>
+    <v-footer app height="64" class="AsignaturaCrear__Footer">
+      <span>&copy; {{ new Date().getFullYear() }} AcademIQ</span>
     </v-footer>
   </v-app>
 </template>
 
-<style scoped>
-.primary {
-  background: linear-gradient(135deg, #1976d2, #0d47a1);
-}
+<style lang="scss" scoped>
+@import "@/assets/sass/pages/CrearAsignaturas";
 </style>

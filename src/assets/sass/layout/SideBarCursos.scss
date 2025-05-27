@@ -1,0 +1,26 @@
+.Sidebar {
+  background-color: white;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
+
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+  }
+
+  &__divider {
+    margin: 0.5rem 0;
+  }
+
+  &__item {
+    margin-bottom: 0.25rem;
+    border-radius: 6px;
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+
+    @media (min-width: 768px) {
+      margin-bottom: 0.5rem;
+    }
+  }
+}

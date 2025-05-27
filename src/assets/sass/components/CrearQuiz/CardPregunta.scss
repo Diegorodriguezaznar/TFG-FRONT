@@ -1,0 +1,87 @@
+.CardPregunta {
+  margin-bottom: 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 152, 0, 0.2);
+
+  &__header {
+    display: flex;
+    align-items: center;
+  }
+
+  &__numero {
+    margin-right: 0.75rem;
+  }
+
+  &__titulo {
+    font-weight: 500;
+  }
+
+  &__estado {
+    margin-right: 0.5rem;
+  }
+
+  &__contenido {
+    padding: 1rem;
+  }
+
+  &__campo {
+    margin-bottom: 1rem;
+  }
+
+  &__respuestas-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  &__respuestas-titulo {
+    font-size: 1.125rem;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+
+    @media (min-width: 960px) {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__respuesta {
+    transition: all 0.2s ease;
+
+    &--correcta {
+      border-color: #4CAF50 !important;
+      background: rgba(76, 175, 80, 0.05);
+    }
+  }
+
+  &__respuesta-contenido {
+    padding: 0.75rem;
+  }
+
+  &__respuesta-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+
+  &__radio {
+    margin: 0;
+    padding: 0;
+  }
+
+  &__estado-texto {
+    font-size: 0.75rem;
+  }
+
+  &__eliminar {
+    text-align: center;
+  }
+}

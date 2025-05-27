@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// --------------------------- Imports ---------------------------
 import { ref, onMounted, watch, computed } from 'vue';
 import { useComentarioStore } from '@/stores/Comentario';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
@@ -8,12 +7,10 @@ import { storeToRefs } from 'pinia';
 import ModalReportarComentario from './Modales/ModalReportarComentario.vue';
 import ModalNotificacion from './Modales/ModalReporteCorrecto.vue';
 
-// --------------------------- Stores ---------------------------
 const comentarioStore = useComentarioStore();
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
 const { loading: storeLoading, errorMessage } = storeToRefs(comentarioStore);
 
-// --------------------------- Props ---------------------------
 const props = defineProps({
   videoId: {
     type: Number,
@@ -21,13 +18,11 @@ const props = defineProps({
   }
 });
 
-// --------------------------- Variables ---------------------------
 const comments = ref<ComentarioUI[]>([]);
 const newComment = ref('');
 const commentError = ref('');
 const showLoginMsg = ref(false);
 
-// Variables para los modales de reporte
 const dialogConfirmarReporte = ref(false);
 const dialogReporteExitoso = ref(false);
 const dialogErrorReporte = ref(false);
@@ -35,27 +30,23 @@ const comentarioAReportar = ref<ComentarioUI | null>(null);
 const mensajeError = ref('');
 const cargandoReporte = ref(false);
 
-// --------------------------- Computed ---------------------------
 const usuarioActual = computed(() => usuarioLogeadoStore.usuarioActual);
 const usuarioId = computed(() => {
   if (!usuarioActual.value) return null;
   return usuarioActual.value.idUsuario || usuarioActual.value.id || null;
 });
 
-// --------------------------- Métodos ---------------------------
 const cargarComentarios = async () => {
   try {
     if (props.videoId) {
-      console.log(`Cargando comentarios para video ID: ${props.videoId}`);
       const comentarios = await comentarioStore.fetchComentariosByVideoId(props.videoId);
       comments.value = comentarios;
-      
-      console.log("Comentarios cargados:", comentarios);
     }
   } catch (error) {
     console.error("Error al cargar comentarios:", error);
   }
 };
+
 const eliminarComentario = async (idComentario: number) => {
   try {
     const exito = await comentarioStore.eliminarComentarioPropio(idComentario);
@@ -66,7 +57,6 @@ const eliminarComentario = async (idComentario: number) => {
     console.error("Error eliminando comentario:", error);
   }
 };
-
 
 const abrirModalReporte = (comentario: ComentarioUI) => {
   if (!usuarioId.value) {
@@ -105,13 +95,11 @@ const confirmarReporte = async () => {
 };
 
 const submitComment = async () => {
-  // Validar que el comentario no esté vacío
   if (!newComment.value.trim()) {
     commentError.value = 'Por favor, escribe un comentario';
     return;
   }
   
-  // Validar que el usuario esté logueado
   if (!usuarioId.value) {
     showLoginMsg.value = true;
     return;
@@ -127,26 +115,20 @@ const submitComment = async () => {
     });
     
     if (nuevoComentario) {
-      // Añadir el nuevo comentario al inicio de la lista
       comments.value.unshift(nuevoComentario);
-      
-      // Limpiar el formulario
       newComment.value = '';
     }
   } catch (error: any) {
     commentError.value = error.message || 'Error al enviar el comentario';
-    console.error("Error al enviar comentario:", error);
   }
 };
 
-// --------------------------- Watchers ---------------------------
 watch(() => props.videoId, (newId) => {
   if (newId) {
     cargarComentarios();
   }
 });
 
-// --------------------------- Lifecycle Hooks ---------------------------
 onMounted(() => {
   cargarComentarios();
 });
@@ -154,36 +136,31 @@ onMounted(() => {
 
 <template>
   <div class="VideoComments">
-    <h3 class="text-subtitle-1 font-weight-bold mb-4">
-      {{ comments.length }} Comentarios
-    </h3>
+    <h3 class="VideoComments__titulo">{{ comments.length }} Comentarios</h3>
     
-    <!-- Loader -->
-    <div v-if="storeLoading && comments.length === 0" class="d-flex justify-center my-4">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    <div v-if="storeLoading && comments.length === 0" class="VideoComments__loading">
+      <v-progress-circular indeterminate color="primary" />
     </div>
     
-    <!-- Mensaje de error -->
     <v-alert
       v-if="errorMessage"
       type="error"
       variant="tonal"
       closable
-      class="mb-4"
+      class="VideoComments__alerta"
     >
       {{ errorMessage }}
     </v-alert>
     
-    <!-- Formulario para agregar comentarios -->
-    <div v-if="!storeLoading || comments.length > 0" class="VideoComments__Form d-flex align-start mb-6">
-      <v-avatar size="40" class="mr-3 mt-1">
+    <div v-if="!storeLoading || comments.length > 0" class="VideoComments__form">
+      <v-avatar size="40" class="VideoComments__avatar">
         <v-img 
           :src="usuarioActual ? `https://picsum.photos/seed/user${usuarioId}/40/40` : 'https://picsum.photos/seed/guest/40/40'" 
           alt="Tu avatar"
-        ></v-img>
+        />
       </v-avatar>
       
-      <div class="VideoComments__Input flex-grow-1">
+      <div class="VideoComments__input">
         <v-textarea
           v-model="newComment"
           :label="usuarioActual ? 'Añadir un comentario...' : 'Inicia sesión para comentar'"
@@ -194,12 +171,12 @@ onMounted(() => {
           variant="outlined"
           :error-messages="commentError"
           :disabled="!usuarioActual"
-        ></v-textarea>
+        />
         
-        <div class="d-flex justify-end mt-2">
+        <div class="VideoComments__botones">
           <v-btn 
             variant="text" 
-            class="mr-2"
+            class="VideoComments__cancelar"
             @click="newComment = ''"
             :disabled="!usuarioActual || !newComment.trim()"
           >
@@ -216,13 +193,12 @@ onMounted(() => {
           </v-btn>
         </div>
         
-        <!-- Mensaje para iniciar sesión -->
         <v-alert
           v-if="showLoginMsg"
           type="info"
           variant="tonal"
           closable
-          class="mt-2"
+          class="VideoComments__login-msg"
           @click:close="showLoginMsg = false"
         >
           Debes iniciar sesión para poder comentar.
@@ -230,28 +206,27 @@ onMounted(() => {
       </div>
     </div>
     
-    <!-- Lista de comentarios -->
-    <div v-if="comments.length > 0" class="VideoComments__List">
-      <div v-for="comment in comments" :key="comment.id" class="VideoComments__Comment mb-4">
-        <div class="d-flex">
-          <v-avatar size="40" class="mr-3">
-            <v-img :src="comment.avatar" :alt="comment.user"></v-img>
+    <div v-if="comments.length > 0" class="VideoComments__lista">
+      <div v-for="comment in comments" :key="comment.id" class="VideoComments__comentario">
+        <div class="VideoComments__comentario-layout">
+          <v-avatar size="40" class="VideoComments__comentario-avatar">
+            <v-img :src="comment.avatar" :alt="comment.user" />
           </v-avatar>
           
-          <div class="VideoComments__CommentContent">
-            <div class="d-flex align-center">
-              <span class="font-weight-medium">{{ comment.user }}</span>
-              <span class="ml-2 text-caption text-grey">{{ comment.time }}</span>
+          <div class="VideoComments__comentario-contenido">
+            <div class="VideoComments__comentario-header">
+              <span class="VideoComments__usuario">{{ comment.user }}</span>
+              <span class="VideoComments__tiempo">{{ comment.time }}</span>
             </div>
             
-            <p class="mt-1 text-body-2">{{ comment.content }}</p>
+            <p class="VideoComments__texto">{{ comment.content }}</p>
             
-            <div class="d-flex align-center mt-1">
+            <div class="VideoComments__acciones">
               <v-btn icon variant="plain" size="small">
                 <v-icon size="small">mdi-thumb-up</v-icon>
               </v-btn>
               
-              <span class="text-caption mr-4">{{ comment.likes }}</span>
+              <span class="VideoComments__likes">{{ comment.likes }}</span>
               
               <v-btn icon variant="plain" size="small">
                 <v-icon size="small">mdi-thumb-down</v-icon>
@@ -259,33 +234,31 @@ onMounted(() => {
               
               <v-btn 
                 variant="text" 
-                class="text-caption ml-4 text-red"
+                class="VideoComments__reportar"
                 @click="abrirModalReporte(comment)"
               >
                 Reportar
               </v-btn>
+              
               <v-btn 
                 v-if="comment.idUsuario === usuarioId" 
                 variant="text" 
-                class="text-caption ml-2 text-grey"
+                class="VideoComments__eliminar"
                 @click="eliminarComentario(comment.id)"
               >
                 Eliminar
               </v-btn>
-
             </div>
           </div>
         </div>
       </div>
     </div>
     
-    <!-- Estado sin comentarios -->
-    <div v-else-if="!storeLoading" class="VideoComments__Empty text-center py-4">
+    <div v-else-if="!storeLoading" class="VideoComments__vacio">
       <v-icon color="grey" size="large">mdi-comment-text-outline</v-icon>
-      <p class="mt-2 text-body-2 text-grey">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+      <p class="VideoComments__vacio-texto">No hay comentarios aún. ¡Sé el primero en comentar!</p>
     </div>
 
-    <!-- Modal de confirmación de reporte -->
     <ModalReportarComentario
       :mostrar="dialogConfirmarReporte"
       :comentario="comentarioAReportar"
@@ -294,7 +267,6 @@ onMounted(() => {
       @confirmar="confirmarReporte"
     />
 
-    <!-- Modal de reporte exitoso -->
     <ModalNotificacion
       :mostrar="dialogReporteExitoso"
       tipo="success"
@@ -303,7 +275,6 @@ onMounted(() => {
       @update:mostrar="dialogReporteExitoso = $event"
     />
 
-    <!-- Modal de error en reporte --> 
     <ModalNotificacion
       :mostrar="dialogErrorReporte"
       tipo="error"
@@ -315,24 +286,6 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
-.VideoComments {
-  padding: 0 16px 24px;
-}
-
-.VideoComments__Form {
-  margin-bottom: 24px;
-}
-
-.VideoComments__Comment {
-  margin-bottom: 16px;
-}
-
-.VideoComments__CommentContent {
-  flex: 1;
-}
-
-.VideoComments__Empty {
-  padding: 32px 0;
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/Video/VideoComentarios";
 </style>

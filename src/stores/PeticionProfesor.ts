@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 
-// Tipos
 interface PeticionProfesorData {
   documentacionUrl: string;
   texto: string;
@@ -18,23 +17,20 @@ interface PeticionProfesorResponse {
 }
 
 export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
-  // Estado
   const peticiones = ref<PeticionProfesorResponse[]>([]);
   const loading = ref(false);
   const error = ref<string | null>(null);
   const errorMessage = ref<string>('');
 
-  // Método para crear una petición
+  // POST - Crear petición de profesor
   const createPeticion = async (data: PeticionProfesorData): Promise<boolean> => {
     const usuarioLogeadoStore = useUsuarioLogeadoStore();
     
-    // Verificar autenticación
     if (!usuarioLogeadoStore.estaAutenticado || !usuarioLogeadoStore.usuarioActual) {
       error.value = 'Usuario no autenticado';
       throw new Error('Usuario no autenticado');
     }
 
-    // Verificar que el usuario tenga un ID válido
     if (!usuarioLogeadoStore.usuarioActual.idUsuario) {
       error.value = 'Usuario sin ID válido';
       throw new Error('Usuario sin ID válido');
@@ -50,8 +46,6 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
         texto: data.texto,
         estado: 'Pendiente'
       };
-
-      console.log('Enviando petición:', requestData);
 
       const response = await fetch("http://localhost:5190/api/PeticionProfesor", {
         method: 'POST',
@@ -69,15 +63,10 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
       }
 
       const result = await response.json();
-      console.log('Petición creada exitosamente:', result);
-
-      // Agregar la nueva petición al estado local
       peticiones.value.push(result);
       
       return true;
     } catch (err) {
-      console.error('Error al crear petición:', err);
-      
       if (err instanceof Error) {
         error.value = err.message;
       } else {
@@ -90,8 +79,8 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
     }
   };
 
-  
-  // Método para obtener TODAS las peticiones (para administradores)
+
+  // GET - Obtener todas las peticiones (para administradores)
   const fetchPeticiones = async (): Promise<any[]> => {
     const usuarioLogeadoStore = useUsuarioLogeadoStore();
     
@@ -117,7 +106,6 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
 
       const result = await response.json();
       
-      // Transformar los datos al formato esperado por la UI
       const peticionesUI = result.map((peticion: any) => ({
         id: peticion.id,
         user: peticion.nombreUsuario || `Usuario ${peticion.idUsuario}`,
@@ -131,8 +119,6 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
       
       return peticionesUI;
     } catch (err) {
-      console.error('Error al obtener todas las peticiones:', err);
-      
       if (err instanceof Error) {
         errorMessage.value = err.message;
         error.value = err.message;
@@ -147,8 +133,7 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
     }
   };
 
-
-
+  // DELETE - Rechazar petición
   async function rechazarPeticion(idPeticion: number): Promise<boolean> {
     try {
       const response = await fetch(`http://localhost:5190/api/PeticionProfesor/rechazar/${idPeticion}`, {
@@ -160,19 +145,15 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
         throw new Error(`Error al rechazar petición: ${errorText}`);
       }
 
-      // Elimina del array local
       peticiones.value = peticiones.value.filter(p => p.id !== idPeticion);
       return true;
     } catch (error: any) {
       errorMessage.value = error.message || "Error al rechazar la petición";
-      console.error("Error al rechazar petición:", error);
       return false;
     }
   }
 
-
-
-  // Método para limpiar el estado
+  // Limpiar estado
   const clearState = () => {
     peticiones.value = [];
     error.value = null;
@@ -181,13 +162,10 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
   };
 
   return {
-    // Estado
     peticiones,
     loading,
     error,
     errorMessage,
-    
-    // Métodos
     createPeticion,
     fetchPeticiones,
     rechazarPeticion,

@@ -1,0 +1,122 @@
+.VideoComments {
+  padding: 0 1rem 1.5rem;
+
+  &__titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.125rem;
+    }
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    margin: 1rem 0;
+  }
+
+  &__alerta {
+    margin-bottom: 1rem;
+  }
+
+  &__form {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  &__avatar {
+    margin-right: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  &__input {
+    flex: 1;
+  }
+
+  &__botones {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+  }
+
+  &__cancelar {
+    margin-right: 0.5rem;
+  }
+
+  &__login-msg {
+    margin-top: 0.5rem;
+  }
+
+  &__comentario {
+    margin-bottom: 1rem;
+  }
+
+  &__comentario-layout {
+    display: flex;
+  }
+
+  &__comentario-avatar {
+    margin-right: 0.75rem;
+  }
+
+  &__comentario-contenido {
+    flex: 1;
+  }
+
+  &__comentario-header {
+    display: flex;
+    align-items: center;
+  }
+
+  &__usuario {
+    font-weight: 500;
+  }
+
+  &__tiempo {
+    margin-left: 0.5rem;
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  &__texto {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+  }
+
+  &__acciones {
+    display: flex;
+    align-items: center;
+    margin-top: 0.25rem;
+  }
+
+  &__likes {
+    font-size: 0.75rem;
+    margin-right: 1rem;
+  }
+
+  &__reportar {
+    font-size: 0.75rem;
+    margin-left: 1rem;
+    color: #d32f2f;
+  }
+
+  &__eliminar {
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+    color: #666;
+  }
+
+  &__vacio {
+    text-align: center;
+    padding: 2rem 0;
+  }
+
+  &__vacio-texto {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #666;
+  }
+}

@@ -4,14 +4,12 @@ import type { RespuestaDTO } from "@/stores/dtos/RespuestaDTO";
 import type { PreguntaDTO } from "@/stores/dtos/PreguntaDTO";
 
 export const useRespuestaStore = defineStore("respuesta", () => {
-  // --------------------------- Estado ---------------------------
+  // Estado
   const respuestas = ref<RespuestaDTO[]>([]);
   const errorMessage = ref<string>("");
   const loading = ref<boolean>(false);
 
-  // --------------------------- Métodos ---------------------------
-
-  // Obtener respuestas por pregunta
+  // GET - Obtener respuestas por pregunta
   async function fetchRespuestasByPreguntaId(idPregunta: number): Promise<RespuestaDTO[]> {
     try {
       const controller = new AbortController();
@@ -27,7 +25,6 @@ export const useRespuestaStore = defineStore("respuesta", () => {
           }
         });
       } catch (error) {
-        // Fallback
         response = await fetch(`http://localhost:5190/api/Respuesta/pregunta/${idPregunta}`, {
           signal: controller.signal,
           headers: {
@@ -47,23 +44,18 @@ export const useRespuestaStore = defineStore("respuesta", () => {
       const data = await response.json();
       return data.sort((a: RespuestaDTO, b: RespuestaDTO) => a.orden - b.orden);
     } catch (error: any) {
-      let message = "Error al obtener las respuestas";
-      
-      if (error.name === 'AbortError') {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        message = "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
+      const message = error.name === 'AbortError'
+        ? "La conexión con el servidor ha excedido el tiempo de espera"
+        : error instanceof TypeError && error.message.includes('Failed to fetch')
+        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+        : error.message || "Error al obtener las respuestas";
       
       errorMessage.value = message;
-      console.error(message, error);
       return [];
     }
   }
 
-  // Obtener respuestas para múltiples preguntas
+  // GET - Obtener respuestas para múltiples preguntas
   async function fetchRespuestasForQuiz(preguntas: PreguntaDTO[]): Promise<Map<number, RespuestaDTO[]>> {
     loading.value = true;
     const respuestasMap = new Map<number, RespuestaDTO[]>();
@@ -78,22 +70,19 @@ export const useRespuestaStore = defineStore("respuesta", () => {
       return respuestasMap;
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al obtener respuestas del quiz:", error);
       return respuestasMap;
     } finally {
       loading.value = false;
     }
   }
 
-  // Crear respuesta - ARREGLADO con mejor manejo de errores
+  // POST - Crear respuesta
   async function createRespuesta(respuesta: Omit<RespuestaDTO, 'idRespuesta'>): Promise<RespuestaDTO | null> {
     try {
-      console.log('Creando respuesta:', respuesta);
-
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      // Validar datos antes de enviar
+      // Validaciones
       if (!respuesta.texto?.trim()) {
         throw new Error('El texto de la respuesta es obligatorio');
       }
@@ -106,7 +95,6 @@ export const useRespuestaStore = defineStore("respuesta", () => {
         throw new Error('El orden de la respuesta debe ser mayor a 0');
       }
 
-      // Preparar datos para envío
       const respuestaData = {
         texto: respuesta.texto.trim(),
         esCorrecta: Boolean(respuesta.esCorrecta),
@@ -114,11 +102,8 @@ export const useRespuestaStore = defineStore("respuesta", () => {
         idPregunta: Number(respuesta.idPregunta)
       };
 
-      console.log('Datos de respuesta a enviar:', respuestaData);
-
       let response;
       try {
-        // Intentar con el endpoint principal
         response = await fetch("http://localhost:5190/api/respuesta", {
           method: "POST",
           headers: { 
@@ -129,7 +114,6 @@ export const useRespuestaStore = defineStore("respuesta", () => {
           signal: controller.signal
         });
       } catch (error) {
-        // Fallback - probar endpoint alternativo
         response = await fetch("http://localhost:5190/api/Respuesta", {
           method: "POST",
           headers: { 
@@ -156,35 +140,27 @@ export const useRespuestaStore = defineStore("respuesta", () => {
             errorMessage = errorText || errorMessage;
           }
         } catch (e) {
-          console.warn("No se pudo parsear el error del servidor");
+          // Error al parsear respuesta
         }
         
-        console.error("Error del servidor al crear respuesta:", errorMessage);
         throw new Error(`Error al crear la respuesta: ${errorMessage}`);
       }
 
-      const result = await response.json();
-      console.log('Respuesta creada exitosamente:', result);
-      return result;
+      return await response.json();
 
     } catch (error: any) {
-      let message = "Error al crear la respuesta";
-      
-      if (error.name === 'AbortError') {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-        message = "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
+      const message = error.name === 'AbortError'
+        ? "La conexión con el servidor ha excedido el tiempo de espera"
+        : error instanceof TypeError && error.message.includes('Failed to fetch')
+        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+        : error.message || "Error al crear la respuesta";
       
       errorMessage.value = message;
-      console.error(message, error);
       return null;
     }
   }
 
-  // Actualizar respuesta
+  // PUT - Actualizar respuesta
   async function updateRespuesta(idRespuesta: number, respuesta: Partial<RespuestaDTO>): Promise<RespuestaDTO | null> {
     try {
       const controller = new AbortController();
@@ -202,7 +178,6 @@ export const useRespuestaStore = defineStore("respuesta", () => {
           signal: controller.signal
         });
       } catch (error) {
-        // Fallback
         response = await fetch(`http://localhost:5190/api/Respuesta/${idRespuesta}`, {
           method: "PUT",
           headers: { 
@@ -224,12 +199,11 @@ export const useRespuestaStore = defineStore("respuesta", () => {
       return await response.json();
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al actualizar respuesta:", error);
       return null;
     }
   }
 
-  // Eliminar respuesta
+  // DELETE - Eliminar respuesta
   async function deleteRespuesta(idRespuesta: number): Promise<boolean> {
     try {
       const controller = new AbortController();
@@ -243,7 +217,6 @@ export const useRespuestaStore = defineStore("respuesta", () => {
           signal: controller.signal
         });
       } catch (error) {
-        // Fallback
         response = await fetch(`http://localhost:5190/api/Respuesta/${idRespuesta}`, {
           method: "DELETE",
           headers: { "Accept": "application/json" },
@@ -261,7 +234,6 @@ export const useRespuestaStore = defineStore("respuesta", () => {
       return true;
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al eliminar respuesta:", error);
       return false;
     }
   }
