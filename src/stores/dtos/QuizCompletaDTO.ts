@@ -5,6 +5,7 @@ export interface QuizCompletaDTO {
   nombreUsuario: string;
   fechaCreacion: string;
   totalPreguntas: number;
+  idCurso: number;
   idAsignatura: number;
   idUsuario: number;
 }

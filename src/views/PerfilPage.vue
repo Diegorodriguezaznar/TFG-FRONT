@@ -1,5 +1,4 @@
 <script setup>
-// --------------------------- Imports ---------------------------
 import { ref, computed, onMounted } from 'vue';
 import Header from '@/components/Layout/Header.vue';
 import Footer from '@/components/Layout/Footer.vue';
@@ -10,10 +9,8 @@ import CursosInscritos from '@/components/Perfil/CursosInscritos.vue';
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 import AvatarRiendo from '@/components/AvatarEmote.vue';
 
-// --------------------------- Store de usuario ---------------------------
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
 
-// --------------------------- Variables ---------------------------
 const drawer = ref(false);
 const items = ref([{ title: 'Inicio', disabled: false, href: '/' }, { title: 'Perfil', disabled: true }]);
 const loading = ref(false);
@@ -22,7 +19,6 @@ const showSnackbar = ref(false);
 const snackbarText = ref('');
 const snackbarColor = ref('success');
 
-// --------------------------- Obtener el usuario actual ---------------------------
 const usuarioActual = computed(() => usuarioLogeadoStore.usuarioActual);
 
 // --------------------------- Información del usuario ---------------------------
@@ -75,7 +71,6 @@ const manejarActualizacion = (success, message) => {
   }
 };
 
-// --------------------------- Verificar usuario en localStorage ---------------------------
 const checkUsuarioLocal = () => {
   const usuarioGuardado = localStorage.getItem('usuario');
   if (usuarioGuardado && !usuarioActual.value) {
@@ -83,12 +78,11 @@ const checkUsuarioLocal = () => {
       usuarioLogeadoStore.usuarioActual = JSON.parse(usuarioGuardado);
       usuarioLogeadoStore.estaAutenticado = true;
     } catch (error) {
-      console.error("Error al recuperar usuario del localStorage:", error);
+      // Error manejado silenciosamente
     }
   }
 };
 
-// --------------------------- Ejecutar al montar el componente ---------------------------
 onMounted(() => {
   checkUsuarioLocal();
 });
@@ -96,19 +90,15 @@ onMounted(() => {
 
 <template>
   <v-app>
-    <!-- --------------------------- Header --------------------------- -->
     <Header @toggle-sidebar="drawer = !drawer" />
     
-    <!-- --------------------------- Breadcrumb --------------------------- -->
     <v-breadcrumbs class="PerfilPage__Breadcrumb" :items="items">
       <template v-slot:prepend>
         <v-icon icon="mdi-home" size="small"></v-icon>
       </template>
     </v-breadcrumbs>
 
-    <!-- --------------------------- Contenedor principal --------------------------- -->
     <v-main class="PerfilPage">
-      <!-- --------------------------- Sidebar --------------------------- -->
       <Sidebar v-model="drawer" />
 
       <v-container class="PerfilPage__Container">
@@ -179,16 +169,14 @@ onMounted(() => {
           class="mb-6"
         />
         
-        <!-- Componente UserTab -->
-        <v-card elevation="2" rounded="lg">
-          <v-card-text class="pa-0">
+        <v-card class="PerfilPage__UserTabCard" elevation="2" rounded="lg">
+          <v-card-text class="PerfilPage__UserTabContent">
             <UserTab />
           </v-card-text>
         </v-card>
       </v-container>
     </v-main>
     
-    <!-- Footer -->
     <Footer />
     
     <!-- Modal de edición -->

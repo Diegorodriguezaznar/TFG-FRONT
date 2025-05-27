@@ -1,6 +1,5 @@
 // src/router/index.ts - ARCHIVO COMPLETO ACTUALIZADO
 import { createRouter, createWebHistory } from "vue-router";
-import Historial from "@/views/Historial.vue";
 import PerfilPage from "../views/PerfilPage.vue";
 import HomePage from "../views/HomePage.vue"; // NUEVA PÁGINA PRINCIPAL
 import CursosPage from "../views/CursosPage.vue"; // RENOMBRADA
@@ -11,6 +10,8 @@ import UsuariosPage from "../views/UsuariosPage.vue";
 import PerfilUsuario from "../views/PerfilUsuario.vue";
 import Login from '../views/Login.vue';
 import AdminPage from "@/views/AdminPage.vue";
+import VideosFavoritos from '../views/FavoritosPage.vue'
+
 
 // === PÁGINAS DE QUIZZES NUEVAS ===
 import HacerQuizzesPage from "../views/HacerQuizzesPage.vue";
@@ -54,7 +55,6 @@ const routes = [
   { path: "/curso/:id", component: Videos, props: true, meta: { requiresAuth: true } },
   { path: "/subir-video", component: SubirVideos, meta: { requiresAuth: true } },
   { path: "/reproductor-video", component: ReproductorVideo, meta: { requiresAuth: true } },
-  { path: "/historial", component: Historial, meta: { requiresAuth: true } },
   { path: "/perfil", component: PerfilPage, meta: { requiresAuth: true } },
   { path: "/usuarios", component: UsuariosPage, meta: { requiresAuth: true } },
   { path: "/usuario/:id", component: PerfilUsuario, props: true, meta: { requiresAuth: true } },
@@ -100,7 +100,14 @@ const routes = [
   { path: "/quizz-detail/:id", component: QuizDetalle, props: true, meta: { requiresAuth: true } },
 
   // === PANEL DE ADMINISTRACIÓN ===
-  { path: "/peticion-profesor", component: PeticionProfesorPage },
+
+  { path: "/login", component: Login },
+  { path: "/cursos", component: HomePage },
+  {
+    path: "/peticion-profesor",
+    component: PeticionProfesorPage,
+    meta: { requiresAuth: true, allowRoles: [1] }
+  },
   { path: "/curso/:idCurso/asignaturas", component: CrearAsignaturas },
   {
     path: "/subir-video/:idCurso",
@@ -122,6 +129,42 @@ const routes = [
     path: "/crear-curso",
     component: () => import("@/views/CrearCurso.vue"),
     meta: { requiresAuth: true, allowRoles: [2, 3] }
+  },
+  {
+    path: "/curso/:id",
+    component: Videos,
+    props: true,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/reproductor-video",
+    component: ReproductorVideo,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/perfil",
+    component: PerfilPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/quizz-time!",
+    component: Quizzes,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/quizz-detail",
+    component: QuizDetalle,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: "/quizz-detail/:id",
+    component: QuizDetalle,
+    props: true
+  },
+  {
+    path: '/favoritos',
+    component: VideosFavoritos,
+    name: 'VideosFavoritos', 
   },
   {
     path: '/ranking',

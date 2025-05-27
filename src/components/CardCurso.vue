@@ -254,17 +254,6 @@ const toggleInscripcion = async (event) => {
           </v-btn>
           
           <v-spacer></v-spacer>
-          
-          <v-btn 
-            variant="flat" 
-            color="primary" 
-            @click.stop="seleccionarCurso"
-            class="curso-card-boton"
-            :class="{ 'btn-hover': isHovering }"
-          >
-            <v-icon left class="mr-1">mdi-play-circle-outline</v-icon>
-            Ver videos
-          </v-btn>
         </v-card-actions>
       </v-card>
     </v-hover>

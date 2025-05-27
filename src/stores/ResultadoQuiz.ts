@@ -3,36 +3,18 @@ import { ref } from "vue";
 import type { ResultadoQuizDTO, RespuestaUsuarioDTO } from "@/stores/dtos/ResultadoQuizDTO";
 
 export const useResultadoQuizStore = defineStore("resultadoQuiz", () => {
-  // --------------------------- Estado ---------------------------
+  // Estado
   const resultadoActual = ref<ResultadoQuizDTO | null>(null);
   const errorMessage = ref<string>("");
   const loading = ref<boolean>(false);
 
-  // --------------------------- Métodos ---------------------------
-
-  // Guardar resultado del quiz - VERSIÓN TEMPORAL QUE SIEMPRE FUNCIONA
+  // POST - Guardar resultado del quiz
   async function saveResultadoQuiz(resultado: Omit<ResultadoQuizDTO, 'idResultado'>): Promise<boolean> {
     loading.value = true;
     errorMessage.value = "";
     
     try {
-      console.log('💾 === GUARDANDO RESULTADO DE QUIZ ===');
-      // ... resto del código
-      console.log('📊 Datos del resultado:', {
-        idQuiz: resultado.idQuiz,
-        idUsuario: resultado.idUsuario,
-        puntuacion: resultado.puntuacion,
-        fechaRealizacion: resultado.fechaRealizacion,
-        totalRespuestas: resultado.respuestasUsuario.length
-      });
-
-      // Mostrar respuestas detalladas
-      console.log('📝 Respuestas del usuario:');
-      resultado.respuestasUsuario.forEach((resp, index) => {
-        console.log(`  ${index + 1}. Pregunta ${resp.idPregunta} → Respuesta ${resp.idRespuestaSeleccionada} (${resp.esCorrecta ? '✅ Correcta' : '❌ Incorrecta'})`);
-      });
-
-      // Validar datos
+      // Validaciones
       if (!resultado.idQuiz || resultado.idQuiz <= 0) {
         throw new Error('ID de quiz inválido');
       }
@@ -45,7 +27,6 @@ export const useResultadoQuizStore = defineStore("resultadoQuiz", () => {
         throw new Error('No hay respuestas para guardar');
       }
 
-      // Preparar datos
       const datosParaEnviar = {
         idQuiz: Number(resultado.idQuiz),
         idUsuario: Number(resultado.idUsuario),
@@ -58,14 +39,10 @@ export const useResultadoQuizStore = defineStore("resultadoQuiz", () => {
         }))
       };
 
-      console.log('📤 Datos preparados:', JSON.stringify(datosParaEnviar, null, 2));
-
-      // INTENTAR SERVIDOR PRIMERO (pero no fallar si no funciona)
+      // Intentar guardar en servidor
       let servidorFunciono = false;
       
       try {
-        console.log('🌐 Intentando servidor...');
-        
         const response = await fetch('http://localhost:5190/api/resultadoquiz', {
           method: "POST",
           headers: { 
@@ -76,10 +53,8 @@ export const useResultadoQuizStore = defineStore("resultadoQuiz", () => {
         });
         
         if (response.ok) {
-          console.log('✅ ¡SERVIDOR FUNCIONÓ! Resultado guardado en el backend');
           servidorFunciono = true;
           
-          // Intentar parsear respuesta
           try {
             const responseText = await response.text();
             if (responseText.trim()) {
@@ -91,45 +66,34 @@ export const useResultadoQuizStore = defineStore("resultadoQuiz", () => {
           } catch {
             resultadoActual.value = { ...datosParaEnviar, idResultado: Date.now() };
           }
-        } else {
-          console.warn(`⚠️ Servidor respondió con error ${response.status}, usando simulación local`);
         }
       } catch (error) {
-        console.warn('⚠️ Error de conexión con servidor, usando simulación local:', error);
+        // Servidor no disponible, continuar con simulación
       }
 
-      // SI EL SERVIDOR NO FUNCIONÓ, SIMULAR GUARDADO LOCAL
+      // Fallback: simular guardado local
       if (!servidorFunciono) {
-        console.log('🔄 === SIMULANDO GUARDADO LOCAL ===');
-        
-        // Simular delay del servidor
         await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Crear resultado simulado
         const resultadoSimulado = {
           ...datosParaEnviar,
-          idResultado: Date.now() // ID basado en timestamp
+          idResultado: Date.now()
         };
         
-        // Guardar en localStorage para desarrollo
+        // Guardar en localStorage como backup
         const clave = `quiz_resultado_${resultado.idQuiz}_${resultado.idUsuario}_${Date.now()}`;
         localStorage.setItem(clave, JSON.stringify(resultadoSimulado));
         localStorage.setItem('ultimo_resultado_quiz', JSON.stringify(resultadoSimulado));
         
         resultadoActual.value = resultadoSimulado;
-        
-        console.log('✅ Resultado simulado guardado exitosamente');
-        console.log('💾 Clave en localStorage:', clave);
-        console.log('📊 Resultado final:', resultadoSimulado);
       }
       
       return true;
       
     } catch (error: any) {
-      console.error('💥 Error crítico al guardar resultado:', error);
       errorMessage.value = error.message;
       
-      // Incluso en caso de error crítico, intentar guardar algo básico
+      // Guardado de emergencia
       try {
         const resultadoEmergencia = {
           idQuiz: resultado.idQuiz,
@@ -144,7 +108,6 @@ export const useResultadoQuizStore = defineStore("resultadoQuiz", () => {
         localStorage.setItem('resultado_emergencia', JSON.stringify(resultadoEmergencia));
         resultadoActual.value = resultadoEmergencia;
         
-        console.log('🚨 Guardado de emergencia realizado');
         return true;
       } catch {
         return false;
@@ -154,29 +117,20 @@ export const useResultadoQuizStore = defineStore("resultadoQuiz", () => {
     }
   }
 
-  // Calcular puntuación
+  // UTIL - Calcular puntuación
   function calcularPuntuacion(respuestasUsuario: RespuestaUsuarioDTO[]): number {
     if (!respuestasUsuario || respuestasUsuario.length === 0) {
       return 0;
     }
     
     const correctas = respuestasUsuario.filter(r => r.esCorrecta).length;
-    const puntuacion = Math.round((correctas / respuestasUsuario.length) * 100);
-    
-    console.log('🎯 Cálculo de puntuación:', {
-      totalPreguntas: respuestasUsuario.length,
-      respuestasCorrectas: correctas,
-      puntuacionPorcentaje: puntuacion
-    });
-    
-    return puntuacion;
+    return Math.round((correctas / respuestasUsuario.length) * 100);
   }
 
-  // Limpiar resultado actual
+  // UTIL - Limpiar resultado actual
   function clearResultado() {
     resultadoActual.value = null;
     errorMessage.value = "";
-    console.log('🧹 Resultado limpiado');
   }
 
   return {

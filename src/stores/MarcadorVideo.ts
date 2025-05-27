@@ -3,16 +3,13 @@ import { ref } from "vue";
 import type { MarcadorVideoDTO } from "@/stores/dtos/MarcadorVideoDTO";
 
 export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
-  // --------------------------- Estado ---------------------------
   const marcadores = ref<MarcadorVideoDTO[]>([]);
   const marcadoresPorVideo = ref<MarcadorVideoDTO[]>([]);
   const marcador = ref<MarcadorVideoDTO | null>(null);
   const errorMessage = ref<string>("");
   const loading = ref<boolean>(false);
 
-  // --------------------------- Métodos de Fetch ---------------------------
-
-  // Obtener marcadores por ID de video
+  // GET - Obtener marcadores por ID de video
   async function fetchMarcadoresByVideoId(idVideo: number) {
     loading.value = true;
     try {
@@ -48,29 +45,11 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
         titulo: m.titulo || ""
       }));
 
-      // Ordenar por minuto importante
       marcadoresPorVideo.value.sort((a, b) => a.minutoImportante - b.minutoImportante);
 
       return marcadoresPorVideo.value;
     } catch (error: any) {
-      let message = "Error al obtener los marcadores del video";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
-
-      errorMessage.value = message;
-      console.error(message, error);
-
-      // Fallback con datos vacíos en caso de error
+      errorMessage.value = error.message || "Error al obtener los marcadores del video";
       marcadoresPorVideo.value = [];
       return marcadoresPorVideo.value;
     } finally {
@@ -78,7 +57,7 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
     }
   }
 
-  // Crear un nuevo marcador
+  // POST - Crear marcador
   async function createMarcador(marcador: MarcadorVideoDTO) {
     loading.value = true;
     try {
@@ -109,43 +88,25 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
 
       const data = await response.json();
       
-      // Añadir a la lista local
       marcadoresPorVideo.value.push(data);
-      // Ordenar por minuto importante
       marcadoresPorVideo.value.sort((a, b) => a.minutoImportante - b.minutoImportante);
       
       return data;
     } catch (error: any) {
-      let message = "Error al crear el marcador";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
-
-      errorMessage.value = message;
-      console.error(message, error);
+      errorMessage.value = error.message || "Error al crear el marcador";
       throw error;
     } finally {
       loading.value = false;
     }
   }
 
-  // Crear varios marcadores en lote
+  // POST - Crear marcadores en lote
   async function createMarcadoresEnLote(idVideo: number, marcadores: MarcadorVideoDTO[]) {
     loading.value = true;
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      // Convertir a formato de request para el endpoint bulk
       const marcadoresRequest = marcadores.map(m => ({
         minutoImportante: m.minutoImportante,
         titulo: m.titulo || ""
@@ -173,34 +134,18 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
         );
       }
 
-      // Después de crear en lote, actualizar nuestra lista local obteniendo todos los marcadores
       await fetchMarcadoresByVideoId(idVideo);
       
       return marcadoresPorVideo.value;
     } catch (error: any) {
-      let message = "Error al crear los marcadores en lote";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
-
-      errorMessage.value = message;
-      console.error(message, error);
+      errorMessage.value = error.message || "Error al crear los marcadores en lote";
       throw error;
     } finally {
       loading.value = false;
     }
   }
 
-  // Actualizar un marcador existente
+  // PUT - Actualizar marcador
   async function updateMarcador(idMarcador: number, marcador: MarcadorVideoDTO) {
     loading.value = true;
     try {
@@ -229,40 +174,23 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
         );
       }
 
-      // Actualizar el marcador en la lista local
       const index = marcadoresPorVideo.value.findIndex(m => m.idMarcador === idMarcador);
       if (index !== -1) {
         marcadoresPorVideo.value[index] = marcador;
       }
       
-      // Ordenar por minuto importante
       marcadoresPorVideo.value.sort((a, b) => a.minutoImportante - b.minutoImportante);
       
       return marcador;
     } catch (error: any) {
-      let message = "Error al actualizar el marcador";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
-
-      errorMessage.value = message;
-      console.error(message, error);
+      errorMessage.value = error.message || "Error al actualizar el marcador";
       throw error;
     } finally {
       loading.value = false;
     }
   }
 
-  // Eliminar un marcador por ID
+  // DELETE - Eliminar marcador
   async function deleteMarcador(idMarcador: number) {
     loading.value = true;
     try {
@@ -290,40 +218,24 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
         );
       }
 
-      // Actualizar el estado local eliminando el marcador
       marcadoresPorVideo.value = marcadoresPorVideo.value.filter(
         (m) => m.idMarcador !== idMarcador
       );
 
       return true;
     } catch (error: any) {
-      let message = "Error al eliminar el marcador";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
-
-      errorMessage.value = message;
-      console.error(message, error);
+      errorMessage.value = error.message || "Error al eliminar el marcador";
       throw error;
     } finally {
       loading.value = false;
     }
   }
 
-  // Método para convertir un timestamp de UI a MarcadorVideoDTO
+  // Convertir timestamp de UI a MarcadorVideoDTO
   function convertTimestampToMarcadorDTO(timestamp: any, idVideo: number): MarcadorVideoDTO {
     return {
       idVideo: idVideo,
-      minutoImportante: timestamp.time || timestamp.tiempo || 0, // Convertir a decimal si es necesario
+      minutoImportante: timestamp.time || timestamp.tiempo || 0,
       titulo: timestamp.title || timestamp.titulo || ""
     };
   }

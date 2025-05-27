@@ -1,4 +1,3 @@
-<!-- SummaryStep.vue - Paso 3 optimizado -->
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount } from 'vue';
 
@@ -43,57 +42,55 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
-    <h2 class="text-h5 mb-4">Resumen del video</h2>
+  <div class="SummaryStep">
+    <h2 class="SummaryStep__titulo">Resumen del video</h2>
     
-    <v-card class="mb-4">
-      <v-card-text>
-        <!-- Vista previa del contenido -->
-        <v-row class="mb-4">
-          <v-col cols="12" sm="4" md="3">
+    <v-card class="SummaryStep__card">
+      <v-card-text class="SummaryStep__contenido">
+        <div class="SummaryStep__vista-previa">
+          <div class="SummaryStep__miniatura">
             <v-img
               v-if="videoDetails.thumbnail && thumbnailUrl" 
               :src="thumbnailUrl" 
               height="120"
               cover
-              class="rounded"
+              class="SummaryStep__imagen"
             />
             
-            <div v-else class="thumbnail-placeholder">
-              <v-icon size="32" class="mb-2">mdi-video-outline</v-icon>
-              <span class="text-caption">Sin miniatura</span>
+            <div v-else class="SummaryStep__placeholder">
+              <v-icon size="32" class="SummaryStep__icono-placeholder">mdi-video-outline</v-icon>
+              <span class="SummaryStep__texto-placeholder">Sin miniatura</span>
             </div>
-          </v-col>
+          </div>
           
-          <v-col cols="12" sm="8" md="9">
-            <h3 class="text-h6 mb-2">{{ videoDetails.title || 'Sin título' }}</h3>
-            <p class="text-body-2 text-grey mb-2">
+          <div class="SummaryStep__detalles">
+            <h3 class="SummaryStep__titulo-video">{{ videoDetails.title || 'Sin título' }}</h3>
+            <p class="SummaryStep__info-archivo">
               {{ videoFile?.name }} | {{ videoFile ? formatFileSize(videoFile.size) : '' }}
             </p>
-            <p class="text-body-2">
+            <p class="SummaryStep__descripcion">
               {{ videoDetails.description || 'Sin descripción' }}
             </p>
-          </v-col>
-        </v-row>
+          </div>
+        </div>
         
-        <v-divider class="mb-4" />
+        <div class="SummaryStep__divider" />
         
-        <!-- Botón de publicación -->
-        <div class="text-center">
+        <div class="SummaryStep__acciones">
           <v-btn 
             color="primary" 
             size="large"
             block
-            class="mb-2" 
+            class="SummaryStep__boton" 
             @click="handleUpload" 
             :disabled="!isReadyToUpload || uploading"
             :loading="uploading"
           >
-            <v-icon v-if="!uploading" class="me-2">mdi-cloud-upload</v-icon>
+            <v-icon v-if="!uploading" class="SummaryStep__icono-boton">mdi-cloud-upload</v-icon>
             {{ uploading ? 'Publicando video...' : 'Publicar video' }}
           </v-btn>
           
-          <p class="text-caption text-grey">
+          <p class="SummaryStep__nota">
             Al publicar, tu video estará disponible para los estudiantes
           </p>
         </div>
@@ -102,15 +99,6 @@ onBeforeUnmount(() => {
   </div>
 </template>
 
-<style scoped>
-.thumbnail-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 120px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  color: #666;
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/SubirVideo/steps/paso3Resumen";
 </style>

@@ -1,17 +1,13 @@
 <script setup lang="ts">
-// --------------------------- Imports ---------------------------
 import { ref } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import UserAvatar from '@/components/UserAvatar.vue';
 
-// --------------------------- Variables ---------------------------
 const searchQuery = ref('');
 const usuarioStore = useUsuarioLogeadoStore();
 
-// --------------------------- Emits ---------------------------
 const emit = defineEmits(['toggle-sidebar', 'update-search']);
 
-// --------------------------- Métodos ---------------------------
 const toggleSidebar = () => {
   emit('toggle-sidebar');
 };
@@ -23,18 +19,15 @@ const updateSearch = () => {
 
 <template>
   <v-app-bar app color="white" elevation="1" class="Header">
-    <!-- Botón para abrir el sidebar -->
-    <v-btn icon @click="toggleSidebar" class="Header__BtnMenu">
+    <v-btn icon @click="toggleSidebar" class="Header__btn-menu">
       <v-icon>mdi-menu</v-icon>
     </v-btn>
     
-    <!-- Logo -->
-    <div class="Header__Logo">
-      <v-icon color="orange" size="x-large" class="mr-2">mdi-play-box</v-icon>
-      <span class="text-h6 font-weight-bold">AcademIQ Play</span>
+    <div class="Header__logo">
+      <v-icon color="orange" size="x-large" class="Header__icono">mdi-play-box</v-icon>
+      <span class="Header__texto">AcademIQ Play</span>
     </div>
     
-    <!-- Buscador -->
     <v-text-field
       v-model="searchQuery"
       density="compact"
@@ -44,9 +37,9 @@ const updateSearch = () => {
       append-inner-icon="mdi-magnify"
       @click:append-inner="updateSearch"
       @keyup.enter="updateSearch"
-      class="Header__Buscador"
+      class="Header__buscador"
       bg-color="grey-lighten-4"
-    ></v-text-field>
+    />
     
     <!-- Spacer para empujar el avatar al extremo derecho -->
     <v-spacer></v-spacer>

@@ -1,0 +1,77 @@
+.AsignaturaCrear {
+  padding: 1rem;
+  margin-top: 1.5rem;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
+
+  &__Card {
+    max-width: 100%;
+    margin: 0 auto;
+    elevation: 3;
+
+    @media (min-width: 768px) {
+      max-width: 700px;
+      margin: 2rem auto;
+    }
+  }
+
+  &__Header {
+    background: linear-gradient(135deg, #1976d2, #0d47a1);
+    color: white;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+
+    @media (min-width: 768px) {
+      padding: 1.5rem;
+    }
+  }
+
+  &__Icon {
+    margin-right: 0.75rem;
+    color: white;
+  }
+
+  &__Title {
+    font-size: 1.25rem;
+    font-weight: 500;
+
+    @media (min-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__Content {
+    padding: 1.5rem;
+
+    @media (min-width: 768px) {
+      padding: 2rem;
+    }
+  }
+
+  &__Alert {
+    margin-bottom: 1rem;
+  }
+
+  &__Input {
+    margin-bottom: 1rem;
+  }
+
+  &__Actions {
+    padding-top: 1rem;
+  }
+
+  &__Button {
+    text-transform: none;
+  }
+
+  &__Footer {
+    background-color: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.875rem;
+  }
+}

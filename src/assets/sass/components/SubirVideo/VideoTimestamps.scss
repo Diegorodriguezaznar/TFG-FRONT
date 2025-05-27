@@ -1,0 +1,117 @@
+.VideoTimestamps {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+
+  @media (min-width: 768px) {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+  }
+
+  &__header {
+    margin-bottom: 1rem;
+  }
+
+  &__titulo {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+
+    @media (min-width: 768px) {
+      font-size: 1.125rem;
+    }
+  }
+
+  &__icono {
+    margin-right: 0.5rem;
+  }
+
+  &__vacio {
+    text-align: center;
+    padding: 1rem;
+  }
+
+  &__texto-vacio {
+    color: #888;
+    font-style: italic;
+    margin: 0;
+    font-size: 0.875rem;
+
+    @media (min-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+
+  &__lista {
+    max-height: 300px;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #ddd;
+      border-radius: 10px;
+
+      &:hover {
+        background: #ccc;
+      }
+    }
+  }
+
+  &__item {
+    display: flex;
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-left: 3px solid transparent;
+
+    @media (min-width: 768px) {
+      padding: 0.625rem;
+    }
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+
+    &--activo {
+      background-color: rgba(255, 152, 0, 0.1);
+      border-left: 3px solid #FF9800;
+    }
+  }
+
+  &__tiempo {
+    min-width: 60px;
+    font-weight: 700;
+    color: #FF9800;
+    font-size: 0.875rem;
+
+    @media (min-width: 768px) {
+      min-width: 70px;
+      font-size: 1rem;
+    }
+  }
+
+  &__nombre {
+    font-weight: 500;
+    flex-grow: 1;
+    font-size: 0.875rem;
+
+    @media (min-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+}

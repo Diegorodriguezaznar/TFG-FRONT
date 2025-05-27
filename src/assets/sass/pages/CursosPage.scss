@@ -1,0 +1,70 @@
+.CursosPage {
+  min-height: calc(100vh - 64px - 64px);
+  background-color: #f5f7fa;
+  padding-bottom: 1rem;
+
+  @media (min-width: 768px) {
+    padding-bottom: 1.5rem;
+  }
+
+  &__Breadcrumb {
+    background-color: transparent;
+    padding: 0.5rem 1rem 0;
+
+    @media (min-width: 768px) {
+      padding: 1rem 1.5rem 0;
+    }
+  }
+
+  &__Container {
+    max-width: 100%;
+    padding: 0 1rem;
+
+    @media (min-width: 768px) {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+  }
+
+  &__Header {
+    text-align: center;
+    padding: 1rem 0 1.5rem;
+
+    @media (min-width: 768px) {
+      padding: 1.5rem 0 2.5rem;
+    }
+  }
+
+  &__Title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    margin-top: 1.5rem;
+    background: linear-gradient(90deg, #3f51b5 0%, #2196f3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    @media (min-width: 600px) {
+      font-size: 2rem;
+    }
+
+    @media (min-width: 960px) {
+      font-size: 2.5rem;
+    }
+  }
+
+
+  &__Content {
+    padding-top: 1rem;
+  }
+
+  &__Grid {
+    width: 100%;
+    padding: 0;
+  }
+
+  &__GridItem {
+    display: flex;
+  }
+}

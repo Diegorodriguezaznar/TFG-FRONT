@@ -1,16 +1,22 @@
+<!-- src/views/CrearQuizPage.vue - Refactorizado con componentes -->
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useQuizStore } from '@/stores/Quiz';
 import { usePreguntaStore } from '@/stores/Pregunta';
 import { useRespuestaStore } from '@/stores/Respuesta';
 import { useAsignaturaStore } from '@/stores/Asignaturas';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import type { PreguntaDTO } from '@/stores/dtos/PreguntaDTO';
-import type { RespuestaDTO } from '@/stores/dtos/RespuestaDTO';
+
+// Componentes
+import QuizStepper from '@/components/CrearQuiz/QuizStepper.vue';
+import QuizInfo from '@/components/CrearQuiz/QuizInfo.vue';
+import PreguntasQuiz from '@/components/CrearQuiz/PreguntasQuiz.vue';
+import VistaPrevia from '@/components/CrearQuiz/VistaPrevia.vue';
 
 // Stores y router
 const router = useRouter();
+const route = useRoute();
 const quizStore = useQuizStore();
 const preguntaStore = usePreguntaStore();
 const respuestaStore = useRespuestaStore();
@@ -20,27 +26,35 @@ const usuarioStore = useUsuarioLogeadoStore();
 // Variables reactivas
 const loading = ref(false);
 const currentStep = ref(0);
-const showPreview = ref(false);
+
+// Detectar curso actual
+const cursoActual = computed(() => {
+  if (route.query.curso) {
+    return Number(route.query.curso);
+  }
+  return null;
+});
 
 // Datos del quiz
 const quizData = ref({
   nombre: '',
   descripcion: '',
   idAsignatura: null,
+  idCurso: cursoActual.value,
   idUsuario: null
 });
 
-// Interfaz para preguntas en creación
-interface PreguntaCreacion {
-  id: string;
-  descripcion: string;
-  respuestas: RespuestaCreacion[];
-}
-
+// Interfaces
 interface RespuestaCreacion {
   id: string;
   texto: string;
   esCorrecta: boolean;
+}
+
+interface PreguntaCreacion {
+  id: string;
+  descripcion: string;
+  respuestas: RespuestaCreacion[];
 }
 
 const preguntas = ref<PreguntaCreacion[]>([]);
@@ -57,10 +71,17 @@ const usuarioActual = computed(() => usuarioStore.usuarioActual);
 
 const puedeCrearQuiz = computed(() => {
   const rol = usuarioActual.value?.idRol;
-  return rol === 2 || rol === 3; // Solo profesores y gestores
+  return rol === 2 || rol === 3;
 });
 
-const asignaturas = computed(() => asignaturaStore.asignaturas);
+const asignaturas = computed(() => {
+  if (cursoActual.value) {
+    return asignaturaStore.asignaturas.filter(asignatura => 
+      asignatura.idCurso === cursoActual.value
+    );
+  }
+  return asignaturaStore.asignaturas;
+});
 
 const pasos = computed(() => [
   { titulo: 'Información', icono: 'mdi-information', completado: validarPaso1() },
@@ -98,7 +119,7 @@ function limpiarErrores() {
   };
 }
 
-// Métodos de navegación
+// Navegación entre pasos
 function siguientePaso() {
   limpiarErrores();
   
@@ -132,7 +153,7 @@ function irAlPaso(paso: number) {
   currentStep.value = paso;
 }
 
-// Métodos para manejo de preguntas
+// Manejo de preguntas
 function agregarPregunta() {
   const nuevaPregunta: PreguntaCreacion = {
     id: `pregunta_${Date.now()}`, 
@@ -145,34 +166,7 @@ function agregarPregunta() {
   preguntas.value.push(nuevaPregunta);
 }
 
-function eliminarPregunta(index: number) {
-  preguntas.value.splice(index, 1);
-}
-
-function agregarRespuesta(preguntaIndex: number) {
-  if (preguntas.value[preguntaIndex].respuestas.length < 4) {
-    preguntas.value[preguntaIndex].respuestas.push({
-      id: `resp_${Date.now()}`,
-      texto: '',
-      esCorrecta: false
-    });
-  }
-}
-
-function eliminarRespuesta(preguntaIndex: number, respuestaIndex: number) {
-  if (preguntas.value[preguntaIndex].respuestas.length > 2) {
-    preguntas.value[preguntaIndex].respuestas.splice(respuestaIndex, 1);
-  }
-}
-
-function toggleRespuestaCorrecta(preguntaIndex: number, respuestaIndex: number) {
-  // Primero marcar todas como incorrectas
-  preguntas.value[preguntaIndex].respuestas.forEach(r => r.esCorrecta = false);
-  // Luego marcar la seleccionada como correcta
-  preguntas.value[preguntaIndex].respuestas[respuestaIndex].esCorrecta = true;
-}
-
-// Guardar quiz - MEJORADO con logs detallados y mejor manejo de errores
+// Guardar quiz
 async function guardarQuiz() {
   if (!usuarioActual.value || !puedeGuardar.value) {
     alert('No se puede guardar el quiz. Verifica que hayas completado todos los campos.');
@@ -184,236 +178,115 @@ async function guardarQuiz() {
   
   try {
     console.log('=== INICIANDO CREACIÓN DE QUIZ ===');
-    console.log('Usuario actual:', usuarioActual.value);
-    console.log('Datos del quiz:', quizData.value);
-    console.log('Preguntas válidas:', preguntasValidas.value.length);
     
-    // Mostrar todas las preguntas que se van a crear
-    preguntasValidas.value.forEach((pregunta, index) => {
-      console.log(`Pregunta ${index + 1}:`, {
-        descripcion: pregunta.descripcion,
-        respuestas: pregunta.respuestas.map(r => ({
-          texto: r.texto,
-          esCorrecta: r.esCorrecta
-        }))
-      });
-    });
-
     // 1. Crear el quiz
-    console.log('Paso 1: Creando quiz...');
-    
-    // Preparar datos del quiz con validación extra
     const datosNuevoQuiz = {
       nombre: quizData.value.nombre,
       descripcion: quizData.value.descripcion || '',
       idAsignatura: quizData.value.idAsignatura!,
+      idCurso: quizData.value.idCurso,
       idUsuario: usuarioActual.value.idUsuario
     };
-    
-    console.log('📋 Datos a enviar para crear quiz:', datosNuevoQuiz);
     
     quizCreado = await quizStore.createQuiz(datosNuevoQuiz);
 
     if (!quizCreado) {
-      console.error('❌ No se recibió respuesta del servidor al crear quiz');
-      console.error('📋 Datos enviados:', datosNuevoQuiz);
-      throw new Error('No se pudo crear el quiz. Verifica que todos los campos estén completos y que el endpoint /api/quiz esté funcionando correctamente.');
+      throw new Error('No se pudo crear el quiz.');
     }
 
-    console.log('✅ Quiz creado exitosamente:', quizCreado);
-    
-    // El servidor retorna { mensaje: '', quiz: { ... } }, necesitamos extraer el quiz
     const quiz = quizCreado.quiz || quizCreado;
     
-    // Validar que el quiz tenga un ID válido
     if (!quiz || !quiz.idQuiz) {
-      console.error('❌ El quiz creado no tiene idQuiz:', {
-        respuestaCompleta: quizCreado,
-        quizExtraido: quiz,
-        tieneQuiz: !!quizCreado.quiz,
-        tieneIdQuiz: !!(quiz && quiz.idQuiz)
-      });
-      throw new Error('El quiz se creó pero no se recibió un ID válido. Revisa la respuesta del servidor.');
+      throw new Error('El quiz se creó pero no se recibió un ID válido.');
     }
-    
-    console.log('🔍 Validando ID del quiz:', {
-      idQuiz: quiz.idQuiz,
-      tipo: typeof quiz.idQuiz,
-      esNumero: Number.isInteger(quiz.idQuiz),
-      valor: quiz.idQuiz,
-      quizCompleto: quiz
-    });
 
-    // 2. Crear las preguntas una por una
-    console.log('Paso 2: Creando preguntas...');
+    // 2. Crear preguntas y respuestas
     const preguntasCreadas = [];
     
     for (let i = 0; i < preguntasValidas.value.length; i++) {
       const pregunta = preguntasValidas.value[i];
-      console.log(`📝 Creando pregunta ${i + 1}/${preguntasValidas.value.length}:`, pregunta.descripcion);
       
-      // Preparar datos de la pregunta con validación extra
       const datosNuevaPregunta = {
         descripcion: pregunta.descripcion,
         orden: i + 1,
-        idQuiz: quiz.idQuiz  // Usar quiz.idQuiz en lugar de quizCreado.idQuiz
+        idQuiz: quiz.idQuiz
       };
       
-      console.log('📋 Datos a enviar para crear pregunta:', datosNuevaPregunta);
-      
-      try {
-        const nuevaPregunta = await preguntaStore.createPregunta(datosNuevaPregunta);
+      const nuevaPregunta = await preguntaStore.createPregunta(datosNuevaPregunta);
 
-        if (!nuevaPregunta) {
-          console.error('❌ No se recibió respuesta del servidor al crear pregunta');
-          console.error('📋 Datos enviados:', datosNuevaPregunta);
-          throw new Error(`No se recibió respuesta al crear la pregunta "${pregunta.descripcion}". Verifica que el endpoint /api/pregunta esté funcionando correctamente.`);
-        }
+      if (!nuevaPregunta || !nuevaPregunta.idPregunta) {
+        throw new Error(`No se pudo crear la pregunta "${pregunta.descripcion}".`);
+      }
+
+      preguntasCreadas.push(nuevaPregunta);
+
+      // Crear respuestas
+      for (let j = 0; j < pregunta.respuestas.length; j++) {
+        const respuesta = pregunta.respuestas[j];
         
-        // Validar que la pregunta tenga un ID válido
-        if (!nuevaPregunta.idPregunta) {
-          console.error('❌ La pregunta creada no tiene idPregunta:', nuevaPregunta);
-          throw new Error(`La pregunta "${pregunta.descripcion}" se creó pero no se recibió un ID válido.`);
-        }
-
-        console.log(`✅ Pregunta ${i + 1} creada exitosamente:`, nuevaPregunta);
-        preguntasCreadas.push(nuevaPregunta);
-
-        // 3. Crear las respuestas para esta pregunta
-        console.log(`📋 Creando ${pregunta.respuestas.length} respuestas para la pregunta ${i + 1}...`);
+        const datosNuevaRespuesta = {
+          texto: respuesta.texto,
+          esCorrecta: respuesta.esCorrecta,
+          orden: j + 1,
+          idPregunta: nuevaPregunta.idPregunta
+        };
         
-        for (let j = 0; j < pregunta.respuestas.length; j++) {
-          const respuesta = pregunta.respuestas[j];
-          
-          // Preparar datos de la respuesta con validación extra
-          const datosNuevaRespuesta = {
-            texto: respuesta.texto,
-            esCorrecta: respuesta.esCorrecta,
-            orden: j + 1,
-            idPregunta: nuevaPregunta.idPregunta
-          };
-          
-          console.log(`  ➤ Creando respuesta ${j + 1}/${pregunta.respuestas.length}:`, datosNuevaRespuesta);
-          
-          try {
-            const nuevaRespuesta = await respuestaStore.createRespuesta(datosNuevaRespuesta);
+        const nuevaRespuesta = await respuestaStore.createRespuesta(datosNuevaRespuesta);
 
-            if (!nuevaRespuesta) {
-              console.error('❌ No se recibió respuesta del servidor al crear respuesta');
-              console.error('📋 Datos enviados:', datosNuevaRespuesta);
-              throw new Error(`No se recibió respuesta al crear la respuesta "${respuesta.texto}". Verifica que el endpoint /api/respuesta esté funcionando correctamente.`);
-            }
-
-            console.log(`    ✅ Respuesta ${j + 1} creada:`, nuevaRespuesta);
-          } catch (respuestaError: any) {
-            console.error(`    ❌ Error al crear respuesta ${j + 1}:`, respuestaError);
-            throw new Error(`Error al crear la respuesta ${j + 1} ("${respuesta.texto}") de la pregunta ${i + 1}: ${respuestaError.message}`);
-          }
+        if (!nuevaRespuesta) {
+          throw new Error(`No se pudo crear la respuesta "${respuesta.texto}".`);
         }
-
-        console.log(`✅ Todas las respuestas de la pregunta ${i + 1} creadas exitosamente`);
-
-      } catch (preguntaError: any) {
-        console.error(`❌ Error al crear pregunta ${i + 1}:`, preguntaError);
-        throw new Error(`Error al crear la pregunta ${i + 1} ("${pregunta.descripcion}"): ${preguntaError.message}`);
       }
     }
 
     console.log('🎉 === QUIZ CREADO EXITOSAMENTE ===');
-    console.log('📊 Resumen:');
-    console.log('  - Quiz ID:', quiz.idQuiz);
-    console.log('  - Nombre:', quiz.nombre || quizData.value.nombre);
-    console.log('  - Preguntas creadas:', preguntasCreadas.length);
-    console.log('  - Total respuestas:', preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0));
-
-    // Éxito - mostrar alert y redirigir
-    alert(`🎉 ¡Quiz "${quizData.value.nombre}" creado exitosamente!\n\n📊 Resumen:\n• ${preguntasCreadas.length} preguntas creadas\n• ${preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0)} respuestas añadidas`);
     
-    // Limpiar formulario antes de redirigir
-    quizData.value = {
-      nombre: '',
-      descripcion: '',
-      idAsignatura: null,
-      idUsuario: usuarioActual.value?.idUsuario || null
-    };
-    preguntas.value = [];
+    const mensaje = cursoActual.value 
+      ? `¡Quiz "${quizData.value.nombre}" creado exitosamente para el curso ${cursoActual.value}!`
+      : `¡Quiz "${quizData.value.nombre}" creado exitosamente!`;
     
-    router.push('/quizz-time!');
+    alert(`🎉 ${mensaje}\n\n📊 Resumen:\n• ${preguntasCreadas.length} preguntas creadas\n• ${preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0)} respuestas añadidas`);
+    
+    // Limpiar y redirigir
+    resetForm();
+    
+    if (cursoActual.value) {
+      router.push(`/quizz-time!?curso=${cursoActual.value}`);
+    } else {
+      router.push('/quizz-time!');
+    }
 
   } catch (error: any) {
-    console.error('💥 === ERROR AL CREAR QUIZ ===');
-    console.error('Error completo:', error);
-    console.error('Stack trace:', error.stack);
-    console.error('Quiz creado antes del error:', quizCreado);
-
-    // Determinar mensaje de error específico
-    let mensaje = 'Error desconocido al crear el quiz';
-    let sugerencia = '';
-    
-    if (error.message.includes('ID de quiz inválido')) {
-      mensaje = '🆔 Error de ID de Quiz: El ID del quiz no es válido';
-      sugerencia = '• El quiz se creó correctamente pero su ID no es válido\n• Verifica que el endpoint /api/quiz retorne un idQuiz válido\n• Revisa que el campo idQuiz en la base de datos sea auto-increment\n• Comprueba los logs del servidor backend';
-    } else if (error.message.includes('Failed to fetch') || error.message.includes('Network')) {
-      mensaje = '🌐 Error de conexión: No se pudo conectar con el servidor';
-      sugerencia = '• Verifica que el backend esté funcionando en http://localhost:5190\n• Revisa tu conexión a internet';
-    } else if (error.message.includes('500') || error.message.includes('Internal Server Error')) {
-      mensaje = '🔧 Error del servidor (500): Problema interno del backend';
-      sugerencia = '• Revisa los logs del servidor backend\n• Verifica que la base de datos esté configurada correctamente\n• Comprueba que las tablas de preguntas y respuestas existan';
-    } else if (error.message.includes('404')) {
-      mensaje = '🔍 Error 404: Endpoint no encontrado';
-      sugerencia = '• Verifica que las rutas /api/pregunta y /api/respuesta estén configuradas\n• Comprueba la URL del backend';
-    } else if (error.message.includes('400') || error.message.includes('Bad Request')) {
-      mensaje = '📝 Error de validación: Datos incorrectos enviados al servidor';
-      sugerencia = '• Revisa que todos los campos estén completos\n• Verifica que las validaciones del backend sean correctas';
-    } else if (error.message.includes('pregunta')) {
-      mensaje = `📝 Error al crear preguntas: ${error.message}`;
-      sugerencia = '• Verifica que el endpoint /api/pregunta funcione correctamente\n• Revisa los logs del servidor';
-    } else if (error.message.includes('respuesta')) {
-      mensaje = `📋 Error al crear respuestas: ${error.message}`;
-      sugerencia = '• Verifica que el endpoint /api/respuesta funcione correctamente\n• Asegúrate de que cada pregunta tenga una respuesta correcta';
-    } else if (error.message.includes('quiz')) {
-      mensaje = `🎯 Error al crear el quiz: ${error.message}`;
-      sugerencia = '• Verifica que el endpoint /api/quiz funcione correctamente';
-    } else {
-      mensaje = error.message || mensaje;
-      sugerencia = '• Revisa la consola del navegador para más detalles\n• Contacta al administrador del sistema';
-    }
-
-    // Mostrar error detallado
-    const errorCompleto = `❌ ${mensaje}\n\n💡 Sugerencias:\n${sugerencia}\n\n🔍 Revisa la consola del navegador (F12) para más información técnica.`;
-    alert(errorCompleto);
-
-    // Si se creó el quiz pero falló después, informar al usuario
-    if (quizCreado) {
-      console.warn('⚠️ ATENCIÓN: El quiz se creó pero falló al agregar preguntas/respuestas');
-      const quiz = quizCreado.quiz || quizCreado;
-      const quizId = quiz.idQuiz || 'ID desconocido';
-      const mensajeRecuperacion = `⚠️ IMPORTANTE:\n\nEl quiz "${quizData.value.nombre}" se creó exitosamente (ID: ${quizId}), pero falló al agregar las preguntas.\n\n✅ Puedes:\n• Intentar crear las preguntas manualmente\n• Eliminar el quiz incompleto desde el panel de administración\n• Contactar al administrador del sistema`;
-      alert(mensajeRecuperacion);
-    }
+    console.error('💥 === ERROR AL CREAR QUIZ ===', error);
+    alert(`❌ Error al crear el quiz: ${error.message}`);
   } finally {
     loading.value = false;
   }
 }
 
+// Resetear formulario
+function resetForm() {
+  quizData.value = {
+    nombre: '',
+    descripcion: '',
+    idAsignatura: null,
+    idCurso: cursoActual.value,
+    idUsuario: usuarioActual.value?.idUsuario || null
+  };
+  preguntas.value = [];
+  currentStep.value = 0;
+  limpiarErrores();
+}
+
 // Cancelar creación
 function cancelarCreacion() {
   if (confirm('¿Estás seguro de que quieres cancelar? Se perderán todos los cambios.')) {
-    router.push('/quizz-time!');
+    if (cursoActual.value) {
+      router.push(`/quizz-time!?curso=${cursoActual.value}`);
+    } else {
+      router.push('/quizz-time!');
+    }
   }
-}
-
-// Variables reactivas adicionales
-const preguntaExpandida = ref<number[]>([0]);
-
-// Método para validar pregunta individual
-function validarPregunta(pregunta: PreguntaCreacion): boolean {
-  return !!(
-    pregunta.descripcion.trim() && 
-    pregunta.respuestas.length >= 2 && 
-    pregunta.respuestas.every(r => r.texto.trim()) &&
-    pregunta.respuestas.some(r => r.esCorrecta)
-  );
 }
 
 // Lifecycle
@@ -433,7 +306,14 @@ onMounted(async () => {
     quizData.value.idUsuario = usuarioActual.value.idUsuario;
   }
 
-  // Agregar primera pregunta por defecto
+  // Verificar si hay asignaturas para el curso
+  if (cursoActual.value && asignaturas.value.length === 0) {
+    alert(`No hay asignaturas disponibles para este curso (${cursoActual.value}). Contacta al administrador.`);
+    router.push(`/curso/${cursoActual.value}`);
+    return;
+  }
+
+  // Agregar primera pregunta
   agregarPregunta();
 });
 </script>
@@ -447,7 +327,7 @@ onMounted(async () => {
       </v-btn>
       
       <v-app-bar-title class="text-h6 font-weight-bold">
-        Crear Nuevo Quiz
+        {{ cursoActual ? `Crear Quiz - Curso ${cursoActual}` : 'Crear Nuevo Quiz' }}
       </v-app-bar-title>
       
       <v-spacer></v-spacer>
@@ -467,317 +347,53 @@ onMounted(async () => {
     <!-- Contenido principal -->
     <v-main class="CrearQuizPage">
       <v-container class="CrearQuizPage__Container">
-        <!-- Stepper de pasos -->
-        <v-card class="CrearQuizPage__Stepper mb-6" elevation="3">
-          <v-card-text class="pa-6">
-            <div class="d-flex justify-space-between align-center">
-              <div
-                v-for="(paso, index) in pasos"
-                :key="index"
-                class="CrearQuizPage__Step"
-                :class="{ 
-                  'CrearQuizPage__Step--active': index === currentStep,
-                  'CrearQuizPage__Step--completed': paso.completado
-                }"
-                @click="irAlPaso(index)"
-              >
-                <div class="CrearQuizPage__StepIcon">
-                  <v-icon
-                    :color="index === currentStep ? 'white' : paso.completado ? 'success' : 'grey'"
-                    :icon="paso.completado ? 'mdi-check' : paso.icono"
-                  ></v-icon>
-                </div>
-                <div class="CrearQuizPage__StepLabel">
-                  {{ paso.titulo }}
-                </div>
-                
-                <!-- Línea conectora -->
-                <div 
-                  v-if="index < pasos.length - 1"
-                  class="CrearQuizPage__StepConnector"
-                  :class="{ 'CrearQuizPage__StepConnector--active': paso.completado }"
-                ></div>
-              </div>
-            </div>
-          </v-card-text>
-        </v-card>
+        <!-- Indicador de curso -->
+        <v-alert
+          v-if="cursoActual"
+          type="info"
+          variant="tonal"
+          class="mb-6"
+        >
+          <v-icon start>mdi-book-open</v-icon>
+          <strong>Creando quiz para el Curso {{ cursoActual }}</strong>
+          <br>
+          <small>Solo se mostrarán las asignaturas de este curso</small>
+        </v-alert>
+
+        <!-- Stepper -->
+        <QuizStepper
+          :pasos="pasos"
+          :paso-actual="currentStep"
+          @ir-al-paso="irAlPaso"
+        />
 
         <!-- Contenido de los pasos -->
         <v-card class="CrearQuizPage__Content" elevation="3">
           <v-card-text class="pa-8">
-            <!-- Paso 1: Información del Quiz -->
-            <div v-if="currentStep === 0" class="CrearQuizPage__StepContent">
-              <h2 class="text-h4 font-weight-bold mb-6 text-center">
-                Información del Quiz
-              </h2>
-              
-              <v-row>
-                <v-col cols="12" md="8" offset-md="2">
-                  <v-text-field
-                    v-model="quizData.nombre"
-                    label="Nombre del Quiz *"
-                    variant="outlined"
-                    size="large"
-                    :error-messages="errores.nombre"
-                    hint="Elige un nombre descriptivo y atractivo"
-                    persistent-hint
-                    class="mb-4"
-                  ></v-text-field>
-                  
-                  <v-textarea
-                    v-model="quizData.descripcion"
-                    label="Descripción (opcional)"
-                    variant="outlined"
-                    rows="3"
-                    hint="Describe de qué trata este quiz"
-                    persistent-hint
-                    class="mb-4"
-                  ></v-textarea>
-                  
-                  <v-select
-                    v-model="quizData.idAsignatura"
-                    :items="asignaturas"
-                    item-title="nombre"
-                    item-value="idAsignatura"
-                    label="Asignatura *"
-                    variant="outlined"
-                    :error-messages="errores.asignatura"
-                    hint="Selecciona la materia correspondiente"
-                    persistent-hint
-                  ></v-select>
-                </v-col>
-              </v-row>
-            </div>
+            <!-- Paso 1: Información -->
+            <QuizInfo
+              v-if="currentStep === 0"
+              v-model:quiz-data="quizData"
+              :asignaturas="asignaturas"
+              :errores="errores"
+              :curso-actual="cursoActual"
+            />
 
-            <!-- Paso 2: Crear Preguntas -->
-            <div v-else-if="currentStep === 1" class="CrearQuizPage__StepContent">
-              <div class="d-flex align-center justify-space-between mb-6">
-                <h2 class="text-h4 font-weight-bold">
-                  Preguntas del Quiz
-                </h2>
-                <v-btn
-                  @click="agregarPregunta"
-                  :disabled="preguntas.length >= 20"
-                  color="orange"
-                  variant="elevated"
-                >
-                  <v-icon start>mdi-plus</v-icon>
-                  Agregar Pregunta
-                </v-btn>
-              </div>
-
-              <v-alert
-                v-if="errores.preguntas"
-                type="error"
-                variant="tonal"
-                class="mb-4"
-              >
-                {{ errores.preguntas }}
-              </v-alert>
-
-              <!-- Lista de preguntas -->
-              <div v-if="preguntas.length === 0" class="text-center py-12">
-                <v-icon color="grey" size="64" class="mb-4">mdi-help-circle-outline</v-icon>
-                <p class="text-h6 text-grey">No hay preguntas aún</p>
-                <v-btn @click="agregarPregunta" color="orange" variant="elevated" class="mt-4">
-                  <v-icon start>mdi-plus</v-icon>
-                  Crear Primera Pregunta
-                </v-btn>
-              </div>
-
-              <div v-else>
-                <v-expansion-panels
-                  v-model="preguntaExpandida"
-                  multiple
-                  class="CrearQuizPage__Questions"
-                >
-                  <v-expansion-panel
-                    v-for="(pregunta, preguntaIndex) in preguntas"
-                    :key="pregunta.id"
-                    class="CrearQuizPage__Question mb-4"
-                  >
-                    <v-expansion-panel-title>
-                      <div class="d-flex align-center">
-                        <v-chip color="orange" size="small" class="mr-3">
-                          {{ preguntaIndex + 1 }}
-                        </v-chip>
-                        <span class="font-weight-medium">
-                          {{ pregunta.descripcion || `Pregunta ${preguntaIndex + 1}` }}
-                        </span>
-                        <v-spacer></v-spacer>
-                        <v-chip
-                          :color="validarPregunta(pregunta) ? 'success' : 'error'"
-                          size="x-small"
-                          class="mr-2"
-                        >
-                          {{ validarPregunta(pregunta) ? 'Válida' : 'Incompleta' }}
-                        </v-chip>
-                      </div>
-                    </v-expansion-panel-title>
-
-                    <v-expansion-panel-text>
-                      <div class="pa-4">
-                        <!-- Texto de la pregunta -->
-                        <v-textarea
-                          v-model="pregunta.descripcion"
-                          label="Texto de la pregunta *"
-                          variant="outlined"
-                          rows="2"
-                          class="mb-4"
-                          hint="Escribe tu pregunta de forma clara y concisa"
-                          persistent-hint
-                        ></v-textarea>
-
-                        <!-- Respuestas -->
-                        <div class="mb-4">
-                          <div class="d-flex align-center justify-space-between mb-3">
-                            <h4 class="text-h6 font-weight-medium">Respuestas</h4>
-                            <v-btn
-                              @click="agregarRespuesta(preguntaIndex)"
-                              :disabled="pregunta.respuestas.length >= 4"
-                              color="info"
-                              size="small"
-                              variant="outlined"
-                            >
-                              <v-icon start size="small">mdi-plus</v-icon>
-                              Agregar
-                            </v-btn>
-                          </div>
-
-                          <v-row>
-                            <v-col
-                              v-for="(respuesta, respuestaIndex) in pregunta.respuestas"
-                              :key="respuesta.id"
-                              cols="12"
-                              md="6"
-                            >
-                              <v-card
-                                class="CrearQuizPage__Answer"
-                                :class="{ 'CrearQuizPage__Answer--correct': respuesta.esCorrecta }"
-                                variant="outlined"
-                              >
-                                <v-card-text class="pa-3">
-                                  <div class="d-flex align-center mb-2">
-                                    <v-radio-group
-                                      :model-value="respuesta.esCorrecta ? respuestaIndex : null"
-                                      @update:model-value="toggleRespuestaCorrecta(preguntaIndex, respuestaIndex)"
-                                      hide-details
-                                      class="ma-0 pa-0"
-                                    >
-                                      <v-radio
-                                        :value="respuestaIndex"
-                                        color="success"
-                                        density="compact"
-                                      >
-                                        <template v-slot:label>
-                                          <span class="text-caption">
-                                            {{ respuesta.esCorrecta ? 'Correcta' : 'Incorrecta' }}
-                                          </span>
-                                        </template>
-                                      </v-radio>
-                                    </v-radio-group>
-                                    
-                                    <v-spacer></v-spacer>
-                                    
-                                    <v-btn
-                                      v-if="pregunta.respuestas.length > 2"
-                                      @click="eliminarRespuesta(preguntaIndex, respuestaIndex)"
-                                      icon="mdi-delete"
-                                      size="x-small"
-                                      color="error"
-                                      variant="text"
-                                    ></v-btn>
-                                  </div>
-                                  
-                                  <v-text-field
-                                    v-model="respuesta.texto"
-                                    :label="`Respuesta ${respuestaIndex + 1} *`"
-                                    variant="outlined"
-                                    density="compact"
-                                    hide-details
-                                  ></v-text-field>
-                                </v-card-text>
-                              </v-card>
-                            </v-col>
-                          </v-row>
-                        </div>
-
-                        <!-- Eliminar pregunta -->
-                        <div class="text-center">
-                          <v-btn
-                            @click="eliminarPregunta(preguntaIndex)"
-                            color="error"
-                            variant="outlined"
-                            size="small"
-                          >
-                            <v-icon start>mdi-delete</v-icon>
-                            Eliminar Pregunta
-                          </v-btn>
-                        </div>
-                      </div>
-                    </v-expansion-panel-text>
-                  </v-expansion-panel>
-                </v-expansion-panels>
-              </div>
-            </div>
+            <!-- Paso 2: Preguntas -->
+            <PreguntasQuiz
+              v-else-if="currentStep === 1"
+              v-model:preguntas="preguntas"
+              :error-preguntas="errores.preguntas"
+              @agregar-pregunta="agregarPregunta"
+            />
 
             <!-- Paso 3: Vista Previa -->
-            <div v-else-if="currentStep === 2" class="CrearQuizPage__StepContent">
-              <h2 class="text-h4 font-weight-bold mb-6 text-center">
-                Vista Previa del Quiz
-              </h2>
-
-              <!-- Información del quiz -->
-              <v-card class="CrearQuizPage__Preview mb-6" elevation="2">
-                <v-card-text class="pa-6">
-                  <div class="text-center mb-4">
-                    <h3 class="text-h5 font-weight-bold mb-2">
-                      {{ quizData.nombre }}
-                    </h3>
-                    <p v-if="quizData.descripcion" class="text-body-1 mb-4">
-                      {{ quizData.descripcion }}
-                    </p>
-                    <v-chip color="orange" size="large">
-                      {{ preguntasValidas.length }} preguntas
-                    </v-chip>
-                  </div>
-                </v-card-text>
-              </v-card>
-
-              <!-- Preview de preguntas -->
-              <div v-for="(pregunta, index) in preguntasValidas" :key="pregunta.id" class="mb-4">
-                <v-card class="CrearQuizPage__PreviewQuestion" elevation="1">
-                  <v-card-text class="pa-6">
-                    <div class="d-flex align-center mb-4">
-                      <v-chip color="orange" size="small" class="mr-3">
-                        {{ index + 1 }}
-                      </v-chip>
-                      <span class="text-h6 font-weight-medium">
-                        {{ pregunta.descripcion }}
-                      </span>
-                    </div>
-
-                    <v-radio-group disabled>
-                      <v-radio
-                        v-for="respuesta in pregunta.respuestas"
-                        :key="respuesta.id"
-                        :value="respuesta.id"
-                        :color="respuesta.esCorrecta ? 'success' : 'default'"
-                      >
-                        <template v-slot:label>
-                          <span :class="{ 'font-weight-bold success--text': respuesta.esCorrecta }">
-                            {{ respuesta.texto }}
-                            <v-icon v-if="respuesta.esCorrecta" color="success" size="small" class="ml-1">
-                              mdi-check
-                            </v-icon>
-                          </span>
-                        </template>
-                      </v-radio>
-                    </v-radio-group>
-                  </v-card-text>
-                </v-card>
-              </div>
-            </div>
+            <VistaPrevia
+              v-else-if="currentStep === 2"
+              :quiz-data="quizData"
+              :preguntas-validas="preguntasValidas"
+              :curso-actual="cursoActual"
+            />
           </v-card-text>
 
           <!-- Botones de navegación -->
@@ -821,116 +437,7 @@ onMounted(async () => {
   max-width: 1200px;
 }
 
-.CrearQuizPage__Stepper {
-  border-radius: 16px;
-}
-
-.CrearQuizPage__Step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.CrearQuizPage__StepIcon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #f5f5f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-
-.CrearQuizPage__Step--active .CrearQuizPage__StepIcon {
-  background: #FF6B35;
-  color: white;
-  transform: scale(1.1);
-}
-
-.CrearQuizPage__Step--completed .CrearQuizPage__StepIcon {
-  background: #4CAF50;
-  color: white;
-}
-
-.CrearQuizPage__StepLabel {
-  font-weight: 500;
-  font-size: 0.875rem;
-  color: #666;
-  transition: color 0.3s ease;
-}
-
-.CrearQuizPage__Step--active .CrearQuizPage__StepLabel {
-  color: #FF6B35;
-  font-weight: 600;
-}
-
-.CrearQuizPage__StepConnector {
-  position: absolute;
-  top: 24px;
-  left: 60px;
-  width: calc(100% - 48px);
-  height: 2px;
-  background: #e0e0e0;
-  transition: background 0.3s ease;
-}
-
-.CrearQuizPage__StepConnector--active {
-  background: #4CAF50;
-}
-
 .CrearQuizPage__Content {
   border-radius: 16px;
-}
-
-.CrearQuizPage__Questions {
-  gap: 16px;
-}
-
-.CrearQuizPage__Question {
-  border-radius: 12px;
-  border: 1px solid rgba(255, 107, 53, 0.2);
-}
-
-.CrearQuizPage__Answer {
-  transition: all 0.2s ease;
-}
-
-.CrearQuizPage__Answer--correct {
-  border-color: #4CAF50 !important;
-  background: rgba(76, 175, 80, 0.05);
-}
-
-.CrearQuizPage__Preview {
-  border-radius: 16px;
-}
-
-.CrearQuizPage__PreviewQuestion {
-  border-radius: 12px;
-  border: 1px solid rgba(255, 107, 53, 0.1);
-}
-
-@media (max-width: 600px) {
-  .CrearQuizPage__Container {
-    padding: 16px;
-  }
-  
-  .CrearQuizPage__Step {
-    margin: 0 8px;
-  }
-  
-  .CrearQuizPage__StepIcon {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .CrearQuizPage__StepLabel {
-    font-size: 0.75rem;
-  }
 }
 </style>

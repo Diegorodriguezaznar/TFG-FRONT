@@ -5,6 +5,6 @@
 </template>
 
 <style lang="scss" scoped>
-@import "@/assets/sass/layout/Footer.scss";
+@import "@/assets/sass/layout/Footer";
 </style>
   

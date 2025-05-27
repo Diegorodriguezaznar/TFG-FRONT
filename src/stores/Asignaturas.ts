@@ -4,23 +4,19 @@ import type { AsignaturaDTO } from "@/stores/dtos/AsignaturasDTO";
 import type { AsignaturaCrearDTO } from "@/stores/dtos/AsignaturaCrearDTO";
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
-
 export const useAsignaturaStore = defineStore("asignatura", () => {
-  // --------------------------- Estado ---------------------------
   const asignaturas = ref<AsignaturaDTO[]>([]);
   const errorMessage = ref<string>("");
   const isLoading = ref<boolean>(false);
   const successMessage = ref<string>("");
 
-  // --------------------------- Métodos de gestión de mensajes ---------------------------
-  // Limpiar mensajes
+  // Limpiar mensajes de error y éxito
   function clearMessages() {
     errorMessage.value = "";
     successMessage.value = "";
   }
 
-  // --------------------------- Métodos de Fetch ---------------------------
-  // Obtener todas las asignaturas
+  // todo GET - Obtener todas las asignaturas
   async function fetchAllAsignaturas() {
     isLoading.value = true;
     clearMessages();
@@ -28,17 +24,15 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     try {
       const response = await fetch("http://localhost:5190/api/Asignatura");
       if (!response.ok) throw new Error("Error al obtener todas las asignaturas");
-
       asignaturas.value = await response.json();
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al obtener todas las asignaturas:", error);
     } finally {
       isLoading.value = false;
     }
   }
 
-  // Obtener asignaturas por curso
+  // GET - Obtener asignaturas por curso
   async function fetchAsignaturasByCurso(idCurso: number) {
     isLoading.value = true;
     clearMessages();
@@ -46,17 +40,15 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     try {
       const response = await fetch(`http://localhost:5190/api/Asignatura/curso/${idCurso}`);
       if (!response.ok) throw new Error("Error al obtener las asignaturas del curso");
-
       asignaturas.value = await response.json();
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al obtener asignaturas del curso:", error);
     } finally {
       isLoading.value = false;
     }
   }
 
-  // Obtener una asignatura por ID
+  // GET - Obtener asignatura por ID
   async function fetchAsignaturaById(idAsignatura: number): Promise<AsignaturaDTO | null> {
     isLoading.value = true;
     clearMessages();
@@ -64,19 +56,16 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     try {
       const response = await fetch(`http://localhost:5190/api/Asignatura/${idAsignatura}`);
       if (!response.ok) throw new Error("Error al obtener la asignatura");
-
       return await response.json();
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al obtener la asignatura:", error);
       return null;
     } finally {
       isLoading.value = false;
     }
   }
 
-  // --------------------------- Métodos de modificación de asignaturas ---------------------------
-
+  // POST - Crear asignatura
   async function createAsignatura(nuevaAsignatura: AsignaturaCrearDTO): Promise<boolean> {
     isLoading.value = true;
     clearMessages();
@@ -108,16 +97,13 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
       return true;
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al crear la asignatura:", error);
       return false;
     } finally {
       isLoading.value = false;
     }
   }
 
-
-
-  // Actualizar una asignatura existente
+  // PUT - Actualizar asignatura
   async function updateAsignatura(asignatura: AsignaturaDTO): Promise<boolean> {
     isLoading.value = true;
     clearMessages();
@@ -133,7 +119,6 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
 
       if (!response.ok) throw new Error("Error al actualizar la asignatura");
 
-      // Actualizar la asignatura en el array local
       const index = asignaturas.value.findIndex(a => a.idAsignatura === asignatura.idAsignatura);
       if (index !== -1) {
         asignaturas.value[index] = asignatura;
@@ -143,14 +128,13 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
       return true;
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al actualizar la asignatura:", error);
       return false;
     } finally {
       isLoading.value = false;
     }
   }
 
-  // Eliminar una asignatura
+  // DELETE - Eliminar asignatura
   async function deleteAsignatura(idAsignatura: number): Promise<boolean> {
     isLoading.value = true;
     clearMessages();
@@ -162,22 +146,18 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
 
       if (!response.ok) throw new Error("Error al eliminar la asignatura");
 
-      // Eliminar la asignatura del array local
       asignaturas.value = asignaturas.value.filter(a => a.idAsignatura !== idAsignatura);
-      
       successMessage.value = "Asignatura eliminada con éxito";
       return true;
     } catch (error: any) {
       errorMessage.value = error.message;
-      console.error("Error al eliminar la asignatura:", error);
       return false;
     } finally {
       isLoading.value = false;
     }
   }
-  
 
-  // --------------------------- Filtrado de asignaturas ---------------------------
+  // Computed - Filtrar asignaturas por búsqueda
   const asignaturasFiltradas = computed(() => (searchQuery: string) => {
     if (!searchQuery) return asignaturas.value;
     return asignaturas.value.filter(asignatura =>

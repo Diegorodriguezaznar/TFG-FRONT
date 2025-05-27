@@ -1,11 +1,10 @@
-<!-- VideoDetailsStep.vue - Paso 2 optimizado -->
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useAsignaturaStore } from '@/stores/Asignaturas';
 
 const props = defineProps({
   videoDetails: { type: Object, default: () => ({}) },
-  idCurso: { type: [String, Number], default: null } // Cambiar a idCurso
+  idCurso: { type: [String, Number], default: null }
 });
 
 const emit = defineEmits(['details-updated']);
@@ -24,12 +23,8 @@ const details = ref({
   subjectId: props.videoDetails.subjectId || null
 });
 
-// Cargar asignaturas del curso actual
 const loadSubjects = async () => {
-  console.log('Loading subjects for idCurso:', props.idCurso); // Debug
-  
   if (!props.idCurso) {
-    console.warn('No hay idCurso disponible para cargar asignaturas');
     return;
   }
   
@@ -37,26 +32,13 @@ const loadSubjects = async () => {
     loading.value = true;
     await asignaturaStore.fetchAsignaturasByCurso(Number(props.idCurso));
     asignaturas.value = asignaturaStore.asignaturas || [];
-    
-    console.log('Asignaturas cargadas:', asignaturas.value); // Debug
   } catch (error) {
-    console.error('Error cargando asignaturas:', error);
     asignaturas.value = [];
   } finally {
     loading.value = false;
   }
 };
 
-// Watch para cargar asignaturas cuando cambie idCurso
-watch(() => props.idCurso, (newIdCurso) => {
-  if (newIdCurso) {
-    loadSubjects();
-  } else {
-    asignaturas.value = [];
-  }
-}, { immediate: true });
-
-// Manejo de miniatura
 const handleThumbnailInput = (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0];
   if (file?.type.startsWith('image/')) {
@@ -98,14 +80,21 @@ const removeThumbnail = (event: Event) => {
 const emitUpdate = () => {
   emit('details-updated', { 
     ...details.value,
-    courseId: props.currentCourseId 
+    courseId: props.idCurso 
   });
 };
 
-// Watchers
 watch(() => details.value.title, emitUpdate);
 watch(() => details.value.description, emitUpdate);
 watch(() => details.value.subjectId, emitUpdate);
+
+watch(() => props.idCurso, (newIdCurso) => {
+  if (newIdCurso) {
+    loadSubjects();
+  } else {
+    asignaturas.value = [];
+  }
+}, { immediate: true });
 
 onMounted(() => {
   loadSubjects();
@@ -122,37 +111,36 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
-    <h2 class="text-h5 mb-2">Detalles del video</h2>
-    <p class="text-subtitle-1 mb-4">Añade información sobre tu video</p>
+  <div class="VideoDetailsStep">
+    <div class="VideoDetailsStep__header">
+      <h2 class="VideoDetailsStep__titulo">Detalles del video</h2>
+      <p class="VideoDetailsStep__subtitulo">Añade información sobre tu video</p>
+    </div>
 
-    <v-row>
-      <!-- Columna izquierda: Miniatura -->
-      <v-col cols="12" md="5">
-        <v-card class="mb-4">
-          <v-card-title>Vista previa</v-card-title>
-          <v-card-text>
-            <!-- Preview de miniatura -->
+    <div class="VideoDetailsStep__contenido">
+      <div class="VideoDetailsStep__miniatura">
+        <v-card class="VideoDetailsStep__card-miniatura">
+          <v-card-title class="VideoDetailsStep__card-titulo">Vista previa</v-card-title>
+          <v-card-text class="VideoDetailsStep__card-contenido">
             <v-img
               v-if="thumbnailPreview"
               :src="thumbnailPreview"
               height="180"
               cover
-              class="rounded mb-3"
+              class="VideoDetailsStep__imagen"
             />
             
             <div 
               v-else
-              class="preview-placeholder"
+              class="VideoDetailsStep__placeholder"
             >
-              <v-icon size="large" class="mb-2">mdi-image-off</v-icon>
-              <span>Sin miniatura</span>
+              <v-icon size="large" class="VideoDetailsStep__icono-placeholder">mdi-image-off</v-icon>
+              <span class="VideoDetailsStep__texto-placeholder">Sin miniatura</span>
             </div>
 
-            <!-- Área de subida de miniatura -->
             <div
-              class="thumbnail-upload"
-              :class="{ 'thumbnail-upload--dragging': isDragging }"
+              class="VideoDetailsStep__upload"
+              :class="{ 'VideoDetailsStep__upload--dragging': isDragging }"
               @dragover.prevent="isDragging = true"
               @dragleave.prevent="isDragging = false"
               @drop.prevent="handleThumbnailDrop"
@@ -161,42 +149,40 @@ onBeforeUnmount(() => {
               <input 
                 ref="thumbnailInput"
                 type="file" 
-                style="display: none" 
+                class="VideoDetailsStep__input" 
                 accept="image/*" 
                 @change="handleThumbnailInput"
               >
               
-              <div v-if="!details.thumbnail" class="text-center">
-                <v-icon class="me-2">mdi-image-plus</v-icon>
+              <div v-if="!details.thumbnail" class="VideoDetailsStep__upload-vacio">
+                <v-icon class="VideoDetailsStep__icono-upload">mdi-image-plus</v-icon>
                 <span>Subir miniatura</span>
               </div>
               
-              <div v-else class="d-flex align-center justify-center">
-                <v-icon color="success" class="me-2">mdi-check-circle</v-icon>
+              <div v-else class="VideoDetailsStep__upload-completo">
+                <v-icon color="success" class="VideoDetailsStep__icono-success">mdi-check-circle</v-icon>
                 <span>Miniatura seleccionada</span>
                 <v-btn 
                   icon="mdi-close" 
                   size="small" 
                   color="error" 
                   variant="text" 
-                  class="ms-2"
+                  class="VideoDetailsStep__boton-eliminar"
                   @click.stop="removeThumbnail"
                 />
               </div>
             </div>
             
-            <p class="text-caption mt-2 text-center text-grey">
+            <p class="VideoDetailsStep__info-formato">
               JPG, PNG o GIF (máx. 2MB)
             </p>
           </v-card-text>
         </v-card>
-      </v-col>
+      </div>
       
-      <!-- Columna derecha: Formulario -->
-      <v-col cols="12" md="7">
-        <v-card>
-          <v-card-text>
-            <!-- Título -->
+      <div class="VideoDetailsStep__formulario">
+        <v-card class="VideoDetailsStep__card-formulario">
+          <v-card-text class="VideoDetailsStep__form-contenido">
             <v-text-field
               v-model="details.title"
               label="Título *"
@@ -205,10 +191,9 @@ onBeforeUnmount(() => {
               :counter="100"
               maxlength="100"
               required
-              class="mb-4"
+              class="VideoDetailsStep__campo"
             />
             
-            <!-- Descripción -->
             <v-textarea
               v-model="details.description"
               label="Descripción"
@@ -218,10 +203,9 @@ onBeforeUnmount(() => {
               maxlength="500"
               rows="4"
               auto-grow
-              class="mb-4"
+              class="VideoDetailsStep__campo"
             />
             
-            <!-- Selector de asignatura -->
             <v-select
               v-model="details.subjectId"
               :items="asignaturas"
@@ -233,52 +217,21 @@ onBeforeUnmount(() => {
               :loading="loading"
               clearable
               prepend-inner-icon="mdi-clipboard-text"
+              class="VideoDetailsStep__campo"
             >
               <template v-slot:no-data>
-                <div class="pa-2 text-center">
+                <div class="VideoDetailsStep__no-data">
                   {{ loading ? 'Cargando asignaturas...' : 'No hay asignaturas disponibles para este curso' }}
                 </div>
               </template>
             </v-select>
-            
-            <!-- Debug info (remover en producción) -->
-            <div class="text-caption text-grey mt-2">
-              Debug: idCurso = {{ idCurso }}, Asignaturas encontradas: {{ asignaturas.length }}
-            </div>
           </v-card-text>
         </v-card>
-      </v-col>
-    </v-row>
+      </div>
+    </div>
   </div>
 </template>
 
-<style scoped>
-.preview-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 180px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  color: #666;
-  margin-bottom: 16px;
-}
-
-.thumbnail-upload {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 60px;
-  border: 2px dashed #ccc;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.thumbnail-upload:hover,
-.thumbnail-upload--dragging {
-  border-color: #FF9800;
-  background-color: rgba(255, 152, 0, 0.05);
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/SubirVideo/steps/paso2DetallesVideo";
 </style>

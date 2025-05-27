@@ -1,0 +1,86 @@
+.VistaPrevia {
+  &__titulo {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-align: center;
+
+    @media (min-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  &__info {
+    margin-bottom: 1.5rem;
+    border-radius: 16px;
+  }
+
+  &__info-contenido {
+    padding: 1.5rem;
+  }
+
+  &__encabezado {
+    text-align: center;
+  }
+
+  &__nombre {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__descripcion {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  &__chips {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__pregunta-item {
+    margin-bottom: 1rem;
+  }
+
+  &__pregunta {
+    border-radius: 12px;
+    border: 1px solid rgba(255, 152, 0, 0.1);
+  }
+
+  &__pregunta-contenido {
+    padding: 1.5rem;
+  }
+
+  &__pregunta-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  &__numero {
+    margin-right: 0.75rem;
+  }
+
+  &__pregunta-texto {
+    font-size: 1.125rem;
+    font-weight: 500;
+  }
+
+  &__respuesta {
+    &--correcta {
+      font-weight: 700;
+      color: #4CAF50;
+    }
+  }
+
+  &__check {
+    margin-left: 0.25rem;
+  }
+}

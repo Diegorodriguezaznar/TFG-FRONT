@@ -1,49 +1,52 @@
 <script setup lang="ts">
-// --------------------------- Imports ---------------------------
 import { ref } from 'vue'
 import Header from '@/components/Layout/Header.vue'
 import Sidebar from '@/components/Layout/Sidebar.vue'
 import GraficoUsuariosVideos from '@/components/GraficoUsuariosVideos.vue'
 
-// --------------------------- Variables ---------------------------
 const drawer = ref(false)
 </script>
 
 <template>
   <v-app>
-    <!-- --------------------------- Header --------------------------- -->
     <Header @toggle-sidebar="drawer = !drawer" />
 
-    <!-- --------------------------- Contenido principal --------------------------- -->
     <v-main class="RankingPage">
-      <!-- --------------------------- Sidebar --------------------------- -->
       <Sidebar v-model="drawer" />
 
-      <!-- --------------------------- Contenedor de estadísticas --------------------------- -->
-      <v-container class="RankingPage__Contenedor">
-        <h1 class="text-h4 font-weight-bold mb-6">Ranking de Aportaciones</h1>
-        <p class="mb-6">Usuarios con más vídeos subidos a la plataforma</p>
+      <div class="RankingPage__Banner">
+        <div class="RankingPage__BannerOverlay">
+          <v-container class="RankingPage__BannerContent">
+            <div class="RankingPage__BannerText">
+              <v-icon size="48" class="RankingPage__BannerIcon">mdi-trophy</v-icon>
+              <h1 class="RankingPage__BannerTitle">Ranking de Aportaciones</h1>
+            </div>
+          </v-container>
+        </div>
+      </div>
 
-        <GraficoUsuariosVideos />
+      <v-container class="RankingPage__Container">
+        <v-card class="RankingPage__Card" elevation="3">
+          <v-card-title class="RankingPage__CardHeader">
+            <v-icon class="RankingPage__CardIcon">mdi-chart-bar</v-icon>
+            <span class="RankingPage__CardTitle">Top Contribuidores</span>
+            <v-spacer></v-spacer>
+          </v-card-title>
+          
+          <v-card-text class="RankingPage__CardContent">
+            <GraficoUsuariosVideos />
+          </v-card-text>
+        </v-card>
+
+
       </v-container>
     </v-main>
+        <v-footer app height="64" class="AsignaturaCrear__Footer">
+          <span>&copy; {{ new Date().getFullYear() }} AcademIQ</span>
+        </v-footer>
   </v-app>
 </template>
 
-<style scoped>
-.RankingPage {
-  background-color: #f9f9f9;
-  min-height: 100vh;
-}
-
-.RankingPage__Contenedor {
-  padding-top: 16px;
-  max-width: 1000px;
-}
-
-@media (max-width: 600px) {
-  .RankingPage__Contenedor {
-    padding: 8px;
-  }
-}
+<style lang="scss" scoped>
+@import "@/assets/sass/pages/RankingPage";
 </style>

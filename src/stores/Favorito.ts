@@ -1,82 +1,114 @@
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { useUsuarioStore } from './Usuario'
+import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado"
 import type { VideoUI } from '@/models/VideoUI'
-import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 export const useFavoritoStore = defineStore('favorito', {
   state: () => ({
-    favoritos: [] as VideoUI[]
+    favoritos: [] as VideoUI[],
+    loading: false
   }),
 
   actions: {
+    // GET - Cargar favoritos del usuario
     async cargarFavoritos() {
-      const usuarioStore = useUsuarioStore()
-      if (!usuarioStore.usuario?.idUsuario) return
-
-      try {
-        const res = await axios.get(`/api/favorito/usuario/${usuarioStore.usuario.idUsuario}`)
-        this.favoritos = res.data
-        console.log('Favoritos cargados:', this.favoritos) // Debug
-      } catch (err) {
-        console.error('Error al cargar favoritos', err)
-      }
-    },
-
-    esFavorito(idVideo: number | string): boolean {
-      // Convertir ambos a string para comparación consistente
-      const idStr = idVideo.toString()
-      const resultado = this.favoritos.some(v => v.idVideo.toString() === idStr)
-      console.log(`¿Es favorito ${idStr}?`, resultado) // Debug
-      return resultado
-    },
-
-    async toggleFavorito(idVideo: number | string) {
-      const usuarioStore = useUsuarioStore()
-      if (!usuarioStore.usuario?.idUsuario) {
-        console.error('No hay usuario logueado')
+      const usuarioLogeadoStore = useUsuarioLogeadoStore()
+      
+      if (!usuarioLogeadoStore.usuarioActual?.idUsuario) {
+        this.favoritos = []
         return
       }
 
-      // Convertir a number para el API
-      const idVideoNum = typeof idVideo === 'string' ? parseInt(idVideo) : idVideo
+      this.loading = true
+      try {
+        const res = await axios.get(`http://localhost:5190/api/favorito/usuario/${usuarioLogeadoStore.usuarioActual.idUsuario}`, {
+          headers: {
+            'Authorization': `Bearer ${usuarioLogeadoStore.token}`
+          }
+        })
+        
+        this.favoritos = res.data
+      } catch (err: any) {
+        this.favoritos = []
+      } finally {
+        this.loading = false
+      }
+    },
+
+    // Verificar si un video es favorito
+    esFavorito(idVideo: number | string): boolean {
+      if (!idVideo) return false
+      
+      const idVideoNum = typeof idVideo === 'string' ? parseInt(idVideo) : Number(idVideo)
+      
+      if (isNaN(idVideoNum)) return false
+      
+      return this.favoritos.some(v => Number(v.idVideo) === idVideoNum)
+    },
+
+    // POST - Toggle favorito
+    async toggleFavorito(idVideo: number | string) {
+      const usuarioLogeadoStore = useUsuarioLogeadoStore()
+      
+      if (!usuarioLogeadoStore.usuarioActual?.idUsuario) {
+        throw new Error('Usuario no autenticado')
+      }
+
+      if (!usuarioLogeadoStore.token) {
+        throw new Error('Token no disponible')
+      }
+
+      const idVideoNum = typeof idVideo === 'string' ? parseInt(idVideo) : Number(idVideo)
+      
+      if (isNaN(idVideoNum)) {
+        throw new Error('ID de video inválido')
+      }
 
       try {
-        console.log('Enviando toggle favorito:', { 
-          idUsuario: usuarioStore.usuario.idUsuario, 
-          idVideo: idVideoNum 
-        }) // Debug
+        const res = await axios.post(
+          `http://localhost:5190/api/favorito/toggle/${idVideoNum}`, 
+          {}, 
+          {
+            headers: {
+              'Authorization': `Bearer ${usuarioLogeadoStore.token}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        )
 
-        const res = await axios.post('/api/favorito/toggle', {
-          idUsuario: usuarioStore.usuario.idUsuario,
-          idVideo: idVideoNum
-        })
-
-        console.log('Respuesta del toggle:', res.data) // Debug
-
-        const añadido = res.data === true || res.data.added === true // Manejar diferentes formatos de respuesta
+        const añadido = res.data.liked === true
         
         if (añadido) {
-          // Agregar a favoritos
-          try {
-            const nuevoFavorito = await axios.get(`/api/video/${idVideoNum}`)
-            this.favoritos.push(nuevoFavorito.data)
-            console.log('Video agregado a favoritos')
-          } catch (videoErr) {
-            console.error('Error al obtener datos del video:', videoErr)
-            // Recargar todos los favoritos como fallback
-            await this.cargarFavoritos()
+          if (!this.esFavorito(idVideoNum)) {
+            try {
+              const videoRes = await axios.get(`http://localhost:5190/api/video/${idVideoNum}`, {
+                headers: {
+                  'Authorization': `Bearer ${usuarioLogeadoStore.token}`
+                }
+              })
+              this.favoritos.push(videoRes.data)
+            } catch (videoErr) {
+              await this.cargarFavoritos()
+            }
           }
         } else {
-          // Remover de favoritos
-          this.favoritos = this.favoritos.filter(v => v.idVideo.toString() !== idVideoNum.toString())
-          console.log('Video removido de favoritos')
+          this.favoritos = this.favoritos.filter(v => Number(v.idVideo) !== idVideoNum)
         }
-      } catch (err) {
-        console.error('Error al hacer toggle de favorito', err)
-        // Recargar favoritos en caso de error para mantener consistencia
-        await this.cargarFavoritos()
+
+        return añadido
+      } catch (err: any) {
+        try {
+          await this.cargarFavoritos()
+        } catch (reloadErr) {
+        }
+        
+        throw err
       }
+    },
+
+    // Limpiar lista de favoritos
+    limpiarFavoritos() {
+      this.favoritos = []
     }
   }
 })

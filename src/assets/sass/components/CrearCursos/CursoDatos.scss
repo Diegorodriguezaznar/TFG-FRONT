@@ -1,0 +1,83 @@
+.CursoForm {
+  &__campo {
+    margin-bottom: 1rem;
+    
+    @media (min-width: 768px) {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &__imagen {
+    margin-bottom: 1rem;
+    
+    @media (min-width: 768px) {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+
+  &__icono {
+    margin-right: 0.5rem;
+  }
+
+  &__input-oculto {
+    display: none;
+  }
+
+  &__area-subida {
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafafa;
+
+    @media (min-width: 768px) {
+      padding: 2rem;
+    }
+
+    &:hover {
+      border-color: #1976d2;
+      background: #f5f7ff;
+    }
+  }
+
+  &__texto-subida {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  &__texto-info {
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  &__preview {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 1rem;
+    background: #f9f9f9;
+  }
+
+  &__imagen-preview {
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+
+  &__archivo-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__nombre-archivo {
+    font-size: 0.875rem;
+  }
+}

@@ -1,0 +1,127 @@
+.VideoUpload {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 1rem;
+
+  @media (min-width: 768px) {
+    max-width: 800px;
+    padding: 1.5rem;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    position: relative;
+
+    @media (min-width: 768px) {
+      margin-bottom: 2rem;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      height: 2px;
+      background: #e0e0e0;
+      z-index: 0;
+    }
+  }
+
+  &__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+
+    &--activo {
+      .VideoUpload__numero {
+        background: #FF9800;
+        color: white;
+      }
+
+      .VideoUpload__titulo-paso {
+        color: #333;
+        font-weight: 500;
+      }
+    }
+
+    &--completado {
+      .VideoUpload__numero {
+        background: #4CAF50;
+        color: white;
+      }
+
+      .VideoUpload__titulo-paso {
+        color: #333;
+        font-weight: 500;
+      }
+    }
+
+    &--marcadores {
+      .VideoUpload__numero {
+        background: #9C27B0;
+        color: white;
+      }
+
+      .VideoUpload__titulo-paso {
+        color: #333;
+        font-weight: 500;
+      }
+    }
+  }
+
+  &__numero {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: #666;
+  }
+
+  &__titulo-paso {
+    font-size: 0.75rem;
+    text-align: center;
+    color: #666;
+
+    @media (min-width: 768px) {
+      font-size: 0.875rem;
+    }
+  }
+
+  &__contenido {
+    min-height: 300px;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      min-height: 400px;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &__acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+  }
+
+  &__boton {
+    @media (max-width: 767px) {
+      width: 100%;
+    }
+  }
+}
