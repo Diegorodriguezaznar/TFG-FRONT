@@ -3,6 +3,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 // --------------------------- Router ---------------------------
 const router = useRouter();
@@ -43,6 +44,19 @@ const formatearFecha = (fechaStr: string) => {
   }
 };
 
+// Función para obtener rol simulado basado en el nombre del autor
+const obtenerRolAutor = (autorNombre: string) => {
+  if (!autorNombre) return 1;
+  
+  const nombre = autorNombre.toLowerCase();
+  if (nombre.includes('profe') || nombre.includes('profesor')) {
+    return 2; // Profesor
+  } else if (nombre.includes('admin') || nombre.includes('director')) {
+    return 3; // Administrador
+  }
+  return 1; // Estudiante por defecto
+};
+
 // Verificar si ya tenemos la información necesaria en los videos
 const necesitaCargarInfoAutores = () => {
   // Si los videos ya tienen nombres de autor que no sean "Profesor", no necesitamos cargar más info
@@ -62,7 +76,8 @@ const cargarInfoAutores = async () => {
     // Formatear fechas aunque no necesitemos cargar autores
     videosConAutores.value = props.videos.map(video => ({
       ...video,
-      fecha: video.fechaSubida ? formatearFecha(video.fechaSubida) : (video.fecha || '')
+      fecha: video.fechaSubida ? formatearFecha(video.fechaSubida) : (video.fecha || ''),
+      rolAutor: obtenerRolAutor(video.autor || video.usuario?.nombre || 'Usuario')
     }));
     return;
   }
@@ -87,7 +102,8 @@ const cargarInfoAutores = async () => {
       // No hay IDs para cargar, usar los datos existentes con fechas formateadas
       videosConAutores.value = videosTemp.map(video => ({
         ...video,
-        fecha: video.fechaSubida ? formatearFecha(video.fechaSubida) : (video.fecha || '')
+        fecha: video.fechaSubida ? formatearFecha(video.fechaSubida) : (video.fecha || ''),
+        rolAutor: obtenerRolAutor(video.autor || video.usuario?.nombre || 'Usuario')
       }));
       cargando.value = false;
       return;
@@ -100,7 +116,10 @@ const cargarInfoAutores = async () => {
       try {
         const response = await axios.get(`http://localhost:5190/api/Usuario/${idUsuario}`);
         if (response.data && response.data.nombre) {
-          nombresUsuarios.set(idUsuario, response.data.nombre);
+          nombresUsuarios.set(idUsuario, {
+            nombre: response.data.nombre,
+            idRol: response.data.idRol || 1
+          });
         }
       } catch (e) {
         console.error(`Error al cargar información del usuario ${idUsuario}:`, e);
@@ -114,10 +133,20 @@ const cargarInfoAutores = async () => {
     videosConAutores.value = videosTemp.map((video: any) => {
       // Obtener el nombre del autor
       let nombreAutor = video.autor;
+      let rolAutor = 1;
       
       // Si el autor es "Profesor" o no existe, intentar obtenerlo
       if (!nombreAutor || nombreAutor === 'Profesor') {
-        nombreAutor = nombresUsuarios.get(video.idUsuario) || video.usuario?.nombre || 'Usuario';
+        const usuarioInfo = nombresUsuarios.get(video.idUsuario);
+        if (usuarioInfo) {
+          nombreAutor = usuarioInfo.nombre;
+          rolAutor = usuarioInfo.idRol;
+        } else {
+          nombreAutor = video.usuario?.nombre || 'Usuario';
+          rolAutor = obtenerRolAutor(nombreAutor);
+        }
+      } else {
+        rolAutor = obtenerRolAutor(nombreAutor);
       }
       
       // Formatear fecha
@@ -126,14 +155,18 @@ const cargarInfoAutores = async () => {
       return {
         ...video,
         autor: nombreAutor,
-        fecha: fechaFormateada
+        fecha: fechaFormateada,
+        rolAutor: rolAutor
       };
     });
     
   } catch (error) {
     console.error('Sugerencias - Error al cargar información de autores:', error);
     // Si hay un error, usar los videos originales
-    videosConAutores.value = [...props.videos];
+    videosConAutores.value = props.videos.map(video => ({
+      ...video,
+      rolAutor: obtenerRolAutor(video.autor || 'Usuario')
+    }));
   } finally {
     cargando.value = false;
   }
@@ -177,9 +210,20 @@ watch(() => props.videos, async (newVideos) => {
             </v-card-title>
             
             <v-card-subtitle class="pa-0 pt-1">
-              <div class="text-body-2">{{ video.autor }}</div>
-              <div class="text-caption text-grey">
-                {{ video.fecha }}
+              <!-- Canal con avatar personalizado -->
+              <div class="d-flex align-center mt-2">
+                <UserAvatar
+                  :nombre="video.autor"
+                  :id-rol="video.rolAutor || 1"
+                  :size="24"
+                  class="mr-2"
+                />
+                <div>
+                  <div class="text-body-2">{{ video.autor }}</div>
+                  <div class="text-caption text-grey">
+                    {{ video.fecha }}
+                  </div>
+                </div>
               </div>
             </v-card-subtitle>
           </v-card-item>

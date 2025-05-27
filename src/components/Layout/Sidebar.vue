@@ -3,6 +3,7 @@
 import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 const props = defineProps({
   modelValue: {
@@ -23,7 +24,7 @@ const idRol = computed(() => usuarioActual.value?.idRol ?? 1);
 
 // Roles
 const esProfesor = computed(() => idRol.value === 2 || idRol.value === 3);
-const esAdmin = computed(() => idRol.value === 1);
+const esAdmin = computed(() => idRol.value === 3);
 
 // Menú base
 const menuItemsBase = [
@@ -57,6 +58,16 @@ const menuItems = computed(() => {
   return items;
 });
 
+// Información del rol para mostrar
+const rolInfo = computed(() => {
+  const roles = {
+    1: { name: 'Estudiante', color: 'green' },
+    2: { name: 'Profesor', color: 'blue' },
+    3: { name: 'Administrador', color: 'red' }
+  };
+  return roles[idRol.value] || { name: 'Usuario', color: 'grey' };
+});
+
 const toggleSidebar = () => {
   isExpanded.value = !isExpanded.value;
 };
@@ -66,7 +77,6 @@ const drawer = computed({
   set: (value) => emit('update:modelValue', value)
 });
 </script>
-
 
 <template>
   <v-navigation-drawer
@@ -103,7 +113,6 @@ const drawer = computed({
           item.color === 'red' && 'Sidebar__MenuItem--admin'
         ]"
       >
-
         <!-- Tooltip para modo colapsado -->
         <template v-if="!isExpanded && !isMobile">
           <v-tooltip activator="parent" location="end">
@@ -121,20 +130,43 @@ const drawer = computed({
       <v-list density="compact">
         <v-list-item
           :title="usuarioActual.nombre"
-          :subtitle="esAdmin ? 'Administrador' : esProfesor ? 'Profesor' : 'Estudiante'"
-          prepend-avatar="https://picsum.photos/seed/user/40/40"
+          :subtitle="rolInfo.name"
           to="/perfil"
+          class="Sidebar__UserItem"
         >
+          <template v-slot:prepend>
+            <UserAvatar
+              :usuario="usuarioActual"
+              :size="40"
+              class="mr-2"
+            />
+          </template>
           <template v-slot:append>
             <v-chip 
-              :color="esAdmin ? 'red' : esProfesor ? 'orange' : 'blue'" 
+              :color="rolInfo.color" 
               size="x-small"
+              variant="elevated"
             >
-              {{ esAdmin ? 'Admin' : esProfesor ? 'Prof' : 'Est' }}
+              {{ rolInfo.name.substring(0, 3) }}
             </v-chip>
           </template>
         </v-list-item>
       </v-list>
+    </div>
+    
+    <!-- Avatar compacto cuando está colapsado -->
+    <div v-else-if="!isExpanded && !isMobile && usuarioActual" class="text-center py-2">
+      <v-tooltip location="end">
+        <template v-slot:activator="{ props }">
+          <div v-bind="props" class="cursor-pointer" @click="$router.push('/perfil')">
+            <UserAvatar
+              :usuario="usuarioActual"
+              :size="32"
+            />
+          </div>
+        </template>
+        <span>{{ usuarioActual.nombre }} ({{ rolInfo.name }})</span>
+      </v-tooltip>
     </div>
   </v-navigation-drawer>
 </template>
@@ -204,5 +236,20 @@ const drawer = computed({
 
 .Sidebar__MisCursos .v-list-item__content {
   color: #FF9800 !important;
+}
+
+/* Item de usuario */
+.Sidebar__UserItem {
+  border-radius: 8px;
+  margin: 4px 0;
+  transition: all 0.2s ease;
+}
+
+.Sidebar__UserItem:hover {
+  background: rgba(255, 152, 0, 0.08);
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 </style>

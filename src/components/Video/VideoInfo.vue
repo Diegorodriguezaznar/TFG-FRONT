@@ -1,6 +1,7 @@
 <script setup>
 // --------------------------- Imports ---------------------------
 import { ref, computed } from 'vue';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 // --------------------------- Props ---------------------------
 const props = defineProps({
@@ -29,6 +30,17 @@ const descripcionCorta = computed(() => {
       : props.video.descripcion;
   }
   return 'No hay descripción disponible.';
+});
+
+// Simulación de rol del autor basado en el nombre
+const autorRol = computed(() => {
+  const autor = props.video?.autor?.toLowerCase() || '';
+  if (autor.includes('profe') || autor.includes('profesor')) {
+    return 2; // Profesor
+  } else if (autor.includes('admin') || autor.includes('director')) {
+    return 3; // Administrador
+  }
+  return 1; // Estudiante por defecto
 });
 
 // --------------------------- Métodos ---------------------------
@@ -90,9 +102,13 @@ const toggleDescription = () => {
     
     <!-- Información del canal y descripción -->
     <div class="VideoInfo__Channel d-flex">
-      <v-avatar size="40" class="mr-3">
-        <v-img :src="video.avatar || 'https://picsum.photos/seed/profesor/40/40'" alt="Avatar del canal"></v-img>
-      </v-avatar>
+      <!-- Avatar personalizado del autor -->
+      <UserAvatar
+        :nombre="video.autor || video.channel || 'Profesor'"
+        :id-rol="autorRol"
+        :size="40"
+        class="mr-3"
+      />
       
       <div class="VideoInfo__ChannelInfo flex-grow-1">
         <div class="d-flex align-center">

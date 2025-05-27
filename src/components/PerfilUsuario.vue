@@ -8,9 +8,10 @@ import { useVideoStore } from '@/stores/Video';
 import { useQuizStore } from '@/stores/Quiz';
 import HeaderUsuarios from '@/components/Usuarios/HeaderUsuarios.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
-import CursosUsuario from '@/components/PerfilUsuario/CursosUsuario.vue';
-import VideosUsuario from '@/components/PerfilUsuario/VideosUsuario.vue';
-import QuizzesUsuario from '@/components/PerfilUsuario/QuizzesUsuario.vue';
+import CursosUsuario from '@/components/Perfil/CursosUsuario.vue';
+import VideosUsuario from '@/components/Perfil/VideosUsuario.vue';
+import QuizzesUsuario from '@/components/Perfil/QuizzesUsuario.vue';
+import UserAvatar from '@/components/UserAvatar.vue';
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 // Route y stores
@@ -38,15 +39,11 @@ const rolInfo = computed(() => {
   if (!usuario.value) return { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
   
   const roles = {
-    1: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' },
+    1: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' },
     2: { name: 'Profesor', color: 'blue', icon: 'mdi-school' },
-    3: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' }
+    3: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' }
   };
   return roles[usuario.value.idRol] || { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
-});
-
-const avatarUrl = computed(() => {
-  return usuario.value?.avatar || `https://picsum.photos/seed/${usuario.value?.idUsuario}/200/200`;
 });
 
 const nombreCompleto = computed(() => {
@@ -172,9 +169,12 @@ onMounted(() => {
               <div class="PerfilUsuario__HeaderContent">
                 <!-- Avatar y información básica -->
                 <div class="d-flex align-center">
-                  <v-avatar size="120" class="PerfilUsuario__Avatar">
-                    <v-img :src="avatarUrl" :alt="nombreCompleto"></v-img>
-                  </v-avatar>
+                  <!-- Avatar personalizado por rol -->
+                  <UserAvatar
+                    :usuario="usuario"
+                    :size="120"
+                    class="PerfilUsuario__Avatar"
+                  />
                   
                   <div class="ml-6">
                     <h1 class="text-h4 font-weight-bold text-white mb-2">

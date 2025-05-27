@@ -13,6 +13,7 @@ const emit = defineEmits(['ver-video', 'eliminado']);
 // --------------------------- Stores ---------------------------
 import { useVideoStore } from '@/stores/Video';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 const videoStore = useVideoStore();
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
@@ -27,6 +28,17 @@ const eliminarVideo = async () => {
   if (exito) {
     emit('eliminado', props.video.id);
   }
+};
+
+// Función para obtener rol simulado basado en el nombre del autor
+const obtenerRolAutor = () => {
+  const autor = props.video?.autor?.toLowerCase() || '';
+  if (autor.includes('profe') || autor.includes('profesor')) {
+    return 2; // Profesor
+  } else if (autor.includes('admin') || autor.includes('director')) {
+    return 3; // Administrador
+  }
+  return 1; // Estudiante por defecto
 };
 
 // --------------------------- Colores para asignaturas ---------------------------
@@ -61,9 +73,12 @@ const getColorForAsignatura = (asignatura) => {
     <v-card-item>
       <v-row no-gutters>
         <v-col cols="auto" class="mr-3">
-          <v-avatar size="36">
-            <v-img src="https://picsum.photos/seed/useravatar/50/50"></v-img>
-          </v-avatar>
+          <!-- Avatar personalizado del autor -->
+          <UserAvatar
+            :nombre="video.autor || 'Usuario'"
+            :id-rol="obtenerRolAutor()"
+            :size="36"
+          />
         </v-col>
         
         <v-col>

@@ -1,9 +1,12 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { ref } from 'vue';
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 // --------------------------- Variables ---------------------------
 const searchQuery = ref('');
+const usuarioStore = useUsuarioLogeadoStore();
 
 // --------------------------- Emits ---------------------------
 const emit = defineEmits(['toggle-sidebar', 'update-search']);
@@ -45,12 +48,29 @@ const updateSearch = () => {
       bg-color="grey-lighten-4"
     ></v-text-field>
     
-    <!-- Icono de usuario -->
-    <v-btn icon class="Header__BtnUsuario" to="/perfil">
-      <v-avatar color="primary" size="32">
-        <v-icon color="white">mdi-account</v-icon>
-      </v-avatar>
-    </v-btn>
+    <!-- Spacer para empujar el avatar al extremo derecho -->
+    <v-spacer></v-spacer>
+    
+    <!-- Avatar de usuario en el extremo derecho -->
+    <div class="Header__UserSection">
+      <v-btn 
+        variant="text"
+        to="/perfil"
+        class="Header__UserButton"
+      >
+        <UserAvatar
+          v-if="usuarioStore.usuarioActual"
+          :usuario="usuarioStore.usuarioActual"
+          :size="32"
+        />
+        <UserAvatar
+          v-else
+          :nombre="'Invitado'"
+          :id-rol="1"
+          :size="32"
+        />
+      </v-btn>
+    </div>
   </v-app-bar>
 </template>
 
@@ -74,6 +94,24 @@ const updateSearch = () => {
   margin: 0 16px;
 }
 
+.Header__UserSection {
+  padding-right: 20px; 
+}
+
+.Header__UserButton {
+  border-radius: 50%;
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.Header__UserButton:hover {
+  background: rgba(255, 152, 0, 0.1);
+  transform: scale(1.05);
+}
+
 @media (max-width: 600px) {
   .Header__Buscador {
     margin: 0 8px;
@@ -85,6 +123,10 @@ const updateSearch = () => {
   
   .Header__Logo {
     min-width: unset;
+  }
+  
+  .Header__UserSection {
+    padding-right: 20px; 
   }
 }
 </style>
