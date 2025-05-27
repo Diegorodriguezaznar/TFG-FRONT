@@ -147,7 +147,7 @@
                 <!-- Register Form -->
                 <div v-else class="form-container">
                   <h2 class="form-title">¡Únete a nosotros!</h2>
-                  <p class="form-subtitle">Crea tu cuenta y comienza a aprender</p>
+                  <p class="form-subtitle">Crea tu cuenta de estudiante y comienza a aprender</p>
 
                   <v-form ref="registerForm" v-model="registerValid" @submit.prevent="handleRegister" class="mt-6">
                     <v-row>
@@ -218,23 +218,6 @@
                       ></v-text-field>
                     </div>
 
-                    <div class="input-group">
-                      <v-select
-                        v-model="selectedRol"
-                        :items="roles"
-                        item-title="nombre"
-                        item-value="id"
-                        label="Tipo de usuario *"
-                        variant="outlined"
-                        color="primary"
-                        class="custom-input"
-                        prepend-inner-icon="mdi-account-cog-outline"
-                        :disabled="loading"
-                        :rules="rolRules"
-                        required
-                      ></v-select>
-                    </div>
-
                     <v-row>
                       <v-col cols="12" sm="6">
                         <div class="input-group">
@@ -291,6 +274,19 @@
                       </v-checkbox>
                     </div>
 
+                    <!-- Información sobre el tipo de cuenta -->
+                    <v-alert
+                      type="info"
+                      variant="tonal"
+                      class="mb-4"
+                      border="start"
+                    >
+                      <template v-slot:prepend>
+                        <v-icon>mdi-information</v-icon>
+                      </template>
+                      <strong>Cuenta de Estudiante:</strong> Te registrarás como estudiante. Si eres profesor, puedes solicitar permisos desde tu perfil una vez registrado.
+                    </v-alert>
+
                     <v-btn
                       type="submit"
                       color="primary"
@@ -301,7 +297,7 @@
                       variant="elevated"
                     >
                       <v-icon start>mdi-account-plus</v-icon>
-                      Crear Cuenta
+                      Crear Cuenta de Estudiante
                     </v-btn>
                   </v-form>
                 </div>
@@ -347,13 +343,6 @@ export default {
       registerConfirmPassword: '',
       termsAccepted: false,
       
-      // Rol selector
-      selectedRol: 1,
-      roles: [
-        { id: 1, nombre: 'Alumno' },
-        { id: 2, nombre: 'Profesor' }
-      ],
-      
       // Alerta
       alert: {
         show: false,
@@ -379,9 +368,6 @@ export default {
       passwordRules: [
         v => !!v || 'La contraseña es requerida',
         v => v.length >= 6 || 'La contraseña debe tener al menos 6 caracteres'
-      ],
-      rolRules: [
-        v => !!v || 'Debes seleccionar un tipo de usuario'
       ]
     }
   },
@@ -451,7 +437,8 @@ export default {
         this.showMessage('success', '¡Bienvenido de vuelta!');
         
         setTimeout(() => {
-          this.$router.push('/cursos');
+          // CAMBIO: Redirigir a /home en lugar de /cursos
+          this.$router.push('/home');
         }, 1200);
       } catch (error) {
         console.error('Error al iniciar sesión:', error);
@@ -467,7 +454,7 @@ export default {
       // Validación adicional para asegurar que todos los campos están completos
       if (!this.registerNombre.trim() || !this.registerApellido.trim() || 
           !this.registerEmail.trim() || !this.registerTelefono.trim() || 
-          !this.registerPassword.trim() || !this.selectedRol || !this.termsAccepted) {
+          !this.registerPassword.trim() || !this.termsAccepted) {
         this.showMessage('warning', 'Por favor, completa todos los campos obligatorios.');
         return;
       }
@@ -475,14 +462,20 @@ export default {
       this.loading = true;
 
       try {
+        // SIEMPRE usar idRol = 1 (Alumno/Estudiante)
         const nuevoUsuario = {
           nombre: this.registerNombre.trim(),
           apellidos: this.registerApellido.trim(),
           gmail: this.registerEmail.trim(),
           telefono: this.registerTelefono.trim(),
           contraseña: this.registerPassword.trim(),
-          idRol: this.selectedRol
+          idRol: 1 // ROL FIJO: Siempre estudiante/alumno
         };
+
+        console.log("📝 Registrando usuario como estudiante:", {
+          ...nuevoUsuario,
+          contraseña: "[OCULTA]"
+        });
 
         const response = await fetch("http://localhost:5190/api/Auth/registro", {
           method: "POST",
@@ -503,8 +496,8 @@ export default {
           gmail: this.registerEmail.trim(),
           apellidos: this.registerApellido.trim(),
           telefono: this.registerTelefono.trim(),
-          idRol: data.idRol,
-          rol: data.rol
+          idRol: 1, // ROL FIJO: Estudiante
+          rol: { id: 1, nombre: 'Estudiante' }
         };
 
         const usuarioLogeadoStore = useUsuarioLogeadoStore();
@@ -513,10 +506,11 @@ export default {
           token: data.token
         });
 
-        this.showMessage('success', '¡Cuenta creada exitosamente! Bienvenido a AcademIQ');
+        this.showMessage('success', '¡Cuenta de estudiante creada exitosamente! Bienvenido a AcademIQ');
         
         setTimeout(() => {
-          this.$router.push('/cursos');
+          // CAMBIO: Redirigir a /home en lugar de /cursos
+          this.$router.push('/home');
         }, 1500);
       } catch (error) {
         console.error('Error al registrarse:', error);

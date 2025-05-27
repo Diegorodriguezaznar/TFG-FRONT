@@ -2,7 +2,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Historial from "@/views/Historial.vue";
 import PerfilPage from "../views/PerfilPage.vue";
-import HomePage from "../views/CursosPage.vue";
+import HomePage from "../views/HomePage.vue"; // NUEVA PÁGINA PRINCIPAL
+import CursosPage from "../views/CursosPage.vue"; // RENOMBRADA
 import ReproductorVideo from "@/views/ReproductorVideo.vue";
 import Videos from "@/views/Home.vue";
 import SubirVideos from "../views/SubirVideoPage.vue";
@@ -35,8 +36,21 @@ const routes = [
   { path: "/", component: Login },
   { path: '/login', component: Login },
   
+  // === NUEVA PÁGINA PRINCIPAL DESPUÉS DEL LOGIN ===
+  { 
+    path: "/home", 
+    component: HomePage, 
+    meta: { requiresAuth: true },
+    name: 'home'
+  },
+  
   // === PÁGINAS PRINCIPALES ===
-  { path: "/cursos", component: HomePage },
+  { 
+    path: "/cursos", 
+    component: CursosPage,
+    meta: { requiresAuth: true },
+    name: 'cursos'
+  },
   { path: "/curso/:id", component: Videos, props: true, meta: { requiresAuth: true } },
   { path: "/subir-video", component: SubirVideos, meta: { requiresAuth: true } },
   { path: "/reproductor-video", component: ReproductorVideo, meta: { requiresAuth: true } },
@@ -101,7 +115,8 @@ const routes = [
   {
     path: '/ia',
     name: 'ChatIA',
-    component: () => import('@/views/ChatIA.vue') 
+    component: () => import('@/views/ChatIA.vue'),
+    meta: { requiresAuth: true }
   },
   {
     path: "/crear-curso",
@@ -194,7 +209,7 @@ router.beforeEach((to, from, next) => {
   // Requiere admin
   if (to.meta.requiresAdmin && idRol !== 1) {
     alert("No tienes permisos de administrador");
-    next("/peticion-profesor");
+    next("/home"); // CAMBIO: Redirigir a /home en lugar de /peticion-profesor
     return;
   }
 
