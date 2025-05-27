@@ -63,7 +63,4 @@ const handleUploadComplete = (videoData: any) => {
   margin-top: 8%;
   margin-bottom: 5%;
 }
-
-/* Si prefieres usar un archivo SCSS externo, puedes hacerlo así: */
-/* @import "@/assets/sass/video/UploadPage.scss"; */
 </style>

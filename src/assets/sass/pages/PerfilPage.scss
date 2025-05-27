@@ -1,0 +1,123 @@
+.PerfilPage {
+  background-color: #f9f9f9;
+  min-height: 100vh;
+
+  &__Breadcrumb {
+    background-color: white;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  &__Container {
+    max-width: 100%;
+    padding: 0.75rem;
+
+    @media (min-width: 768px) {
+      max-width: 1200px;
+      padding: 1rem;
+    }
+
+    @media (min-width: 960px) {
+      padding: 1.5rem;
+    }
+  }
+
+  &__Header {
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &__HeaderContent {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  &__Title {
+    font-size: 1.5rem;
+    font-weight: bold;
+
+    @media (min-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  &__EditButton {
+    width: 100%;
+
+    @media (min-width: 768px) {
+      width: auto;
+    }
+  }
+
+  &__ProfileCard {
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &__AvatarSection {
+    text-align: center;
+  }
+
+  &__AvatarContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  &__Avatar {
+    width: 120px;
+    height: 120px;
+    margin-bottom: 1rem;
+
+    @media (min-width: 600px) {
+      width: 150px;
+      height: 150px;
+    }
+
+    @media (min-width: 960px) {
+      width: 180px;
+      height: 180px;
+    }
+  }
+
+  &__AvatarButton {
+    margin-top: 1rem;
+  }
+
+  &__Input {
+  }
+
+  &__HistoryCard {
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  &__UserTabCard {
+  }
+
+  &__UserTabContent {
+    padding: 0;
+  }
+
+  &__Snackbar {
+  }
+}

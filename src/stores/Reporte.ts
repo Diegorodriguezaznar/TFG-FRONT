@@ -1,4 +1,3 @@
-// stores/Reporte.ts
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado'
@@ -11,15 +10,13 @@ export const useReporteStore = defineStore('reporte', () => {
   const successMessage = ref('')
   const reportes = ref<ReporteDTO[]>([])
 
-  // Crear un nuevo reporte
+  // POST - Crear nuevo reporte
   async function crearReporte(nuevoReporte: ReporteDTO) {
     loading.value = true
     errorMessage.value = ''
     successMessage.value = ''
     
     try {
-      console.log(`%c Reportando video ID: ${nuevoReporte.idVideo} - Motivo: ${nuevoReporte.motivo}`, 'color: #ff9800;')
-      
       const usuarioStore = useUsuarioLogeadoStore()
       
       const response = await fetch('http://localhost:5190/api/ReporteVideo', {
@@ -37,19 +34,12 @@ export const useReporteStore = defineStore('reporte', () => {
         throw new Error(`Error al enviar el reporte: ${response.status}. ${errorText}`)
       }
       
-      console.log('%c Reporte enviado correctamente', 'color: #42b883;')
       successMessage.value = "Reporte enviado correctamente. Gracias por ayudarnos a mejorar la plataforma."
       return true
     } catch (err: any) {
-      console.error('%c Error al enviar reporte:', 'color: #ff5252;', err)
-      
-      let message = 'Error al enviar el reporte'
-      
-      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
-        message = 'No se pudo conectar con el servidor. Verifica la conexión.'
-      } else {
-        message = err.message || message
-      }
+      const message = err instanceof TypeError && err.message.includes('Failed to fetch')
+        ? 'No se pudo conectar con el servidor. Verifica la conexión.'
+        : err.message || 'Error al enviar el reporte'
       
       errorMessage.value = message
       return false
@@ -58,14 +48,12 @@ export const useReporteStore = defineStore('reporte', () => {
     }
   }
   
-  // Obtener reportes de un video específico
+  // GET - Obtener reportes por video
   async function fetchReportesPorVideo(idVideo: number) {
     loading.value = true
     errorMessage.value = ''
     
     try {
-      console.log(`%c📊 Obteniendo reportes para video ID: ${idVideo}`, 'color: #2196f3;')
-      
       const response = await fetch(`http://localhost:5190/api/ReporteVideo/video/${idVideo}`)
       
       if (!response.ok) {
@@ -74,19 +62,11 @@ export const useReporteStore = defineStore('reporte', () => {
       
       const data = await response.json()
       reportes.value = data
-      
-      console.log(`%c✅ Se obtuvieron ${reportes.value.length} reportes`, 'color: #42b883;')
       return reportes.value
     } catch (err: any) {
-      console.error('%c❌ Error al obtener reportes:', 'color: #ff5252;', err)
-      
-      let message = 'Error al cargar los reportes'
-      
-      if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
-        message = 'No se pudo conectar con el servidor. Verifica la conexión.'
-      } else {
-        message = err.message || message
-      }
+      const message = err instanceof TypeError && err.message.includes('Failed to fetch')
+        ? 'No se pudo conectar con el servidor. Verifica la conexión.'
+        : err.message || 'Error al cargar los reportes'
       
       errorMessage.value = message
       return []
@@ -95,28 +75,23 @@ export const useReporteStore = defineStore('reporte', () => {
     }
   }
   
-  // Verificar si un usuario ya reportó un video
+  // GET - Verificar reporte existente
   async function verificarReporteExistente(idUsuario: number, idVideo: number) {
     if (!idUsuario || !idVideo) return false
     
     try {
-      console.log(`%c🔍 Verificando si el usuario ${idUsuario} ya reportó el video ${idVideo}`, 'color: #9c27b0;')
-      
       const response = await fetch(`http://localhost:5190/api/ReporteVideo/check?idUsuario=${idUsuario}&idVideo=${idVideo}`)
       
-      if (!response.ok) {
-        return false
-      }
+      if (!response.ok) return false
       
       const data = await response.json()
       return data.exists || false
-    } catch (err) {
-      console.error('%c❌ Error al verificar reporte existente:', 'color: #ff5252;', err)
+    } catch {
       return false
     }
   }
   
-  // Resetear mensajes
+  // UTIL - Resetear mensajes
   function resetMessages() {
     errorMessage.value = ''
     successMessage.value = ''

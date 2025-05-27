@@ -1,25 +1,65 @@
-.SideBar {
-    background: #ffffff;
-    color: #ff7424;
-    min-height: 100vh;
-    border-right: 1.5px solid #ff7424;
-    transition: width 0.3s ease;
-    position: fixed;
-}
+.Sidebar {
+  background-color: white;
+  border-right: 1px solid rgba(0, 0, 0, 0.12);
 
-.v-list-item {
-    margin-top: 0.2%;
-}
+  &__cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+  }
 
-.v-list-item-title {
-    color: #ff7424;
-    font-weight: bold;
-}
+  &__divider {
+    margin: 0.5rem 0;
+  }
 
-.SideBar__Boton {
-    position: fixed;
-    top: 15px;
-    left: 15px;
-    z-index: 2000;
-    background: white;
+  &__item {
+    margin: 1px 4px;
+    border-radius: 6px;
+
+    &--profesor {
+      background: rgba(255, 152, 0, 0.05);
+      border-radius: 8px;
+      margin: 2px 8px;
+
+      &:hover {
+        background: rgba(255, 152, 0, 0.1);
+      }
+    }
+
+    &--admin {
+      background: rgba(244, 67, 54, 0.05);
+      border-radius: 8px;
+      margin: 2px 8px;
+
+      &:hover {
+        background: rgba(244, 67, 54, 0.1);
+      }
+    }
+
+    &--mariano {
+      color: #ff6600 !important;
+      font-weight: bold;
+      font-family: 'Courier New', monospace;
+      border-left: 4px solid #f88112;
+
+      :deep(.v-icon) {
+        color: #e08105 !important;
+      }
+    }
+  }
+
+  &__usuario {
+    padding: 0.75rem;
+
+    @media (min-width: 768px) {
+      padding: 0.5rem 0.75rem;
+    }
+  }
+
+  &__usuario-titulo {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
 }

@@ -1,4 +1,3 @@
-<!-- TimestampStep.vue - Paso de marcadores optimizado -->
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 
@@ -53,7 +52,6 @@ const handleTimeUpdate = () => {
 const captureCurrentTime = () => {
   if (!videoUrl.value || isAddingTimestamp.value) return;
   
-  // Pausar video
   if (videoPlayer.value) {
     videoPlayer.value.pause();
   }
@@ -65,7 +63,6 @@ const captureCurrentTime = () => {
     title: ''
   };
   
-  // Focus en el input
   setTimeout(() => {
     if (timestampTitleInput.value) {
       timestampTitleInput.value.focus();
@@ -106,7 +103,6 @@ const generateId = () => {
   return 'timestamp-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 };
 
-// Watchers
 watch(() => props.videoFile, (newFile) => {
   if (newFile) {
     createVideoUrl(newFile);
@@ -134,54 +130,55 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div>
-    <h2 class="text-h5 mb-2">Marcadores de tiempo</h2>
-    <p class="text-subtitle-1 mb-4">Añade marcadores para facilitar la navegación</p>
+  <div class="TimestampStep">
+    <div class="TimestampStep__header">
+      <h2 class="TimestampStep__titulo">Marcadores de tiempo</h2>
+      <p class="TimestampStep__subtitulo">Añade marcadores para facilitar la navegación</p>
+    </div>
 
-    <!-- Reproductor de video -->
-    <v-card class="mb-4">
-      <v-card-text>
+    <v-card class="TimestampStep__video-card">
+      <v-card-text class="TimestampStep__video-contenido">
         <video 
           v-if="videoUrl" 
           ref="videoPlayer" 
           :src="videoUrl" 
           controls
-          style="width: 100%; max-height: 400px; border-radius: 8px;"
+          class="TimestampStep__video"
           @timeupdate="handleTimeUpdate"
         />
         
-        <div v-else class="video-placeholder">
-          <v-icon size="64" class="mb-2">mdi-video-off</v-icon>
-          <span>No hay video disponible</span>
+        <div v-else class="TimestampStep__video-placeholder">
+          <v-icon size="64" class="TimestampStep__icono-placeholder">mdi-video-off</v-icon>
+          <span class="TimestampStep__texto-placeholder">No hay video disponible</span>
         </div>
       </v-card-text>
     </v-card>
 
-    <!-- Controles de marcadores -->
-    <v-card class="mb-4">
-      <v-card-text>
-        <div class="d-flex justify-space-between align-center mb-4">
-          <h3>Marcadores</h3>
+    <v-card class="TimestampStep__marcadores-card">
+      <v-card-text class="TimestampStep__marcadores-contenido">
+        <div class="TimestampStep__marcadores-header">
+          <h3 class="TimestampStep__marcadores-titulo">Marcadores</h3>
           <v-btn 
             color="primary"
             @click="captureCurrentTime" 
             :disabled="!videoUrl || isAddingTimestamp"
+            class="TimestampStep__boton-añadir"
           >
-            <v-icon class="me-2">mdi-plus</v-icon>
+            <v-icon class="TimestampStep__icono-añadir">mdi-plus</v-icon>
             Añadir en {{ formatTime(currentTime) }}
           </v-btn>
         </div>
 
-        <!-- Formulario para nuevo marcador -->
-        <v-card v-if="isAddingTimestamp" variant="outlined" class="mb-4">
-          <v-card-text>
-            <div class="d-flex justify-space-between align-center mb-3">
-              <h4>Marcador en {{ formatTime(newTimestamp.time) }}</h4>
+        <v-card v-if="isAddingTimestamp" variant="outlined" class="TimestampStep__nuevo-marcador">
+          <v-card-text class="TimestampStep__nuevo-contenido">
+            <div class="TimestampStep__nuevo-header">
+              <h4 class="TimestampStep__nuevo-titulo">Marcador en {{ formatTime(newTimestamp.time) }}</h4>
               <v-btn 
                 icon="mdi-close" 
                 size="small" 
                 variant="text" 
                 @click="cancelAddTimestamp"
+                class="TimestampStep__boton-cerrar"
               />
             </div>
             
@@ -192,13 +189,14 @@ onBeforeUnmount(() => {
               variant="outlined"
               placeholder="Ej: Introducción, Desarrollo, Conclusión"
               maxlength="100"
-              class="mb-3"
+              class="TimestampStep__input-titulo"
             />
             
-            <div class="d-flex gap-2">
+            <div class="TimestampStep__nuevo-acciones">
               <v-btn 
                 variant="outlined" 
                 @click="cancelAddTimestamp"
+                class="TimestampStep__boton-cancelar"
               >
                 Cancelar
               </v-btn>
@@ -206,6 +204,7 @@ onBeforeUnmount(() => {
                 color="primary"
                 @click="saveTimestamp" 
                 :disabled="!newTimestamp.title.trim()"
+                class="TimestampStep__boton-guardar"
               >
                 Guardar
               </v-btn>
@@ -213,29 +212,29 @@ onBeforeUnmount(() => {
           </v-card-text>
         </v-card>
 
-        <!-- Lista de marcadores -->
-        <div v-if="localTimestamps.length === 0" class="text-center py-6">
-          <v-icon size="48" color="grey" class="mb-2">mdi-bookmark-outline</v-icon>
-          <p class="text-grey">Aún no hay marcadores</p>
-          <p class="text-caption text-grey">Los marcadores ayudan a navegar por el video</p>
+        <div v-if="localTimestamps.length === 0" class="TimestampStep__vacio">
+          <v-icon size="48" color="grey" class="TimestampStep__icono-vacio">mdi-bookmark-outline</v-icon>
+          <p class="TimestampStep__texto-vacio">Aún no hay marcadores</p>
+          <p class="TimestampStep__descripcion-vacio">Los marcadores ayudan a navegar por el video</p>
         </div>
 
-        <div v-else>
+        <div v-else class="TimestampStep__lista">
           <div 
             v-for="(timestamp, index) in localTimestamps" 
             :key="timestamp.id" 
-            class="timestamp-item"
+            class="TimestampStep__item"
           >
-            <div class="timestamp-time" @click="seekToTime(timestamp.time)">
+            <div class="TimestampStep__tiempo" @click="seekToTime(timestamp.time)">
               {{ formatTime(timestamp.time) }}
             </div>
-            <div class="timestamp-title">{{ timestamp.title }}</div>
+            <div class="TimestampStep__nombre">{{ timestamp.title }}</div>
             <v-btn 
               icon="mdi-delete" 
               size="small" 
               color="error" 
               variant="text"
               @click="deleteTimestamp(index)"
+              class="TimestampStep__boton-eliminar"
             />
           </div>
         </div>
@@ -244,46 +243,6 @@ onBeforeUnmount(() => {
   </div>
 </template>
 
-<style scoped>
-.video-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 200px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  color: #666;
-}
-
-.timestamp-item {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  transition: all 0.2s ease;
-}
-
-.timestamp-item:hover {
-  background-color: #f5f5f5;
-}
-
-.timestamp-time {
-  min-width: 80px;
-  font-weight: bold;
-  color: #FF9800;
-  cursor: pointer;
-  margin-right: 16px;
-}
-
-.timestamp-time:hover {
-  text-decoration: underline;
-}
-
-.timestamp-title {
-  flex-grow: 1;
-  font-weight: 500;
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/SubirVideo/steps/pasoExtraSelectorMinutos";
 </style>

@@ -1,0 +1,246 @@
+.ConvertirseProfesor {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  &__Hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 0;
+
+    @media (min-width: 768px) {
+      padding: 4rem 0;
+    }
+  }
+
+  &__HeroContent {
+    text-align: center;
+  }
+
+  &__Title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+
+    @media (min-width: 768px) {
+      font-size: 3rem;
+    }
+  }
+
+  &__TitleIcon {
+    margin-right: 0.75rem;
+  }
+
+  &__Subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+    max-width: 100%;
+    margin: 0 auto;
+
+    @media (min-width: 768px) {
+      font-size: 1.25rem;
+      max-width: 600px;
+    }
+  }
+
+  &__Steps {
+    padding: 2rem 0;
+
+    @media (min-width: 768px) {
+      padding: 4rem 0;
+    }
+  }
+
+  &__SectionTitle {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
+
+    @media (min-width: 768px) {
+      font-size: 2.5rem;
+      margin-bottom: 3rem;
+    }
+
+    &--White {
+      color: white;
+    }
+  }
+
+  &__Stepper {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  &__StepCard {
+    border-radius: 1rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: #667eea;
+      transform: translateY(-4px);
+    }
+  }
+
+  &__StepContent {
+    text-align: center;
+    padding: 1.5rem;
+
+    @media (min-width: 768px) {
+      padding: 2rem;
+    }
+  }
+
+  &__StepAvatar {
+    margin: 0 auto 1rem;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  &__StepTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.75rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.5rem;
+    }
+  }
+
+  &__StepDescription {
+    font-size: 0.9rem;
+    color: #666;
+    line-height: 1.6;
+
+    @media (min-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+
+  &__StepButton {
+    text-transform: none;
+  }
+
+  &__Benefits {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    padding: 2rem 0;
+
+    @media (min-width: 768px) {
+      padding: 4rem 0;
+    }
+  }
+
+  &__BenefitCard {
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    height: 100%;
+
+    &:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    }
+  }
+
+  &__BenefitContent {
+    text-align: center;
+    padding: 1.5rem;
+
+    @media (min-width: 768px) {
+      padding: 2rem;
+    }
+  }
+
+  &__BenefitIcon {
+    margin-bottom: 1rem;
+  }
+
+  &__BenefitTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.75rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.25rem;
+    }
+  }
+
+  &__BenefitDescription {
+    color: #666;
+    line-height: 1.6;
+    font-size: 0.9rem;
+
+    @media (min-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+
+  &__CTA {
+    padding: 2rem 0;
+
+    @media (min-width: 768px) {
+      padding: 4rem 0;
+    }
+  }
+
+  &__CTACard {
+    border-radius: 1.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  }
+
+  &__CTAContent {
+    text-align: center;
+    padding: 2rem;
+
+    @media (min-width: 768px) {
+      padding: 3rem;
+    }
+  }
+
+  &__CTAIcon {
+    margin-bottom: 1rem;
+  }
+
+  &__CTATitle {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      font-size: 2rem;
+    }
+  }
+
+  &__CTADescription {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+  }
+
+  &__CTAButton {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 1rem 2rem;
+    border-radius: 0.75rem;
+    text-transform: none;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    @media (min-width: 768px) {
+      font-size: 1.1rem;
+    }
+  }
+}

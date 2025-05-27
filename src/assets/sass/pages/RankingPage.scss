@@ -1,0 +1,152 @@
+.RankingPage {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+
+  &__Banner {
+    position: relative;
+    height: 250px;
+    background-image: url('@/images/Carrusel1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    @media (min-width: 768px) {
+      height: 300px;
+    }
+  }
+
+  &__BannerOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg, 
+      rgba(248, 167, 92, 0.85) 0%, 
+      rgba(252, 137, 29, 0.85) 100%
+    );
+    display: flex;
+    align-items: center;
+  }
+
+  &__BannerContent {
+    width: 100%;
+  }
+
+  &__BannerText {
+    text-align: center;
+    color: white;
+  }
+
+  &__BannerIcon {
+    margin-bottom: 1rem;
+    color: #FFD700;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+  }
+
+  &__BannerTitle {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+
+    @media (min-width: 768px) {
+      font-size: 2.5rem;
+    }
+  }
+
+  &__BannerSubtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.95;
+    max-width: 100%;
+
+    @media (min-width: 768px) {
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+    }
+  }
+
+  &__BannerStats {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    @media (min-width: 576px) {
+      gap: 2rem;
+    }
+  }
+
+  &__Stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.5rem 1rem;
+    border-radius: 1.5rem;
+    backdrop-filter: blur(10px);
+  }
+
+  &__StatIcon {
+    color: #FFD700;
+  }
+
+  &__StatLabel {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  &__Container {
+    padding: 1rem;
+    max-width: 100%;
+    margin-top: -2rem;
+    position: relative;
+    z-index: 1;
+
+    @media (min-width: 768px) {
+      padding: 1.5rem;
+      max-width: 1200px;
+    }
+  }
+
+  &__Card {
+    border-radius: 1rem;
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+  }
+
+  &__CardHeader {
+    background: linear-gradient(135deg, #e78223 0%, #f76f14 100%);
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 1rem 1rem 0 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &__CardIcon {
+    margin-right: 0.75rem;
+  }
+
+  &__CardTitle {
+    font-size: 1.125rem;
+    font-weight: 600;
+
+    @media (min-width: 768px) {
+      font-size: 1.25rem;
+    }
+  }
+
+  &__CardContent {
+    padding: 1.5rem;
+
+    @media (min-width: 768px) {
+      padding: 2rem;
+    }
+  }
+
+}

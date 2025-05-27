@@ -1,6 +1,5 @@
 // src/router/index.ts - ARCHIVO COMPLETO PARA COPIAR
 import { createRouter, createWebHistory } from "vue-router";
-import Historial from "@/views/Historial.vue";
 import PerfilPage from "../views/PerfilPage.vue";
 import HomePage from "../views/CursosPage.vue";
 import ReproductorVideo from "@/views/ReproductorVideo.vue";
@@ -39,7 +38,6 @@ const routes = [
   { path: "/curso/:id", component: Videos, props: true, meta: { requiresAuth: true } },
   { path: "/subir-video", component: SubirVideos, meta: { requiresAuth: true } },
   { path: "/reproductor-video", component: ReproductorVideo, meta: { requiresAuth: true } },
-  { path: "/historial", component: Historial, meta: { requiresAuth: true } },
   { path: "/perfil", component: PerfilPage, meta: { requiresAuth: true } },
   { path: "/usuarios", component: UsuariosPage, meta: { requiresAuth: true } },
   { path: "/usuario/:id", component: PerfilUsuario, props: true, meta: { requiresAuth: true } },
@@ -80,7 +78,11 @@ const routes = [
 
   { path: "/login", component: Login },
   { path: "/cursos", component: HomePage },
-  { path: "/peticion-profesor", component: PeticionProfesorPage },
+  {
+    path: "/peticion-profesor",
+    component: PeticionProfesorPage,
+    meta: { requiresAuth: true, allowRoles: [1] }
+  },
   { path: "/curso/:idCurso/asignaturas", component: CrearAsignaturas },
   {
     path: "/subir-video/:idCurso",
@@ -113,11 +115,6 @@ const routes = [
   {
     path: "/reproductor-video",
     component: ReproductorVideo,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/historial",
-    component: Historial,
     meta: { requiresAuth: true }
   },
   {

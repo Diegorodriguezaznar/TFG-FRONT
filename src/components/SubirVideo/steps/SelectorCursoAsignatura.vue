@@ -1,12 +1,10 @@
 <script setup lang="ts">
-// Imports esenciales
 import { ref, computed, watch, onMounted } from 'vue';
 import { useCursoStore } from '@/stores/Curso';
 import { useAsignaturaStore } from '@/stores/Asignaturas';
 import type { CursoDTO } from '@/stores/dtos/CursoDTO';
 import type { AsignaturaDTO } from '@/stores/dtos/AsignaturasDTO';
 
-// Props y emits
 const props = defineProps({
   initialCourseId: { type: Number, default: null },
   initialSubjectId: { type: Number, default: null }
@@ -14,11 +12,9 @@ const props = defineProps({
 
 const emit = defineEmits(['selection-changed']);
 
-// Stores
 const cursoStore = useCursoStore();
 const asignaturaStore = useAsignaturaStore();
 
-// Estado
 const cursos = ref<CursoDTO[]>([]);
 const asignaturas = ref<AsignaturaDTO[]>([]);
 const selectedCourseId = ref<number | null>(props.initialCourseId);
@@ -26,7 +22,6 @@ const selectedSubjectId = ref<number | null>(props.initialSubjectId);
 const loading = ref<boolean>(false);
 const error = ref<string | null>(null);
 
-// Items para selects
 const cursoItems = computed(() => [
   { text: 'Seleccionar curso', value: null, disabled: true },
   ...cursos.value.map(curso => ({
@@ -43,34 +38,28 @@ const asignaturaItems = computed(() => [
   }))
 ]);
 
-// Cargar datos
 const fetchData = async () => {
   try {
-    // Cargar cursos
     loading.value = true;
     error.value = null;
     const result = await cursoStore.fetchAllCursos();
     cursos.value = result || [];
     
-    // Verificar si hay cursos
     if (cursos.value.length === 0) {
       error.value = "No se encontraron cursos disponibles.";
       return;
     }
     
-    // Cargar asignaturas si hay curso seleccionado
     if (selectedCourseId.value) {
       await loadAsignaturas(selectedCourseId.value);
     }
   } catch (err: any) {
     error.value = err.message || "Error al cargar los datos";
-    console.error("Error:", err);
   } finally {
     loading.value = false;
   }
 };
 
-// Cargar asignaturas de un curso
 const loadAsignaturas = async (courseId: number) => {
   if (!courseId) return;
   
@@ -86,13 +75,11 @@ const loadAsignaturas = async (courseId: number) => {
     }
   } catch (err: any) {
     error.value = err.message || "Error al cargar las asignaturas";
-    console.error("Error:", err);
   } finally {
     loading.value = false;
   }
 };
 
-// Manejar cambio de curso
 const handleCourseChange = async () => {
   selectedSubjectId.value = null;
   
@@ -105,7 +92,6 @@ const handleCourseChange = async () => {
   emitSelection();
 };
 
-// Notificar selección
 const emitSelection = () => {
   emit('selection-changed', {
     courseId: selectedCourseId.value ? Number(selectedCourseId.value) : null,
@@ -113,24 +99,21 @@ const emitSelection = () => {
   });
 };
 
-// Observar cambios
 watch(selectedSubjectId, emitSelection);
 
-// Inicialización
 onMounted(fetchData);
 </script>
 
 <template>
-  <v-card flat border class="mb-4 bg-grey-lighten-5">
-    <v-card-title class="d-flex align-center pb-0">
-      <v-icon icon="mdi-school" class="me-2" color="primary"></v-icon>
-      <span class="text-subtitle-1 font-weight-medium">Asociar video</span>
+  <v-card flat border class="CursoAsignaturaSelector">
+    <v-card-title class="CursoAsignaturaSelector__header">
+      <v-icon icon="mdi-school" class="CursoAsignaturaSelector__icono" color="primary" />
+      <span class="CursoAsignaturaSelector__titulo">Asociar video</span>
     </v-card-title>
     
-    <v-card-text>
-      <v-row>
-        <!-- Selector de Curso -->
-        <v-col cols="12" sm="6">
+    <v-card-text class="CursoAsignaturaSelector__contenido">
+      <div class="CursoAsignaturaSelector__selectores">
+        <div class="CursoAsignaturaSelector__campo">
           <v-select
             v-model="selectedCourseId"
             :items="cursoItems"
@@ -145,17 +128,17 @@ onMounted(fetchData);
             @update:model-value="handleCourseChange"
             hide-details="auto"
             prepend-inner-icon="mdi-book-education"
+            class="CursoAsignaturaSelector__select"
           >
             <template v-slot:no-data>
-              <div class="pa-2 text-center">
+              <div class="CursoAsignaturaSelector__no-data">
                 No se encontraron cursos disponibles
               </div>
             </template>
           </v-select>
-        </v-col>
+        </div>
         
-        <!-- Selector de Asignatura -->
-        <v-col cols="12" sm="6">
+        <div class="CursoAsignaturaSelector__campo">
           <v-select
             v-model="selectedSubjectId"
             :items="asignaturaItems"
@@ -169,23 +152,23 @@ onMounted(fetchData);
             :error-messages="error && selectedCourseId && asignaturas.length === 0 ? [error] : []"
             hide-details="auto"
             prepend-inner-icon="mdi-clipboard-text"
+            class="CursoAsignaturaSelector__select"
           >
             <template v-slot:no-data>
-              <div class="pa-2 text-center">
+              <div class="CursoAsignaturaSelector__no-data">
                 {{ selectedCourseId ? 'No hay asignaturas disponibles' : 'Selecciona un curso primero' }}
               </div>
             </template>
           </v-select>
-        </v-col>
-      </v-row>
+        </div>
+      </div>
       
-      <!-- Mensaje de error -->
       <v-alert
         v-if="error && !(selectedCourseId && asignaturas.length === 0) && !(cursos.length === 0)"
         type="error"
         variant="tonal"
         density="compact"
-        class="mt-2"
+        class="CursoAsignaturaSelector__alerta"
       >
         {{ error }}
       </v-alert>
@@ -193,12 +176,6 @@ onMounted(fetchData);
   </v-card>
 </template>
 
-<style scoped>
-:deep(.v-field--focused .v-field__outline) {
-  border-color: #FF9800 !important;
-}
-
-:deep(.v-field--error .v-field__outline) {
-  border-color: #d32f2f !important;
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/SubirVideo/steps/SelectorAsignaturas";
 </style>

@@ -1,0 +1,46 @@
+.FiltrosAsignaturas {
+  margin-bottom: 1rem;
+
+  &__contenedor {
+    border-radius: 8px;
+    padding: 0.5rem 0;
+  }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0;
+    color: #FF9800;
+  }
+
+  &__texto-loading {
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+
+    @media (min-width: 768px) {
+      font-size: 1rem;
+    }
+  }
+
+  &__chip {
+    margin: 0.5rem;
+    border: 2px solid #FF9800 !important;
+    background-color: white !important;
+    color: #FF9800 !important;
+    transition: all 0.2s ease;
+
+    @media (min-width: 768px) {
+      margin: 0.5rem 0.75rem;
+    }
+
+    &--activo {
+      background-color: #FF9800 !important;
+      color: white !important;
+    }
+
+    &:hover:not(&--activo) {
+      background-color: rgba(255, 152, 0, 0.1) !important;
+    }
+  }
+}

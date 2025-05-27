@@ -3,7 +3,7 @@ import { ref } from "vue";
 import type { VideoDTO } from "@/stores/dtos/VideoDTO";
 
 export const useVideoStore = defineStore("video", () => {
-  // --------------------------- Estado ---------------------------
+  // Estado
   const videos = ref<VideoDTO[]>([]);
   const videosFiltradosPorCurso = ref<VideoDTO[]>([]);
   const videosReportados = ref<VideoDTO[]>([]);
@@ -11,9 +11,7 @@ export const useVideoStore = defineStore("video", () => {
   const errorMessage = ref<string>("");
   const loading = ref<boolean>(false);
 
-  // --------------------------- Métodos de Fetch ---------------------------
-
-  // Obtener todos los videos
+  // GET - Obtener todos los videos
   async function fetchAllVideos() {
     loading.value = true;
     try {
@@ -60,24 +58,13 @@ export const useVideoStore = defineStore("video", () => {
 
       return videos.value;
     } catch (error: any) {
-      let message = "Error al obtener los videos";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
+      const message = error.name === "AbortError"
+        ? "La conexión con el servidor ha excedido el tiempo de espera"
+        : error instanceof TypeError && error.message.includes("Failed to fetch")
+        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+        : error.message || "Error al obtener los videos";
 
       errorMessage.value = message;
-      console.error(message, error);
-
-      // Fallback con datos de ejemplo en caso de error
       videos.value = simulateVideos();
       return videos.value;
     } finally {
@@ -85,7 +72,7 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // Obtener videos por curso
+  // GET - Obtener videos por curso
   async function fetchVideosByCurso(idCurso: number) {
     loading.value = true;
     try {
@@ -135,24 +122,13 @@ export const useVideoStore = defineStore("video", () => {
 
       return videosFiltradosPorCurso.value;
     } catch (error: any) {
-      let message = "Error al obtener los videos del curso";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
+      const message = error.name === "AbortError"
+        ? "La conexión con el servidor ha excedido el tiempo de espera"
+        : error instanceof TypeError && error.message.includes("Failed to fetch")
+        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+        : error.message || "Error al obtener los videos del curso";
 
       errorMessage.value = message;
-      console.error(message, error);
-
-      // Fallback con datos de ejemplo en caso de error
       videosFiltradosPorCurso.value = simulateVideosByCurso(idCurso);
       return videosFiltradosPorCurso.value;
     } finally {
@@ -160,7 +136,7 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // Obtener un video por ID
+  // GET - Obtener video por ID
   async function fetchVideoById(idVideo: number) {
     loading.value = true;
     try {
@@ -207,24 +183,13 @@ export const useVideoStore = defineStore("video", () => {
 
       return video.value;
     } catch (error: any) {
-      let message = "Error al obtener el video";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
+      const message = error.name === "AbortError"
+        ? "La conexión con el servidor ha excedido el tiempo de espera"
+        : error instanceof TypeError && error.message.includes("Failed to fetch")
+        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+        : error.message || "Error al obtener el video";
 
       errorMessage.value = message;
-      console.error(message, error);
-
-      // Fallback con datos de ejemplo en caso de error
       const videosSimulados = simulateVideos();
       video.value = videosSimulados.find((v) => v.idVideo === idVideo) || null;
       return video.value;
@@ -233,7 +198,7 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // Obtener videos reportados
+  // GET - Obtener videos reportados
   async function fetchVideosReportados() {
     loading.value = true;
     try {
@@ -259,7 +224,6 @@ export const useVideoStore = defineStore("video", () => {
 
       const data = await response.json();
 
-      // Mapear los datos y ordenar por número de reportes (de mayor a menor)
       videosReportados.value = data
         .map((v: any) => ({
           idVideo: v.idVideo,
@@ -283,24 +247,13 @@ export const useVideoStore = defineStore("video", () => {
 
       return videosReportados.value;
     } catch (error: any) {
-      let message = "Error al obtener los videos reportados";
-
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
+      const message = error.name === "AbortError"
+        ? "La conexión con el servidor ha excedido el tiempo de espera"
+        : error instanceof TypeError && error.message.includes("Failed to fetch")
+        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+        : error.message || "Error al obtener los videos reportados";
 
       errorMessage.value = message;
-      console.error(message, error);
-
-      // Fallback con datos de ejemplo en caso de error
       videosReportados.value = simulateVideosReportados();
       return videosReportados.value;
     } finally {
@@ -308,74 +261,39 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // Aprobar un video (eliminar reportes)
+  // PUT - Aprobar video
   async function aprobarVideo(idVideo: number) {
     loading.value = true;
     try {
-      // Obtener primero el video completo
-      const videoActual = await fetchVideoById(idVideo);
-      
-      if (!videoActual) {
-        throw new Error("No se pudo encontrar el video");
-      }
-      
-      // Actualizar el video para quitar reportes
-      const videoActualizado = {
-        ...videoActual,
-        numReportes: 0
-      };
-      
-      // Llamar al endpoint para actualizar el video
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
-      
-      const response = await fetch(`http://localhost:5190/api/Video/${idVideo}`, {
-        method: "PUT",
+      const response = await fetch(`http://localhost:5190/api/ReporteVideo/aprobar/${idVideo}`, {
+        method: 'PUT',
         headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(videoActualizado),
-        signal: controller.signal
+          'Content-Type': 'application/json'
+        }
       });
       
-      clearTimeout(timeoutId);
-      
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Error al aprobar el video: ${response.status} ${response.statusText}. ${errorText}`
-        );
+        const errorData = await response.json();
+        throw new Error(errorData.mensaje || `Error al aprobar el video: ${response.status}`);
       }
       
-      // Actualizar la lista de videos reportados
       videosReportados.value = videosReportados.value.filter(v => v.idVideo !== idVideo);
-      
       return true;
     } catch (error: any) {
-      let message = "Error al aprobar el video";
-      
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
+      const message = error.name === "AbortError"
+        ? "La conexión con el servidor ha excedido el tiempo de espera"
+        : error instanceof TypeError && error.message.includes("Failed to fetch")
+        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+        : error.message || "Error al aprobar el video";
       
       errorMessage.value = message;
-      console.error(message, error);
       return false;
     } finally {
       loading.value = false;
     }
   }
   
-  // Eliminar un video
+  // DELETE - Eliminar video
   async function eliminarVideo(idVideo: number) {
     loading.value = true;
     try {
@@ -399,38 +317,28 @@ export const useVideoStore = defineStore("video", () => {
         );
       }
       
-      // Actualizar las listas de videos
       videosReportados.value = videosReportados.value.filter(v => v.idVideo !== idVideo);
       videos.value = videos.value.filter(v => v.idVideo !== idVideo);
       
       return true;
     } catch (error: any) {
-      let message = "Error al eliminar el video";
-      
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
+      const message = error.name === "AbortError"
+        ? "La conexión con el servidor ha excedido el tiempo de espera"
+        : error instanceof TypeError && error.message.includes("Failed to fetch")
+        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
+        : error.message || "Error al eliminar el video";
       
       errorMessage.value = message;
-      console.error(message, error);
       return false;
     } finally {
       loading.value = false;
     }
   }
 
-    async function eliminarVideoPropio(idVideo: number): Promise<boolean> {
+  // DELETE - Eliminar video propio
+  async function eliminarVideoPropio(idVideo: number): Promise<boolean> {
     const token = localStorage.getItem("token");
     if (!token) {
-      console.error("Token no disponible");
       return false;
     }
 
@@ -449,59 +357,11 @@ export const useVideoStore = defineStore("video", () => {
 
       return true;
     } catch (error: any) {
-      console.error("Error al eliminar vídeo:", error);
       return false;
     }
   }
 
-  // --------------------------- Datos de ejemplo para fallback ---------------------------
-  async function aprobarVideo(idVideo: number) {
-    loading.value = true;
-    try {
-      console.log(`%c👍 Aprobando video ID: ${idVideo}`, 'color: #2196f3;');
-      
-      // Usar el endpoint específico para aprobar
-      const response = await fetch(`http://localhost:5190/api/ReporteVideo/aprobar/${idVideo}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.mensaje || `Error al aprobar el video: ${response.status}`);
-      }
-      
-      // Actualizar la lista de videos reportados eliminando el que fue aprobado
-      videosReportados.value = videosReportados.value.filter(v => v.idVideo !== idVideo);
-      
-      console.log(`%c Video aprobado correctamente`, 'color: #42b883;');
-      return true;
-    } catch (error: any) {
-      let message = "Error al aprobar el video";
-      
-      if (error.name === "AbortError") {
-        message = "La conexión con el servidor ha excedido el tiempo de espera";
-      } else if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch")
-      ) {
-        message =
-          "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
-      } else {
-        message = error.message || message;
-      }
-      
-      errorMessage.value = message;
-      console.error('%c Error al aprobar video:', 'color: #ff5252;', error);
-      return false;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  // --------------------------- Datos de ejemplo para fallback ---------------------------
+  // UTIL - Datos de fallback
   function simulateVideos(): VideoDTO[] {
     return [
       {
@@ -524,12 +384,10 @@ export const useVideoStore = defineStore("video", () => {
     ];
   }
 
-  // Simular videos específicos de un curso
   function simulateVideosByCurso(idCurso: number): VideoDTO[] {
     return simulateVideos().filter((v) => v.idCurso === idCurso);
   }
 
-  // Simular videos reportados para fallback
   function simulateVideosReportados(): VideoDTO[] {
     return [
       {

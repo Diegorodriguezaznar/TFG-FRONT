@@ -1,0 +1,70 @@
+.CursoPreview {
+  &__card {
+    margin: 0 auto;
+  }
+
+  &__imagen {
+    align-items: end;
+  }
+
+  &__titulo {
+    font-weight: 500;
+
+    &--overlay {
+      color: white;
+    }
+
+    @media (min-width: 768px) {
+      font-size: 1.25rem;
+    }
+  }
+
+  &__icono {
+    margin-right: 0.5rem;
+  }
+
+  &__contenido {
+    padding: 1rem;
+
+    @media (min-width: 768px) {
+      padding: 1.5rem;
+    }
+  }
+
+  &__descripcion {
+    font-size: 1rem;
+    margin: 0.5rem 0;
+
+    @media (min-width: 768px) {
+      font-size: 1.125rem;
+    }
+  }
+
+  &__divider {
+    margin: 0.75rem 0;
+  }
+
+  &__fecha {
+    display: flex;
+    align-items: center;
+  }
+
+  &__icono-fecha {
+    margin-right: 0.25rem;
+  }
+
+  &__texto-fecha {
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  &__aviso {
+    margin-top: 1rem;
+    text-align: center;
+  }
+
+  &__texto-aviso {
+    font-size: 0.75rem;
+    color: #666;
+  }
+}

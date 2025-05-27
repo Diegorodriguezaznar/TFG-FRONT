@@ -1,4 +1,3 @@
-<!-- VideoUpload.vue - Componente principal optimizado -->
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
@@ -14,80 +13,39 @@ const router = useRouter();
 const route = useRoute();
 const marcadorVideoStore = useMarcadorVideoStore();
 
-// Estados principales
 const currentStep = ref(0);
 const isMarkersMode = ref(false);
 const uploading = ref(false);
 const uploadedVideoData = ref(null);
 
-// Obtener idCurso de la ruta
 const currentCourseId = computed(() => {
-  console.log('=== ROUTE DEBUG ===');
-  console.log('Full route object:', route);
-  console.log('Route path:', route.path);
-  console.log('Route params:', route.params);
-  console.log('All param keys:', Object.keys(route.params));
-  console.log('===================');
-  
-  // Intentar diferentes nombres de parámetro
   let id = null;
   
   if (route.params.idCurso) {
     id = Number(route.params.idCurso);
-    console.log('Found idCurso:', id);
   } else if (route.params.id) {
     id = Number(route.params.id);
-    console.log('Found id:', id);
   } else if (route.params.courseId) {
     id = Number(route.params.courseId);
-    console.log('Found courseId:', id);
-  } else {
-    console.log('No course parameter found in route');
   }
   
-  console.log('Final currentCourseId:', id);
   return id;
 });
 
-// Datos del video
 const videoFile = ref(null);
 const videoDetails = reactive({
   title: '',
   description: '',
   thumbnail: null,
-  courseId: currentCourseId.value, // Incluir courseId desde el inicio
+  courseId: currentCourseId.value,
   subjectId: null
 });
 const timestamps = ref([]);
 
-// Watch para mantener courseId actualizado
-watch(currentCourseId, (newCourseId) => {
-  videoDetails.courseId = newCourseId;
-}, { immediate: true });
-
-// Validar que existe idCurso en la ruta
-onMounted(() => {
-  console.log('VideoUpload mounted, currentCourseId:', currentCourseId.value);
-  if (!currentCourseId.value) {
-    console.error('No se encontró idCurso en la ruta');
-    router.push('/cursos');
-  }
-});
-
-// Validar que existe idCurso en la ruta
-onMounted(() => {
-  if (!currentCourseId.value) {
-    console.error('No se encontró idCurso en la ruta');
-    router.push('/cursos');
-  }
-});
-
-// Diálogos
 const showMarkerDialog = ref(false);
 const showErrorDialog = ref(false);
 const errorMessage = ref('');
 
-// Pasos del flujo
 const steps = computed(() => {
   if (isMarkersMode.value) {
     return [
@@ -113,27 +71,24 @@ const canProceed = computed(() => {
   }
 });
 
-// Navegación entre pasos
 const nextStep = () => {
-  if (currentStep.value < 2 && canProceed.value) { // Máximo paso 2 (Finalizar)
+  if (currentStep.value < 2 && canProceed.value) {
     currentStep.value++;
   }
 };
 
 const prevStep = () => {
-  if (currentStep.value > 0 && !isMarkersMode.value) { // No retroceder si estamos en marcadores
+  if (currentStep.value > 0 && !isMarkersMode.value) {
     currentStep.value--;
   }
 };
 
-// Handlers
 const handleFileSelection = (file) => {
   videoFile.value = file;
 };
 
 const handleDetailsUpdate = (details) => {
   Object.assign(videoDetails, details);
-  // AÑADIR: Incluir el courseId cuando se actualicen los detalles
   videoDetails.courseId = currentCourseId.value;
 };
 
@@ -141,16 +96,9 @@ const handleTimestampsUpdate = (newTimestamps) => {
   timestamps.value = [...newTimestamps];
 };
 
-// Subida de video
 const uploadVideo = async () => {
   try {
     uploading.value = true;
-    
-    console.log('Datos a enviar:', {
-      videoFile: videoFile.value?.name,
-      videoDetails: videoDetails,
-      thumbnail: videoDetails.thumbnail?.name
-    });
     
     const result = await VideoService.uploadCompleteVideo(
       videoFile.value,
@@ -162,7 +110,6 @@ const uploadVideo = async () => {
     uploadedVideoData.value = result;
     emit('upload-complete', result);
     
-    // Preguntar sobre marcadores
     setTimeout(() => {
       uploading.value = false;
       showMarkerDialog.value = true;
@@ -170,26 +117,23 @@ const uploadVideo = async () => {
     
   } catch (error) {
     uploading.value = false;
-    console.error('Error detallado:', error);
     errorMessage.value = error.message || 'Error al subir el video';
     showErrorDialog.value = true;
   }
 };
 
-// Manejo de marcadores
 const handleMarkerDecision = (addMarkers) => {
   showMarkerDialog.value = false;
   
   if (addMarkers) {
     isMarkersMode.value = true;
-    currentStep.value = 3; // Paso de marcadores
+    currentStep.value = 3;
   } else {
     router.push(`/cursos`);
     resetForm();
   }
 };
 
-// Guardar marcadores
 const saveTimestamps = async () => {
   if (!uploadedVideoData.value?.idVideo) {
     errorMessage.value = 'Error: Video no encontrado';
@@ -236,33 +180,40 @@ const resetForm = () => {
     console.warn('Error resetting form:', error);
   }
 };
+
+watch(currentCourseId, (newCourseId) => {
+  videoDetails.courseId = newCourseId;
+}, { immediate: true });
+
+onMounted(() => {
+  if (!currentCourseId.value) {
+    router.push('/cursos');
+  }
+});
 </script>
 
 <template>
-  <div class="video-upload">
-    <!-- Header con pasos -->
-    <div class="steps-header">
+  <div class="VideoUpload">
+    <div class="VideoUpload__header">
       <div 
         v-for="(step, index) in steps" 
         :key="index"
-        class="step-item"
+        class="VideoUpload__step"
         :class="{ 
-          'step-active': currentStep === index && !isMarkersMode, 
-          'step-completed': step.completed,
-          'step-markers': isMarkersMode && index === 3
+          'VideoUpload__step--activo': currentStep === index && !isMarkersMode, 
+          'VideoUpload__step--completado': step.completed,
+          'VideoUpload__step--marcadores': isMarkersMode && index === 3
         }"
       >
-        <div class="step-number">
+        <div class="VideoUpload__numero">
           <span v-if="step.completed">✓</span>
           <span v-else>{{ index + 1 }}</span>
         </div>
-        <span class="step-title">{{ step.title }}</span>
+        <span class="VideoUpload__titulo-paso">{{ step.title }}</span>
       </div>
     </div>
 
-    <!-- Contenido de pasos -->
-    <div class="step-content">
-      <!-- Paso 1: Subir archivo -->
+    <div class="VideoUpload__contenido">
       <FileUploadStep 
         v-if="currentStep === 0"
         :selected-file="videoFile"
@@ -270,7 +221,6 @@ const resetForm = () => {
         @file-selected="handleFileSelection"
       />
 
-      <!-- Paso 2: Detalles -->
       <VideoDetailsStep 
         v-if="currentStep === 1"
         :video-details="videoDetails"
@@ -278,7 +228,6 @@ const resetForm = () => {
         @details-updated="handleDetailsUpdate"
       />
 
-      <!-- Paso 3: Resumen y publicar -->
       <SummaryStep 
         v-if="currentStep === 2"
         :video-file="videoFile"
@@ -287,7 +236,6 @@ const resetForm = () => {
         @upload-video="uploadVideo"
       />
 
-      <!-- Paso 4: Marcadores (solo en modo marcadores) -->
       <TimestampStep 
         v-if="currentStep === 3 && isMarkersMode"
         :video-file="videoFile"
@@ -296,15 +244,14 @@ const resetForm = () => {
       />
     </div>
 
-    <!-- Acciones -->
-    <div class="actions">
-      <!-- Navegación normal (pasos 1, 2, 3) -->
+    <div class="VideoUpload__acciones">
       <template v-if="!isMarkersMode">
         <v-btn 
           v-if="currentStep > 0"
           variant="outlined" 
           @click="prevStep"
           :disabled="uploading"
+          class="VideoUpload__boton"
         >
           Anterior
         </v-btn>
@@ -314,19 +261,18 @@ const resetForm = () => {
           color="primary" 
           @click="nextStep"
           :disabled="!canProceed || uploading"
+          class="VideoUpload__boton"
         >
           Siguiente
         </v-btn>
-        
-        <!-- En el paso final (3), el botón "Publicar" está dentro del componente SummaryStep -->
       </template>
 
-      <!-- Acciones para marcadores (paso 4) -->
       <template v-if="isMarkersMode && currentStep === 3">
         <v-btn 
           variant="outlined"
           @click="finishWithoutMarkers"
           :disabled="uploading"
+          class="VideoUpload__boton"
         >
           Salir sin guardar
         </v-btn>
@@ -336,13 +282,13 @@ const resetForm = () => {
           @click="saveTimestamps"
           :disabled="uploading"
           :loading="uploading"
+          class="VideoUpload__boton"
         >
           Guardar marcadores
         </v-btn>
       </template>
     </div>
 
-    <!-- Diálogo para marcadores -->
     <v-dialog v-model="showMarkerDialog" max-width="400" persistent>
       <v-card>
         <v-card-title>¿Añadir marcadores?</v-card-title>
@@ -357,7 +303,6 @@ const resetForm = () => {
       </v-card>
     </v-dialog>
 
-    <!-- Diálogo de error -->
     <v-dialog v-model="showErrorDialog" max-width="400">
       <v-card>
         <v-card-title>Error</v-card-title>
@@ -371,102 +316,6 @@ const resetForm = () => {
   </div>
 </template>
 
-<style scoped>
-.video-upload {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-.steps-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 32px;
-  position: relative;
-}
-
-.steps-header::before {
-  content: '';
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  height: 2px;
-  background: #e0e0e0;
-  z-index: 0;
-}
-
-.step-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  z-index: 1;
-}
-
-.step-number {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 8px;
-  font-weight: bold;
-  color: #666;
-}
-
-.step-active .step-number {
-  background: #FF9800;
-  color: white;
-}
-
-.step-completed .step-number {
-  background: #4CAF50;
-  color: white;
-}
-
-.step-markers .step-number {
-  background: #9C27B0;
-  color: white;
-}
-
-.step-title {
-  font-size: 14px;
-  text-align: center;
-  color: #666;
-}
-
-.step-active .step-title,
-.step-completed .step-title,
-.step-markers .step-title {
-  color: #333;
-  font-weight: 500;
-}
-
-.step-content {
-  min-height: 400px;
-  margin-bottom: 24px;
-}
-
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-@media (max-width: 600px) {
-  .video-upload {
-    padding: 16px;
-  }
-  
-  .step-title {
-    font-size: 12px;
-  }
-  
-  .actions {
-    flex-direction: column;
-  }
-}
+<style lang="scss" scoped>
+@import "@/assets/sass/components/SubirVideo/VideoUpload";
 </style>

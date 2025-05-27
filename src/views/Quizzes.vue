@@ -37,6 +37,14 @@ const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value;
 };
 
+onMounted(async () => {
+  if (route.params.idCurso) {
+    await quizStore.fetchQuizzesByCurso(Number(route.params.idCurso));
+  } else {
+    await quizStore.fetchAllQuizzes();
+  }
+});
+
 // Manejo de búsqueda con debounce
 const debounceTimeout = ref(null);
 const updateSearch = (query) => {
