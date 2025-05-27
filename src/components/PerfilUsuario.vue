@@ -1,7 +1,7 @@
 <!-- src/views/PerfilUsuario.vue -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useUsuarioStore } from '@/stores/Usuario';
 import { useCursoStore } from '@/stores/Curso';
 import { useVideoStore } from '@/stores/Video';
@@ -16,7 +16,6 @@ import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 // Route y stores
 const route = useRoute();
-const router = useRouter();
 const usuarioStore = useUsuarioStore();
 const cursoStore = useCursoStore();
 const videoStore = useVideoStore();
@@ -169,7 +168,7 @@ onMounted(() => {
               <div class="PerfilUsuario__HeaderContent">
                 <!-- Avatar y información básica -->
                 <div class="d-flex align-center">
-                  <!-- Avatar personalizado por rol -->
+                  <!-- Avatar personalizado con letra inicial y colores por rol -->
                   <UserAvatar
                     :usuario="usuario"
                     :size="120"
@@ -300,6 +299,11 @@ onMounted(() => {
 .PerfilUsuario__Avatar {
   border: 4px solid white;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.PerfilUsuario__Avatar:hover {
+  transform: scale(1.05);
 }
 
 .PerfilUsuario__Stats {
@@ -313,6 +317,12 @@ onMounted(() => {
   padding: 16px 24px;
   border-radius: 12px;
   backdrop-filter: blur(10px);
+  transition: transform 0.2s ease;
+}
+
+.PerfilUsuario__Stat:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .PerfilUsuario__StatNumber {
@@ -338,10 +348,35 @@ onMounted(() => {
   
   .PerfilUsuario__Stats {
     justify-content: center;
+    flex-wrap: wrap;
   }
   
   .PerfilUsuario__Container {
     padding: 16px;
+  }
+  
+  .PerfilUsuario__Avatar {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .PerfilUsuario__Stats {
+    gap: 16px;
+  }
+  
+  .PerfilUsuario__Stat {
+    padding: 12px 16px;
+    min-width: 80px;
+  }
+  
+  .PerfilUsuario__StatNumber {
+    font-size: 1.5rem;
+  }
+  
+  .PerfilUsuario__StatLabel {
+    font-size: 0.75rem;
   }
 }
 </style>

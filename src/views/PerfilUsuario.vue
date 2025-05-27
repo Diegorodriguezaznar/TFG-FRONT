@@ -11,6 +11,7 @@ import Sidebar from '@/components/Layout/Sidebar.vue';
 import CursosUsuario from '@/components/Perfil/CursosUsuario.vue';
 import VideosUsuario from '@/components/Perfil/VideosUsuario.vue';
 import QuizzesUsuario from '@/components/Perfil/QuizzesUsuario.vue';
+import UserAvatar from '@/components/UserAvatar.vue'; // ← AÑADIDO
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 // Route y stores
@@ -171,9 +172,13 @@ onMounted(() => {
               <div class="PerfilUsuario__HeaderContent">
                 <!-- Avatar y información básica -->
                 <div class="d-flex align-center">
-                  <v-avatar size="120" class="PerfilUsuario__Avatar">
-                    <v-img :src="avatarUrl" :alt="nombreCompleto"></v-img>
-                  </v-avatar>
+                  <!-- CAMBIO AQUÍ: Reemplazado v-avatar + v-img por UserAvatar -->
+                  <UserAvatar
+                    :nombre="nombreCompleto"
+                    :id-rol="usuario.idRol"
+                    :size="120"
+                    class="PerfilUsuario__Avatar"
+                  />
                   
                   <div class="ml-6">
                     <h1 class="text-h4 font-weight-bold text-white mb-2">
@@ -284,7 +289,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" patternUnits="userSpaceOnUse" width="100" height="100"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" patternUnits="userSpaceOnUse" width="100" height="100"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></rect></svg>');
   opacity: 0.3;
 }
 

@@ -1,9 +1,17 @@
 <!-- src/components/Usuarios/HeaderUsuarios.vue -->
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 // Variables
 const searchQuery = ref('');
+
+// Store
+const usuarioStore = useUsuarioLogeadoStore();
+
+// Computed
+const usuarioActual = computed(() => usuarioStore.usuarioActual);
 
 // Emits
 const emit = defineEmits(['toggle-sidebar', 'search']);
@@ -51,9 +59,7 @@ const clearSearch = () => {
       </div>
     </div>
     
-    <v-spacer></v-spacer>
-    
-    <!-- Buscador -->
+    <!-- Buscador - MOVIDO Y AMPLIADO -->
     <div class="HeaderUsuarios__Search d-flex align-center">
       <v-text-field
         v-model="searchQuery"
@@ -67,7 +73,6 @@ const clearSearch = () => {
         class="HeaderUsuarios__SearchField"
         bg-color="grey-lighten-5"
         color="orange"
-        :style="{ maxWidth: '300px' }"
       >
         <template v-slot:append-inner v-if="searchQuery">
           <v-btn 
@@ -81,18 +86,28 @@ const clearSearch = () => {
       </v-text-field>
     </div>
     
-    <!-- Botón de perfil -->
-    <v-btn 
-      icon 
-      class="HeaderUsuarios__ProfileBtn ml-2" 
-      to="/perfil"
-      color="orange"
-      variant="text"
-    >
-      <v-avatar color="orange" size="32">
-        <v-icon color="white">mdi-account</v-icon>
-      </v-avatar>
-    </v-btn>
+    <v-spacer></v-spacer>
+    
+    <!-- Botón de perfil con UserAvatar -->
+    <div class="HeaderUsuarios__ProfileSection">
+      <v-btn 
+        variant="text"
+        to="/perfil"
+        class="HeaderUsuarios__ProfileBtn"
+      >
+        <UserAvatar
+          v-if="usuarioActual"
+          :usuario="usuarioActual"
+          :size="32"
+        />
+        <UserAvatar
+          v-else
+          :nombre="'Invitado'"
+          :id-rol="1"
+          :size="32"
+        />
+      </v-btn>
+    </div>
   </v-app-bar>
 </template>
 
@@ -106,15 +121,20 @@ const clearSearch = () => {
 }
 
 .HeaderUsuarios__Logo {
-  min-width: 180px;
+  min-width: 200px; /* Aumentado para dar más espacio */
+  margin-right: 25px; /* 25px de separación como pediste */
 }
 
+/* BUSCADOR AMPLIADO Y REPOSICIONADO */
 .HeaderUsuarios__Search {
-  flex-shrink: 1;
-  max-width: 400px;
+  flex: 1; /* Ocupa todo el espacio disponible */
+  max-width: 600px; /* Máximo ancho */
+  min-width: 300px; /* Mínimo ancho */
+  margin-right: 16px; /* Separación del botón de perfil */
 }
 
 .HeaderUsuarios__SearchField {
+  width: 100% !important; /* Ocupa todo el ancho disponible */
   transition: all 0.3s ease;
 }
 
@@ -137,40 +157,69 @@ const clearSearch = () => {
   background-color: rgba(255, 152, 0, 0.1);
 }
 
-/* Responsive */
+/* Responsive mejorado */
 @media (max-width: 768px) {
-  .HeaderUsuarios__Search {
-    max-width: 200px;
+  .HeaderUsuarios__Logo {
+    min-width: 160px;
+    margin-right: 15px; /* Reducido en móvil */
   }
   
-  .HeaderUsuarios__SearchField {
-    max-width: 180px !important;
+  .HeaderUsuarios__Search {
+    min-width: 200px;
+    max-width: 300px;
+  }
+  
+  .HeaderUsuarios__ProfileSection {
+    padding-right: 15px; /* Reducido en tablet */
   }
 }
 
 @media (max-width: 600px) {
   .HeaderUsuarios__Logo {
-    min-width: 60px;
+    min-width: 60px; /* Solo ícono en móvil */
+    margin-right: 10px;
   }
   
   .HeaderUsuarios__Search {
-    max-width: 150px;
+    min-width: 150px;
+    max-width: 200px;
   }
   
   .HeaderUsuarios__SearchField {
-    max-width: 140px !important;
+    font-size: 14px; /* Texto más pequeño en móvil */
+  }
+  
+  .HeaderUsuarios__ProfileSection {
+    padding-right: 10px; /* Reducido en móvil */
   }
 }
 
 /* Animaciones */
-.HeaderUsuarios__MenuBtn,
-.HeaderUsuarios__ProfileBtn {
+.HeaderUsuarios__MenuBtn {
   transition: transform 0.2s ease;
 }
 
-.HeaderUsuarios__MenuBtn:hover,
-.HeaderUsuarios__ProfileBtn:hover {
+.HeaderUsuarios__MenuBtn:hover {
   transform: scale(1.1);
+}
+
+/* AVATAR DE PERFIL - 25px de la derecha */
+.HeaderUsuarios__ProfileSection {
+  padding-right: 25px; /* 25px del borde derecho */
+}
+
+.HeaderUsuarios__ProfileBtn {
+  border-radius: 50%;
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.HeaderUsuarios__ProfileBtn:hover {
+  background: rgba(255, 152, 0, 0.1);
+  transform: scale(1.05);
 }
 
 /* Focus states */
