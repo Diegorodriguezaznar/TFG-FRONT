@@ -3,6 +3,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUsuarioEstadisticasStore } from '@/stores/UsuarioEstadisticas';
+import UserAvatar from '@/components/UserAvatar.vue';
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 // Props
@@ -20,15 +21,11 @@ const loading = ref(true);
 // Computed
 const rolInfo = computed(() => {
   const roles = {
-    1: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' },
+    1: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' },
     2: { name: 'Profesor', color: 'blue', icon: 'mdi-school' },
-    3: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' }
+    3: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' }
   };
   return roles[props.usuario.idRol] || { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
-});
-
-const avatarUrl = computed(() => {
-  return props.usuario.avatar || `https://picsum.photos/seed/${props.usuario.idUsuario}/150/150`;
 });
 
 const nombreCompleto = computed(() => {
@@ -54,13 +51,11 @@ const cargarEstadisticas = async () => {
 
 const verPerfil = () => {
   console.log(`Navegando al perfil de ${nombreCompleto.value}`);
-  // Navegar al perfil del usuario específico
   router.push(`/usuario/${props.usuario.idUsuario}`);
 };
 
 const verCursos = () => {
   console.log(`Viendo cursos de ${nombreCompleto.value}`);
-  // Navegar a los cursos del profesor
   router.push(`/cursos?profesor=${props.usuario.idUsuario}`);
 };
 
@@ -79,9 +74,12 @@ onMounted(() => {
     <!-- Header con avatar y rol -->
     <div class="CardUsuario__Header">
       <div class="CardUsuario__AvatarSection">
-        <v-avatar size="64" class="CardUsuario__Avatar">
-          <v-img :src="avatarUrl" :alt="nombreCompleto"></v-img>
-        </v-avatar>
+        <!-- Avatar personalizado por rol -->
+        <UserAvatar
+          :usuario="usuario"
+          :size="64"
+          class="CardUsuario__Avatar"
+        />
         
         <div class="CardUsuario__Chips">
           <v-chip 

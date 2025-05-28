@@ -10,6 +10,7 @@ import Sidebar from '@/components/Layout/Sidebar.vue';
 import CursosUsuario from '@/components/Perfil/CursosUsuario.vue';
 import VideosUsuario from '@/components/Perfil/VideosUsuario.vue';
 import QuizzesUsuario from '@/components/Perfil/QuizzesUsuario.vue';
+import UserAvatar from '@/components/UserAvatar.vue'; // ← AÑADIDO
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 const route = useRoute();
@@ -144,10 +145,15 @@ onMounted(() => {
           <v-card class="PerfilUsuario__Header" elevation="3">
             <div class="PerfilUsuario__HeaderBg">
               <div class="PerfilUsuario__HeaderContent">
-                <div class="PerfilUsuario__ProfileInfo">
-                  <v-avatar size="120" class="PerfilUsuario__Avatar">
-                    <v-img :src="avatarUrl" :alt="nombreCompleto"></v-img>
-                  </v-avatar>
+                <!-- Avatar y información básica -->
+                <div class="d-flex align-center">
+                  <!-- CAMBIO AQUÍ: Reemplazado v-avatar + v-img por UserAvatar -->
+                  <UserAvatar
+                    :nombre="nombreCompleto"
+                    :id-rol="usuario.idRol"
+                    :size="120"
+                    class="PerfilUsuario__Avatar"
+                  />
                   
                   <div class="PerfilUsuario__UserDetails">
                     <h1 class="PerfilUsuario__UserName">
@@ -225,6 +231,92 @@ onMounted(() => {
   </v-app>
 </template>
 
-<style lang="scss" scoped>
-@import "@/assets/sass/pages/PerfilUsuario";
+<style scoped>
+.PerfilUsuario {
+  background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
+  min-height: 100vh;
+}
+
+.PerfilUsuario__Container {
+  padding-top: 24px;
+  max-width: 1400px;
+}
+
+.PerfilUsuario__Header {
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.PerfilUsuario__HeaderBg {
+  background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
+  position: relative;
+}
+
+.PerfilUsuario__HeaderBg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" patternUnits="userSpaceOnUse" width="100" height="100"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></rect></svg>');
+  opacity: 0.3;
+}
+
+.PerfilUsuario__HeaderContent {
+  position: relative;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.PerfilUsuario__Avatar {
+  border: 4px solid white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.PerfilUsuario__Stats {
+  display: flex;
+  gap: 24px;
+}
+
+.PerfilUsuario__Stat {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 16px 24px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.PerfilUsuario__StatNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1;
+}
+
+.PerfilUsuario__StatLabel {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .PerfilUsuario__HeaderContent {
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+  }
+  
+  .PerfilUsuario__Stats {
+    justify-content: center;
+  }
+  
+  .PerfilUsuario__Container {
+    padding: 16px;
+  }
+}
 </style>

@@ -1,21 +1,21 @@
 <!-- src/views/PerfilUsuario.vue -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useUsuarioStore } from '@/stores/Usuario';
 import { useCursoStore } from '@/stores/Curso';
 import { useVideoStore } from '@/stores/Video';
 import { useQuizStore } from '@/stores/Quiz';
 import HeaderUsuarios from '@/components/Usuarios/HeaderUsuarios.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
-import CursosUsuario from '@/components/PerfilUsuario/CursosUsuario.vue';
-import VideosUsuario from '@/components/PerfilUsuario/VideosUsuario.vue';
-import QuizzesUsuario from '@/components/PerfilUsuario/QuizzesUsuario.vue';
+import CursosUsuario from '@/components/Perfil/CursosUsuario.vue';
+import VideosUsuario from '@/components/Perfil/VideosUsuario.vue';
+import QuizzesUsuario from '@/components/Perfil/QuizzesUsuario.vue';
+import UserAvatar from '@/components/UserAvatar.vue';
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 // Route y stores
 const route = useRoute();
-const router = useRouter();
 const usuarioStore = useUsuarioStore();
 const cursoStore = useCursoStore();
 const videoStore = useVideoStore();
@@ -38,15 +38,11 @@ const rolInfo = computed(() => {
   if (!usuario.value) return { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
   
   const roles = {
-    1: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' },
+    1: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' },
     2: { name: 'Profesor', color: 'blue', icon: 'mdi-school' },
-    3: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' }
+    3: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' }
   };
   return roles[usuario.value.idRol] || { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
-});
-
-const avatarUrl = computed(() => {
-  return usuario.value?.avatar || `https://picsum.photos/seed/${usuario.value?.idUsuario}/200/200`;
 });
 
 const nombreCompleto = computed(() => {
@@ -172,9 +168,12 @@ onMounted(() => {
               <div class="PerfilUsuario__HeaderContent">
                 <!-- Avatar y información básica -->
                 <div class="d-flex align-center">
-                  <v-avatar size="120" class="PerfilUsuario__Avatar">
-                    <v-img :src="avatarUrl" :alt="nombreCompleto"></v-img>
-                  </v-avatar>
+                  <!-- Avatar personalizado con letra inicial y colores por rol -->
+                  <UserAvatar
+                    :usuario="usuario"
+                    :size="120"
+                    class="PerfilUsuario__Avatar"
+                  />
                   
                   <div class="ml-6">
                     <h1 class="text-h4 font-weight-bold text-white mb-2">
@@ -300,6 +299,11 @@ onMounted(() => {
 .PerfilUsuario__Avatar {
   border: 4px solid white;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.PerfilUsuario__Avatar:hover {
+  transform: scale(1.05);
 }
 
 .PerfilUsuario__Stats {
@@ -313,6 +317,12 @@ onMounted(() => {
   padding: 16px 24px;
   border-radius: 12px;
   backdrop-filter: blur(10px);
+  transition: transform 0.2s ease;
+}
+
+.PerfilUsuario__Stat:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .PerfilUsuario__StatNumber {
@@ -338,10 +348,35 @@ onMounted(() => {
   
   .PerfilUsuario__Stats {
     justify-content: center;
+    flex-wrap: wrap;
   }
   
   .PerfilUsuario__Container {
     padding: 16px;
+  }
+  
+  .PerfilUsuario__Avatar {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .PerfilUsuario__Stats {
+    gap: 16px;
+  }
+  
+  .PerfilUsuario__Stat {
+    padding: 12px 16px;
+    min-width: 80px;
+  }
+  
+  .PerfilUsuario__StatNumber {
+    font-size: 1.5rem;
+  }
+  
+  .PerfilUsuario__StatLabel {
+    font-size: 0.75rem;
   }
 }
 </style>

@@ -2,6 +2,7 @@
 // --------------------------- Imports ---------------------------
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 // --------------------------- Router ---------------------------
 const router = useRouter();
@@ -14,7 +15,8 @@ const historialReciente = ref([
     canal: 'sockrteez',
     vistas: '378K visualizaciones',
     thumbnail: 'https://picsum.photos/id/237/300/200',
-    duracion: '1:51'
+    duracion: '1:51',
+    idRol: 1 // Estudiante
   },
   {
     id: 2,
@@ -22,7 +24,8 @@ const historialReciente = ref([
     canal: 'Profe Santos Cloud',
     vistas: '701 visualizaciones',
     thumbnail: 'https://picsum.photos/id/24/300/200',
-    duracion: '8:07'
+    duracion: '8:07',
+    idRol: 2 // Profesor
   },
   {
     id: 3,
@@ -30,7 +33,8 @@ const historialReciente = ref([
     canal: 'los primero de mayo',
     vistas: '38K visualizaciones',
     thumbnail: 'https://picsum.photos/id/25/300/200',
-    duracion: '0:45'
+    duracion: '0:45',
+    idRol: 1 // Estudiante
   },
   {
     id: 4,
@@ -38,7 +42,8 @@ const historialReciente = ref([
     canal: 'Davoo Xeneize',
     vistas: '1.4M de visualizaciones',
     thumbnail: 'https://picsum.photos/id/26/300/200',
-    duracion: '50:55'
+    duracion: '50:55',
+    idRol: 3 // Admin
   }
 ]);
 
@@ -96,13 +101,23 @@ const verVideo = (id) => {
               {{ video.titulo }}
             </v-card-title>
             
-            <v-card-subtitle class="text-caption pa-0 pt-1 pb-0 text-grey">
-              {{ video.canal }}
-            </v-card-subtitle>
-            
-            <v-card-subtitle class="text-caption pa-0 text-grey">
-              {{ video.vistas }}
-            </v-card-subtitle>
+            <!-- Canal con avatar -->
+            <div class="d-flex align-center mt-2">
+              <UserAvatar
+                :nombre="video.canal"
+                :id-rol="video.idRol"
+                :size="24"
+                class="mr-2"
+              />
+              <div>
+                <v-card-subtitle class="text-caption pa-0 text-grey">
+                  {{ video.canal }}
+                </v-card-subtitle>
+                <v-card-subtitle class="text-caption pa-0 text-grey">
+                  {{ video.vistas }}
+                </v-card-subtitle>
+              </div>
+            </div>
           </v-card-item>
         </v-card>
       </v-slide-group-item>

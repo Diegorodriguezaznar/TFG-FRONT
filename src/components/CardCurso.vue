@@ -124,7 +124,7 @@ const guardarCurso = async (event) => {
   }
 };
 
-// Método para borrar un curso guardado
+// Método para borrar un curso guardado - CORREGIDO
 const borrarGuardado = async (event) => {
   // Prevenir la navegación
   event.stopPropagation();
@@ -150,59 +150,18 @@ const borrarGuardado = async (event) => {
       return;
     }
     
-    console.log("Intentando eliminar inscripción con método POST");
+    console.log("Eliminando inscripción usando el store...");
     
-    // Intentar eliminar con método POST y un campo especial para indicar eliminación
-    const response = await fetch("http://localhost:5190/api/UsuarioCurso/Eliminar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        IdUsuario: usuarioId.value,
-        IdCurso: props.id
-      })
-    });
+    // USAR EL MÉTODO DEL STORE en lugar de hacer peticiones directas
+    const resultado = await usuarioCursoStore.deleteInscripcion(usuarioId.value, props.id);
     
-    if (response.ok) {
+    if (resultado) {
       estaInscrito.value = false;
       mostrarMensaje('Curso quitado de guardados', 'success');
       emit('eliminado', props.id);
     } else {
-      // Si falla, intentar con otro endpoint
-      console.log("Primer intento falló, probando con otro endpoint");
-      
-      // Intentar con otro endpoint específico para eliminar
-      const response2 = await fetch(`http://localhost:5190/api/UsuarioCurso/Eliminar/${usuarioId.value}/${props.id}`, {
-        method: "GET" // Probar con GET ya que muchos backends permiten eliminar con GET en endpoints específicos
-      });
-      
-      if (response2.ok) {
-        estaInscrito.value = false;
-        mostrarMensaje('Curso quitado de guardados', 'success');
-        emit('eliminado', props.id);
-      } else {
-        // Si falla, intentar con método PUT
-        console.log("Segundo intento falló, probando con método PUT");
-        
-        const response3 = await fetch("http://localhost:5190/api/UsuarioCurso", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            IdUsuario: usuarioId.value,
-            IdCurso: props.id,
-            _method: "DELETE" // Algunos backends usan este patrón para emular DELETE
-          })
-        });
-        
-        if (response3.ok) {
-          estaInscrito.value = false;
-          mostrarMensaje('Curso quitado de guardados', 'success');
-          emit('eliminado', props.id);
-        } else {
-          const errorText = await response3.text();
-          console.error("Todos los intentos de eliminar fallaron. Último error:", errorText);
-          mostrarMensaje('Error al quitar curso guardado. Consulta la consola para más detalles.', 'error');
-        }
-      }
+      console.error("Error al eliminar inscripción:", usuarioCursoStore.errorMessage);
+      mostrarMensaje(`Error al quitar curso guardado: ${usuarioCursoStore.errorMessage}`, 'error');
     }
 
     // Quitar animación después de un tiempo

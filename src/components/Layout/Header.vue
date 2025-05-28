@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 const searchQuery = ref('');
+const usuarioStore = useUsuarioLogeadoStore();
 
 const emit = defineEmits(['toggle-sidebar', 'update-search']);
 
@@ -38,14 +41,85 @@ const updateSearch = () => {
       bg-color="grey-lighten-4"
     />
     
-    <v-btn icon class="Header__btn-usuario" to="/perfil">
-      <v-avatar color="primary" size="32">
-        <v-icon color="white">mdi-account</v-icon>
-      </v-avatar>
-    </v-btn>
+    <!-- Spacer para empujar el avatar al extremo derecho -->
+    <v-spacer></v-spacer>
+    
+    <!-- Avatar de usuario en el extremo derecho -->
+    <div class="Header__UserSection">
+      <v-btn 
+        variant="text"
+        to="/perfil"
+        class="Header__UserButton"
+      >
+        <UserAvatar
+          v-if="usuarioStore.usuarioActual"
+          :usuario="usuarioStore.usuarioActual"
+          :size="32"
+        />
+        <UserAvatar
+          v-else
+          :nombre="'Invitado'"
+          :id-rol="1"
+          :size="32"
+        />
+      </v-btn>
+    </div>
   </v-app-bar>
 </template>
 
-<style lang="scss" scoped>
-@import "@/assets/sass/layout/Header";
+<style scoped>
+.Header {
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+}
+
+.Header__Logo {
+  display: flex;
+  align-items: center;
+  min-width: 140px;
+  margin-right: 16px;
+}
+
+.Header__Buscador {
+  max-width: 600px;
+  flex-grow: 1;
+  margin: 0 16px;
+}
+
+.Header__UserSection {
+  padding-right: 20px; 
+}
+
+.Header__UserButton {
+  border-radius: 50%;
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.Header__UserButton:hover {
+  background: rgba(255, 152, 0, 0.1);
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .Header__Buscador {
+    margin: 0 8px;
+  }
+  
+  .Header__Logo span {
+    display: none;
+  }
+  
+  .Header__Logo {
+    min-width: unset;
+  }
+  
+  .Header__UserSection {
+    padding-right: 20px; 
+  }
+}
 </style>

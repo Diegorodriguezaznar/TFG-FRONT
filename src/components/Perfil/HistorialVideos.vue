@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { computed } from 'vue';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 // --------------------------- Props y Emits ---------------------------
 const props = defineProps({
@@ -49,6 +50,17 @@ const historialFiltrado = computed(() => {
 // --------------------------- Métodos ---------------------------
 const eliminarVideo = (seccionIndex, videoIndex) => {
   emit('eliminar-video', seccionIndex, videoIndex);
+};
+
+// Función para obtener rol simulado basado en el canal
+const obtenerRolSimulado = (canal: string) => {
+  // Simular roles basado en el nombre del canal
+  if (canal.toLowerCase().includes('profe') || canal.toLowerCase().includes('profesor')) {
+    return 2; // Profesor
+  } else if (canal.toLowerCase().includes('admin') || canal.toLowerCase().includes('director')) {
+    return 3; // Administrador
+  }
+  return 1; // Estudiante por defecto
 };
 </script>
 
@@ -99,6 +111,14 @@ const eliminarVideo = (seccionIndex, videoIndex) => {
           <!-- Información del video -->
           <div class="HistorialVideos__Info">
             <div class="d-flex align-start">
+              <!-- Avatar del canal -->
+              <UserAvatar
+                :nombre="video.canal"
+                :id-rol="obtenerRolSimulado(video.canal)"
+                :size="36"
+                class="mr-3 mt-1"
+              />
+              
               <div class="flex-grow-1">
                 <div class="HistorialVideos__Titulo">
                   {{ video.titulo }}

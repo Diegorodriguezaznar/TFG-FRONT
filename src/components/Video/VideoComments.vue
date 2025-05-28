@@ -6,6 +6,7 @@ import type { ComentarioUI } from '@/stores/dtos/ComentarioDTO';
 import { storeToRefs } from 'pinia';
 import ModalReportarComentario from './Modales/ModalReportarComentario.vue';
 import ModalNotificacion from './Modales/ModalReporteCorrecto.vue';
+import UserAvatar from '@/components/UserAvatar.vue';
 
 const comentarioStore = useComentarioStore();
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
@@ -46,6 +47,7 @@ const cargarComentarios = async () => {
     console.error("Error al cargar comentarios:", error);
   }
 };
+
 
 const eliminarComentario = async (idComentario: number) => {
   try {
@@ -120,9 +122,23 @@ const submitComment = async () => {
     }
   } catch (error: any) {
     commentError.value = error.message || 'Error al enviar el comentario';
+    console.error("Error al enviar comentario:", error);
   }
 };
 
+// Función para obtener el rol de un comentario basado en el ID del usuario
+const obtenerRolComentario = (comment: ComentarioUI) => {
+  // Si el comentario es del usuario actual, usar su rol
+  if (comment.idUsuario === usuarioId.value && usuarioActual.value) {
+    return usuarioActual.value.idRol;
+  }
+  
+  // Para otros usuarios, podrías tener esta info en el comentario
+  // o hacer una llamada para obtenerla. Por ahora, usar rol por defecto
+  return 1; // Rol de estudiante por defecto
+};
+
+// --------------------------- Watchers ---------------------------
 watch(() => props.videoId, (newId) => {
   if (newId) {
     cargarComentarios();
@@ -152,13 +168,22 @@ onMounted(() => {
       {{ errorMessage }}
     </v-alert>
     
-    <div v-if="!storeLoading || comments.length > 0" class="VideoComments__form">
-      <v-avatar size="40" class="VideoComments__avatar">
-        <v-img 
-          :src="usuarioActual ? `https://picsum.photos/seed/user${usuarioId}/40/40` : 'https://picsum.photos/seed/guest/40/40'" 
-          alt="Tu avatar"
-        />
-      </v-avatar>
+    <!-- Formulario para agregar comentarios -->
+    <div v-if="!storeLoading || comments.length > 0" class="VideoComments__Form d-flex align-start mb-6">
+      <!-- Avatar del usuario actual -->
+      <UserAvatar
+        v-if="usuarioActual"
+        :usuario="usuarioActual"
+        :size="40"
+        class="mr-3 mt-1"
+      />
+      <UserAvatar
+        v-else
+        :nombre="'Invitado'"
+        :id-rol="1"
+        :size="40"
+        class="mr-3 mt-1"
+      />
       
       <div class="VideoComments__input">
         <v-textarea
@@ -206,12 +231,17 @@ onMounted(() => {
       </div>
     </div>
     
-    <div v-if="comments.length > 0" class="VideoComments__lista">
-      <div v-for="comment in comments" :key="comment.id" class="VideoComments__comentario">
-        <div class="VideoComments__comentario-layout">
-          <v-avatar size="40" class="VideoComments__comentario-avatar">
-            <v-img :src="comment.avatar" :alt="comment.user" />
-          </v-avatar>
+    <!-- Lista de comentarios -->
+    <div v-if="comments.length > 0" class="VideoComments__List">
+      <div v-for="comment in comments" :key="comment.id" class="VideoComments__Comment mb-4">
+        <div class="d-flex">
+          <!-- Avatar del usuario que comentó -->
+          <UserAvatar
+            :nombre="comment.user"
+            :id-rol="obtenerRolComentario(comment)"
+            :size="40"
+            class="mr-3"
+          />
           
           <div class="VideoComments__comentario-contenido">
             <div class="VideoComments__comentario-header">
