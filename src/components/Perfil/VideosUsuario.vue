@@ -138,15 +138,14 @@ const formatearDuracion = (duracion: string) => {
                     </v-card-title>
                     
                     <v-card-subtitle class="VideosUsuario__VideoMeta">
-                      <div class="text-grey">{{ video.vistas }} visualizaciones</div>
                       <div class="text-grey">{{ formatearFecha(video.fechaSubida) }}</div>
                     </v-card-subtitle>
                   </div>
                 </div>
               </v-card-item>
               
-              <!-- Chip de asignatura -->
-              <div class="VideosUsuario__VideoChip">
+              <!-- Chip de asignatura (solo si no es "General") -->
+              <div v-if="video.asignatura && video.asignatura !== 'General'" class="VideosUsuario__VideoChip">
                 <v-chip 
                   size="small" 
                   color="red" 

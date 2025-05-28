@@ -38,15 +38,6 @@ const verQuiz = (quiz: QuizDTO) => {
     query: { id: quiz.idQuiz }
   });
 };
-
-const formatearFecha = (fecha: string | Date) => {
-  const fechaObj = typeof fecha === 'string' ? new Date(fecha) : fecha;
-  return fechaObj.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-};
 </script>
 
 <template>
@@ -106,17 +97,7 @@ const formatearFecha = (fecha: string | Date) => {
                   {{ quiz.descripcion || 'Sin descripción disponible' }}
                 </v-card-text>
                 
-                <div class="QuizzesUsuario__QuizMeta">
-                  <div class="d-flex align-center text-caption text-grey">
-                    <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
-                    <span>Creado hace {{ Math.floor(Math.random() * 30) + 1 }} días</span>
-                  </div>
-                  
-                  <div class="d-flex align-center text-caption text-grey mt-1">
-                    <v-icon size="small" class="mr-1">mdi-account-multiple</v-icon>
-                    <span>{{ Math.floor(Math.random() * 500) + 50 }} participantes</span>
-                  </div>
-                </div>
+
               </v-card-item>
               
               <!-- Acciones -->
