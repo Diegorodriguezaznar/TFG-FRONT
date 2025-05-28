@@ -18,6 +18,7 @@ const usuarioLogeadoStore = useUsuarioLogeadoStore();
 const drawer = ref(false);
 const searchQuery = ref('');
 const filtroSeleccionado = ref('Todos');
+const paginaActual = ref(1);
 const loading = computed(() => videoStore.loading || cursoStore.loading);
 const curso = computed(() => cursoStore.curso);
 const mostrarModalAsignatura = ref(false);
@@ -58,29 +59,14 @@ const bannerImage = computed(() => {
   return 'https://picsum.photos/seed/home/1600/400';
 });
 
-const cargarVideos = async () => {
-  try {
-    if (cursoId.value) {
-      await cursoStore.fetchCursoById(cursoId.value);
-      await videoStore.fetchVideosByCurso(cursoId.value);
-    } else {
-      await videoStore.fetchAllVideos();
-    }
-  } catch (error) {
-    // Error manejado por los stores
-  }
-};
-
-const asignaturaCreada = async () => {
-  if (cursoId.value) {
-    await cursoStore.fetchCursoById(cursoId.value);
-    filtroSeleccionado.value = 'Todos';
-  }
-};
+const videosData = computed(() => {
+  return cursoId.value ? videoStore.videosCursoPaged : videoStore.videosPaged;
+});
 
 const videosFiltrados = computed(() => {
-  const videosBase = cursoId.value ? videoStore.videosFiltradosPorCurso : videoStore.videos;
-  let resultado = videosBase;
+  if (!videosData.value) return [];
+  
+  let resultado = videosData.value.items;
   
   if (searchQuery.value) {
     resultado = resultado.filter(video => 
@@ -97,6 +83,51 @@ const videosFiltrados = computed(() => {
   return resultado;
 });
 
+const totalPaginas = computed(() => videosData.value?.totalPages || 1);
+const hayPaginaAnterior = computed(() => videosData.value?.hasPreviousPage || false);
+const hayPaginaSiguiente = computed(() => videosData.value?.hasNextPage || false);
+
+const cargarVideos = async () => {
+  try {
+    if (cursoId.value) {
+      await cursoStore.fetchCursoById(cursoId.value);
+      await videoStore.fetchVideosByCursoPaged(cursoId.value, { page: paginaActual.value, pageSize: 20 });
+    } else {
+      await videoStore.fetchAllVideosPaged({ page: paginaActual.value, pageSize: 20 });
+    }
+  } catch (error) {
+    // Error manejado por los stores
+  }
+};
+
+const cambiarPagina = async (nuevaPagina: number) => {
+  if (nuevaPagina < 1 || nuevaPagina > totalPaginas.value) return;
+  
+  paginaActual.value = nuevaPagina;
+  await cargarVideos();
+};
+
+const paginaAnterior = async () => {
+  if (hayPaginaAnterior.value) {
+    await cambiarPagina(paginaActual.value - 1);
+  }
+};
+
+const paginaSiguiente = async () => {
+  if (hayPaginaSiguiente.value) {
+    await cambiarPagina(paginaActual.value + 1);
+  }
+};
+
+const asignaturaCreada = async () => {
+  if (cursoId.value) {
+    await cursoStore.fetchCursoById(cursoId.value);
+    filtroSeleccionado.value = 'Todos';
+    paginaActual.value = 1;
+    await cargarVideos();
+  }
+};
+
 const actualizarBusqueda = (query: string) => {
   searchQuery.value = query;
 };
@@ -107,6 +138,7 @@ const actualizarFiltro = (filtro: string | number) => {
 
 watch(() => route.params.id, () => {
   filtroSeleccionado.value = 'Todos';
+  paginaActual.value = 1;
   cargarVideos();
 });
 
@@ -157,7 +189,7 @@ onMounted(() => {
                   size="large"
                 >
                   <v-icon start icon="mdi-play-circle"></v-icon>
-                  {{ videosFiltrados.length }} videos
+                  {{ videosData?.totalCount || 0 }} videos
                 </v-chip>
                 
                 <v-btn 
@@ -210,6 +242,29 @@ onMounted(() => {
               text="No se encontraron videos con los filtros actuales."
               class="HomePage__NoVideos"
             ></v-alert>
+
+            <!-- Paginación -->
+            <div v-if="totalPaginas > 1" class="HomePage__Pagination">
+              <v-btn 
+                icon="mdi-chevron-left"
+                :disabled="!hayPaginaAnterior"
+                @click="paginaAnterior"
+                variant="text"
+                size="small"
+              ></v-btn>
+              
+              <span class="HomePage__PageInfo">
+                {{ paginaActual }} / {{ totalPaginas }}
+              </span>
+              
+              <v-btn 
+                icon="mdi-chevron-right"
+                :disabled="!hayPaginaSiguiente"
+                @click="paginaSiguiente"
+                variant="text"
+                size="small"
+              ></v-btn>
+            </div>
           </template>
         </v-container>
       </div>
@@ -228,4 +283,21 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 @import "@/assets/sass/pages/Home";
+
+.HomePage__Pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+  padding: 16px 0;
+}
+
+.HomePage__PageInfo {
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(var(--v-theme-on-surface), 0.87);
+  min-width: 60px;
+  text-align: center;
+}
 </style>

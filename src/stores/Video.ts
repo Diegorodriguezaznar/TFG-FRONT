@@ -1,17 +1,174 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import type { VideoDTO } from "@/stores/dtos/VideoDTO";
+import type { PagedResult, PaginationParams } from "@/stores/dtos/PagedResult";
 
 export const useVideoStore = defineStore("video", () => {
   // Estado
   const videos = ref<VideoDTO[]>([]);
+  const videosPaged = ref<PagedResult<VideoDTO> | null>(null);
+  const videosUsuarioPaged = ref<PagedResult<VideoDTO> | null>(null);
+  const videosCursoPaged = ref<PagedResult<VideoDTO> | null>(null);
   const videosFiltradosPorCurso = ref<VideoDTO[]>([]);
   const videosReportados = ref<VideoDTO[]>([]);
   const video = ref<VideoDTO | null>(null);
   const errorMessage = ref<string>("");
   const loading = ref<boolean>(false);
 
-  // GET - Obtener todos los videos
+  // GET paginado de todos los videos
+  async function fetchAllVideosPaged(params: PaginationParams = {}): Promise<PagedResult<VideoDTO> | null> {
+    loading.value = true;
+    try {
+      const { page = 1, pageSize = 10 } = params;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(
+        `http://localhost:5190/api/Video/paged?page=${page}&pageSize=${pageSize}`,
+        {
+          signal: controller.signal,
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Error al obtener los videos paginados: ${response.status} ${response.statusText}. ${errorText}`
+        );
+      }
+
+      const data: PagedResult<any> = await response.json();
+
+      const mappedVideos = data.items.map((v: any) => mapVideoFromAPI(v));
+
+      videosPaged.value = {
+        ...data,
+        items: mappedVideos
+      };
+
+      return videosPaged.value;
+    } catch (error: any) {
+      const message = getErrorMessage(error, "Error al obtener los videos paginados");
+      errorMessage.value = message;
+      
+      // Fallback con datos simulados
+      videosPaged.value = {
+        items: simulateVideos(),
+        totalCount: 1,
+        page: params.page || 1,
+        pageSize: params.pageSize || 10,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false
+      };
+      
+      return videosPaged.value;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  //  GET paginado de videos por curso
+  async function fetchVideosByCursoPaged(
+    idCurso: number, 
+    params: PaginationParams = {}
+  ): Promise<PagedResult<VideoDTO> | null> {
+    loading.value = true;
+    try {
+      const { page = 1, pageSize = 10 } = params;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      const response = await fetch(
+        `http://localhost:5190/api/Video/curso/${idCurso}/paged?page=${page}&pageSize=${pageSize}`,
+        {
+          signal: controller.signal,
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(
+          `Error al obtener los videos del curso paginados: ${response.status} ${response.statusText}. ${errorText}`
+        );
+      }
+
+      const data: PagedResult<any> = await response.json();
+
+      const mappedVideos = data.items.map((v: any) => mapVideoFromAPI(v));
+
+      videosCursoPaged.value = {
+        ...data,
+        items: mappedVideos
+      };
+
+      return videosCursoPaged.value;
+    } catch (error: any) {
+      const message = getErrorMessage(error, "Error al obtener los videos del curso paginados");
+      errorMessage.value = message;
+      
+      videosCursoPaged.value = {
+        items: simulateVideosByCurso(idCurso),
+        totalCount: 1,
+        page: params.page || 1,
+        pageSize: params.pageSize || 10,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false
+      };
+      
+      return videosCursoPaged.value;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  //Mapear video desde API
+  function mapVideoFromAPI(v: any): VideoDTO {
+    return {
+      idVideo: v.idVideo,
+      titulo: v.titulo,
+      descripcion: v.descripcion,
+      url: v.url,
+      miniatura: v.miniatura || `https://picsum.photos/id/${v.idVideo}/300/200`,
+      fechaSubida: v.fechaSubida,
+      idAsignatura: v.idAsignatura,
+      asignatura: v.asignatura?.nombre || "General",
+      idUsuario: v.idUsuario,
+      autor: v.usuario?.nombre || "Profesor",
+      idCurso: v.idCurso,
+      duracion: v.duracion,
+      vistas: Math.floor(Math.random() * 10) + "K",
+      fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
+      numReportes: v.numReportes || 0,
+      contadorLikes: v.contadorLikes || 0 
+    };
+  }
+
+  // Manejo de errores
+  function getErrorMessage(error: any, defaultMessage: string): string {
+    if (error.name === "AbortError") {
+      return "La conexión con el servidor ha excedido el tiempo de espera";
+    }
+    if (error instanceof TypeError && error.message.includes("Failed to fetch")) {
+      return "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.";
+    }
+    return error.message || defaultMessage;
+  }
+
+
   async function fetchAllVideos() {
     loading.value = true;
     try {
@@ -36,34 +193,10 @@ export const useVideoStore = defineStore("video", () => {
       }
 
       const data = await response.json();
-
-      videos.value = data.map((v: any) => ({
-        idVideo: v.idVideo,
-        titulo: v.titulo,
-        descripcion: v.descripcion,
-        url: v.url,
-        miniatura: v.miniatura || `https://picsum.photos/id/${v.idVideo}/300/200`,
-        fechaSubida: v.fechaSubida,
-        idAsignatura: v.idAsignatura,
-        asignatura: v.asignatura?.nombre || "General",
-        idUsuario: v.idUsuario,
-        autor: v.usuario?.nombre || "Profesor",
-        idCurso: v.idCurso,
-        duracion: v.duracion,
-        vistas: Math.floor(Math.random() * 10) + "K",
-        fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
-        numReportes: v.numReportes || 0,
-        contadorLikes: v.contadorLikes || 0 
-      }));
-
+      videos.value = data.map((v: any) => mapVideoFromAPI(v));
       return videos.value;
     } catch (error: any) {
-      const message = error.name === "AbortError"
-        ? "La conexión con el servidor ha excedido el tiempo de espera"
-        : error instanceof TypeError && error.message.includes("Failed to fetch")
-        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
-        : error.message || "Error al obtener los videos";
-
+      const message = getErrorMessage(error, "Error al obtener los videos");
       errorMessage.value = message;
       videos.value = simulateVideos();
       return videos.value;
@@ -72,7 +205,6 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // GET - Obtener videos por curso
   async function fetchVideosByCurso(idCurso: number) {
     loading.value = true;
     try {
@@ -100,34 +232,10 @@ export const useVideoStore = defineStore("video", () => {
       }
 
       const data = await response.json();
-
-      videosFiltradosPorCurso.value = data.map((v: any) => ({
-        idVideo: v.idVideo,
-        titulo: v.titulo,
-        descripcion: v.descripcion,
-        url: v.url,
-        miniatura: v.miniatura || `https://picsum.photos/id/${v.idVideo}/300/200`,
-        fechaSubida: v.fechaSubida,
-        idAsignatura: v.idAsignatura,
-        asignatura: v.asignatura?.nombre || "General",
-        idUsuario: v.idUsuario,
-        autor: v.usuario?.nombre || "Profesor",
-        idCurso: v.idCurso,
-        duracion: v.duracion,
-        vistas: Math.floor(Math.random() * 10) + "K",
-        fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
-        numReportes: v.numReportes || 0,
-        contadorLikes: v.contadorLikes || 0 
-      }));
-
+      videosFiltradosPorCurso.value = data.map((v: any) => mapVideoFromAPI(v));
       return videosFiltradosPorCurso.value;
     } catch (error: any) {
-      const message = error.name === "AbortError"
-        ? "La conexión con el servidor ha excedido el tiempo de espera"
-        : error instanceof TypeError && error.message.includes("Failed to fetch")
-        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
-        : error.message || "Error al obtener los videos del curso";
-
+      const message = getErrorMessage(error, "Error al obtener los videos del curso");
       errorMessage.value = message;
       videosFiltradosPorCurso.value = simulateVideosByCurso(idCurso);
       return videosFiltradosPorCurso.value;
@@ -136,7 +244,6 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // GET - Obtener video por ID
   async function fetchVideoById(idVideo: number) {
     loading.value = true;
     try {
@@ -161,34 +268,10 @@ export const useVideoStore = defineStore("video", () => {
       }
 
       const v = await response.json();
-
-      video.value = {
-        idVideo: v.idVideo,
-        titulo: v.titulo,
-        descripcion: v.descripcion,
-        url: v.url,
-        miniatura: v.miniatura || `https://picsum.photos/id/${v.idVideo}/300/200`,
-        fechaSubida: v.fechaSubida,
-        idAsignatura: v.idAsignatura,
-        asignatura: v.asignatura?.nombre || "General",
-        idUsuario: v.idUsuario,
-        autor: v.usuario?.nombre || "Profesor",
-        idCurso: v.idCurso,
-        duracion: v.duracion,
-        vistas: Math.floor(Math.random() * 10) + "K",
-        fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
-        numReportes: v.numReportes || 0,
-        contadorLikes: v.contadorLikes || 0 
-      };
-
+      video.value = mapVideoFromAPI(v);
       return video.value;
     } catch (error: any) {
-      const message = error.name === "AbortError"
-        ? "La conexión con el servidor ha excedido el tiempo de espera"
-        : error instanceof TypeError && error.message.includes("Failed to fetch")
-        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
-        : error.message || "Error al obtener el video";
-
+      const message = getErrorMessage(error, "Error al obtener el video");
       errorMessage.value = message;
       const videosSimulados = simulateVideos();
       video.value = videosSimulados.find((v) => v.idVideo === idVideo) || null;
@@ -198,7 +281,6 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // GET - Obtener videos reportados
   async function fetchVideosReportados() {
     loading.value = true;
     try {
@@ -225,34 +307,12 @@ export const useVideoStore = defineStore("video", () => {
       const data = await response.json();
 
       videosReportados.value = data
-        .map((v: any) => ({
-          idVideo: v.idVideo,
-          titulo: v.titulo,
-          descripcion: v.descripcion,
-          url: v.url,
-          miniatura: v.miniatura || `https://picsum.photos/id/${v.idVideo}/300/200`,
-          fechaSubida: v.fechaSubida,
-          idAsignatura: v.idAsignatura,
-          asignatura: v.asignatura?.nombre || "General",
-          idUsuario: v.idUsuario,
-          autor: v.usuario?.nombre || "Profesor",
-          idCurso: v.idCurso,
-          duracion: v.duracion,
-          vistas: Math.floor(Math.random() * 10) + "K",
-          fecha: "Hace " + Math.floor(Math.random() * 10) + " días",
-          numReportes: v.numReportes || 0,
-          contadorLikes: v.contadorLikes || 0 
-        }))
+        .map((v: any) => mapVideoFromAPI(v))
         .sort((a: VideoDTO, b: VideoDTO) => (b.numReportes || 0) - (a.numReportes || 0));
 
       return videosReportados.value;
     } catch (error: any) {
-      const message = error.name === "AbortError"
-        ? "La conexión con el servidor ha excedido el tiempo de espera"
-        : error instanceof TypeError && error.message.includes("Failed to fetch")
-        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
-        : error.message || "Error al obtener los videos reportados";
-
+      const message = getErrorMessage(error, "Error al obtener los videos reportados");
       errorMessage.value = message;
       videosReportados.value = simulateVideosReportados();
       return videosReportados.value;
@@ -261,7 +321,6 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // PUT - Aprobar video
   async function aprobarVideo(idVideo: number) {
     loading.value = true;
     try {
@@ -280,12 +339,7 @@ export const useVideoStore = defineStore("video", () => {
       videosReportados.value = videosReportados.value.filter(v => v.idVideo !== idVideo);
       return true;
     } catch (error: any) {
-      const message = error.name === "AbortError"
-        ? "La conexión con el servidor ha excedido el tiempo de espera"
-        : error instanceof TypeError && error.message.includes("Failed to fetch")
-        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
-        : error.message || "Error al aprobar el video";
-      
+      const message = getErrorMessage(error, "Error al aprobar el video");
       errorMessage.value = message;
       return false;
     } finally {
@@ -293,7 +347,6 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
   
-  // DELETE - Eliminar video
   async function eliminarVideo(idVideo: number) {
     loading.value = true;
     try {
@@ -322,12 +375,7 @@ export const useVideoStore = defineStore("video", () => {
       
       return true;
     } catch (error: any) {
-      const message = error.name === "AbortError"
-        ? "La conexión con el servidor ha excedido el tiempo de espera"
-        : error instanceof TypeError && error.message.includes("Failed to fetch")
-        ? "No se pudo conectar con el servidor. Verifica que el backend esté en ejecución."
-        : error.message || "Error al eliminar el video";
-      
+      const message = getErrorMessage(error, "Error al eliminar el video");
       errorMessage.value = message;
       return false;
     } finally {
@@ -335,7 +383,6 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // DELETE - Eliminar video propio
   async function eliminarVideoPropio(idVideo: number): Promise<boolean> {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -361,7 +408,7 @@ export const useVideoStore = defineStore("video", () => {
     }
   }
 
-  // UTIL - Datos de fallback
+  // Funciones de simulación (sin cambios)
   function simulateVideos(): VideoDTO[] {
     return [
       {
@@ -411,11 +458,21 @@ export const useVideoStore = defineStore("video", () => {
   }
 
   return {
+    // Estado
     videos,
+    videosPaged,
+    videosUsuarioPaged,
+    videosCursoPaged,
     videosFiltradosPorCurso,
     videosReportados,
     video,
     loading,
+    errorMessage,
+    
+    //  paginación
+    fetchAllVideosPaged,
+    fetchVideosByCursoPaged,
+    
     fetchAllVideos,
     fetchVideosByCurso,
     fetchVideoById,
@@ -423,6 +480,5 @@ export const useVideoStore = defineStore("video", () => {
     aprobarVideo,
     eliminarVideo,
     eliminarVideoPropio,
-    errorMessage,
   };
 });
