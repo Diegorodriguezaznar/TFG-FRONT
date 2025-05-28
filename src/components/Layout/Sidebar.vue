@@ -31,14 +31,14 @@ const menuItemsBase = [
   { title: 'Mis Cursos', icon: 'mdi-bookmark-multiple', route: '/mis-cursos' },
   { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
-  { title: 'Historial', icon: 'mdi-history', route: '/historial' },
   { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
   { title: 'Profesores', icon: 'mdi-account-group', route: '/usuarios' },
   { title: 'MarIAno', icon: 'mdi-robot-outline', route: '/ia' },
   { title: 'Ranking', icon: 'mdi-chart-bar', route: '/ranking' },
-  ...(esAdmin.value ? [
-    { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
-  ] : [])
+...(idRol.value === 1 ? [
+  { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
+] : [])
+
 ];
 
 const menuItemsAdmin = [

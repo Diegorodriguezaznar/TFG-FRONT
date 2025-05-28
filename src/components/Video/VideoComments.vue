@@ -101,22 +101,28 @@ const submitComment = async () => {
     commentError.value = 'Por favor, escribe un comentario';
     return;
   }
-  
+
   if (!usuarioId.value) {
     showLoginMsg.value = true;
     return;
   }
-  
+
   commentError.value = '';
-  
+
   try {
     const nuevoComentario = await comentarioStore.createComentario({
       contenido: newComment.value,
       idUsuario: usuarioId.value,
       idVideo: props.videoId
     });
-    
-    if (nuevoComentario) {
+
+    if (nuevoComentario && usuarioActual.value) {
+      // 👇 Inyectamos manualmente los datos que sabemos
+      nuevoComentario.user = `${usuarioActual.value.nombre} ${usuarioActual.value.apellidos || ''}`.trim();
+      nuevoComentario.avatar = `https://picsum.photos/seed/user${usuarioId.value}/40/40`;
+      nuevoComentario.time = 'ahora mismo';
+      nuevoComentario.likes = 0;
+
       comments.value.unshift(nuevoComentario);
       newComment.value = '';
     }
@@ -126,16 +132,15 @@ const submitComment = async () => {
   }
 };
 
+
 // Función para obtener el rol de un comentario basado en el ID del usuario
 const obtenerRolComentario = (comment: ComentarioUI) => {
-  // Si el comentario es del usuario actual, usar su rol
   if (comment.idUsuario === usuarioId.value && usuarioActual.value) {
     return usuarioActual.value.idRol;
   }
   
-  // Para otros usuarios, podrías tener esta info en el comentario
-  // o hacer una llamada para obtenerla. Por ahora, usar rol por defecto
-  return 1; // Rol de estudiante por defecto
+  
+  return 1; 
 };
 
 // --------------------------- Watchers ---------------------------
@@ -252,15 +257,7 @@ onMounted(() => {
             <p class="VideoComments__texto">{{ comment.content }}</p>
             
             <div class="VideoComments__acciones">
-              <v-btn icon variant="plain" size="small">
-                <v-icon size="small">mdi-thumb-up</v-icon>
-              </v-btn>
-              
-              <span class="VideoComments__likes">{{ comment.likes }}</span>
-              
-              <v-btn icon variant="plain" size="small">
-                <v-icon size="small">mdi-thumb-down</v-icon>
-              </v-btn>
+
               
               <v-btn 
                 variant="text" 

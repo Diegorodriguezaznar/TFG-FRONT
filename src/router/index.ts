@@ -250,7 +250,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // Requiere admin
-  if (to.meta.requiresAdmin && idRol !== 1) {
+  if (to.meta.requiresAdmin && idRol !== 3) {
     alert("No tienes permisos de administrador");
     next("/home"); // CAMBIO: Redirigir a /home en lugar de /peticion-profesor
     return;

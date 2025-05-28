@@ -3,7 +3,7 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 
   &__Hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #eabc66 0%, #ee8b0a 100%);
     color: white;
     padding: 2rem 0;
 
@@ -79,7 +79,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      border-color: #667eea;
+      border-color: #b35600;
       transform: translateY(-4px);
     }
   }
@@ -124,7 +124,7 @@
   }
 
   &__Benefits {
-    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    background: linear-gradient(135deg, #1557ad 0%, #85c3db 100%);
     padding: 2rem 0;
 
     @media (min-width: 768px) {
@@ -168,7 +168,7 @@
   }
 
   &__BenefitDescription {
-    color: #666;
+    color: #666666;
     line-height: 1.6;
     font-size: 0.9rem;
 
@@ -216,7 +216,7 @@
 
   &__CTADescription {
     font-size: 1rem;
-    color: #666;
+    color: #666666;
     line-height: 1.6;
     margin-bottom: 1.5rem;
 
@@ -232,11 +232,11 @@
     padding: 1rem 2rem;
     border-radius: 0.75rem;
     text-transform: none;
-    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 16px rgba(234, 188, 102, 0.3);
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 6px 20px rgba(255, 142, 37, 0.4);
     }
 
     @media (min-width: 768px) {

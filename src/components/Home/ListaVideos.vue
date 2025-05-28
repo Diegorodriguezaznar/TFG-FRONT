@@ -148,9 +148,6 @@ watch(() => props.videos, async (newVideos) => {
         <div class="VideoCard" @click="verVideo(video)">
           <div class="VideoCard__imagen">
             <v-img :src="video.miniatura || video.thumbnail" height="180" cover>
-              <div class="VideoCard__duracion">
-                {{ video.duracion || '00:00' }}
-              </div>
               
               <v-btn
                 v-if="video.idUsuario === usuarioLogeadoStore.usuarioActual?.idUsuario"

@@ -229,16 +229,7 @@ onMounted(() => {
               <!-- Header con gradiente -->
               <div class="quiz-header">
                 <div class="quiz-header-content">
-                  <v-chip 
-                    color="white" 
-                    size="small"
-                    class="quiz-chip"
-                  >
-                    <v-icon start size="small">mdi-help-circle</v-icon>
-                    {{ quiz.totalPreguntas || '?' }} preguntas
-                  </v-chip>
                   
-                  <div class="quiz-duration">00:00</div>
                 </div>
               </div>
               
@@ -247,7 +238,7 @@ onMounted(() => {
                 <div class="d-flex align-center mb-3">
                   <v-avatar 
                     size="32" 
-                    color="orange" 
+                    color="purple" 
                     class="mr-3"
                   >
                     <span class="text-white font-weight-bold">
@@ -256,7 +247,7 @@ onMounted(() => {
                   </v-avatar>
                   <div>
                     <div class="text-h6 font-weight-bold">{{ quiz.nombre }}</div>
-                    <div class="text-caption text-grey-darken-1">{{ quiz.nombreUsuario }}</div>
+                    <div class="text-caption text-grey-darken-1">{{ quiz.nombreUsuario  }}</div>
                   </div>
                 </div>
                 
@@ -265,7 +256,7 @@ onMounted(() => {
                 </p>
                 
                 <div class="text-caption text-grey">
-                  Hace {{ quiz.fechaCreacion }}
+                 {{ quiz.fechaCreacion }}
                 </div>
               </v-card-text>
               
