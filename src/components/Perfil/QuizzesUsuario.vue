@@ -1,4 +1,4 @@
-<!-- src/components/PerfilUsuario/QuizzesUsuario.vue -->
+<!-- src/components/Perfil/QuizzesUsuario.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -38,46 +38,6 @@ const verQuiz = (quiz: QuizDTO) => {
     query: { id: quiz.idQuiz }
   });
 };
-
-const formatearFecha = (fecha: string | Date) => {
-  const fechaObj = typeof fecha === 'string' ? new Date(fecha) : fecha;
-  return fechaObj.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-};
-
-const obtenerDificultad = (quiz: QuizDTO) => {
-  // Generar dificultad basada en el ID del quiz
-  const dificultades = ['Fácil', 'Media', 'Difícil'];
-  return dificultades[quiz.idQuiz % 3];
-};
-
-const obtenerCategoria = (idAsignatura: number) => {
-  const categorias: Record<number, string> = {
-    1: 'Matemáticas',
-    2: 'Ciencias',
-    3: 'Historia',
-    4: 'Literatura',
-    5: 'Geografía',
-    6: 'Arte',
-    7: 'Deportes',
-    8: 'Programación',
-    9: 'Idiomas',
-    10: 'Marketing'
-  };
-  return categorias[idAsignatura] || 'Otras';
-};
-
-const colorDificultad = (dificultad: string) => {
-  const colores: Record<string, string> = {
-    'Fácil': 'success',
-    'Media': 'warning',
-    'Difícil': 'error'
-  };
-  return colores[dificultad] || 'grey';
-};
 </script>
 
 <template>
@@ -103,7 +63,7 @@ const colorDificultad = (dificultad: string) => {
       </div>
       
       <!-- Lista de quizzes -->
-      <div v-else>
+      <div v-else class="QuizzesUsuario__QuizGrid">
         <v-row>
           <v-col 
             v-for="quiz in quizzesVisibles" 
@@ -117,47 +77,13 @@ const colorDificultad = (dificultad: string) => {
               class="QuizzesUsuario__Quiz" 
               elevation="1" 
               @click="verQuiz(quiz)"
+              rounded="xl"
             >
-              <!-- Header del quiz con imagen -->
+              <!-- Header compacto con degradado morado -->
               <div class="QuizzesUsuario__QuizHeader">
-                <v-img 
-                  :src="`https://picsum.photos/seed/quiz${quiz.idQuiz}/400/200`" 
-                  height="140" 
-                  cover
-                  class="QuizzesUsuario__QuizImagen"
-                >
-                  <template v-slot:placeholder>
-                    <v-row class="fill-height ma-0" align="center" justify="center">
-                      <v-progress-circular indeterminate color="purple"></v-progress-circular>
-                    </v-row>
-                  </template>
-                </v-img>
-                
-                <!-- Overlay con badges -->
-                <div class="QuizzesUsuario__QuizOverlay">
-                  <div class="QuizzesUsuario__QuizBadges">
-                    <v-chip 
-                      size="small" 
-                      :color="colorDificultad(obtenerDificultad(quiz))"
-                      variant="elevated"
-                      class="mb-1"
-                    >
-                      {{ obtenerDificultad(quiz) }}
-                    </v-chip>
-                    
-                    <v-chip 
-                      size="small" 
-                      color="white"
-                      variant="elevated"
-                    >
-                      {{ obtenerCategoria(quiz.idAsignatura) }}
-                    </v-chip>
-                  </div>
-                  
-                  <!-- Play icon -->
-                  <div class="QuizzesUsuario__PlayIcon">
-                    <v-icon color="white" size="large">mdi-play-circle</v-icon>
-                  </div>
+                <!-- Icono de play centrado -->
+                <div class="QuizzesUsuario__PlayIcon">
+                  <v-icon color="white" size="large">mdi-play-circle</v-icon>
                 </div>
               </div>
               
@@ -171,17 +97,7 @@ const colorDificultad = (dificultad: string) => {
                   {{ quiz.descripcion || 'Sin descripción disponible' }}
                 </v-card-text>
                 
-                <div class="QuizzesUsuario__QuizMeta">
-                  <div class="d-flex align-center text-caption text-grey">
-                    <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
-                    <span>Creado hace {{ Math.floor(Math.random() * 30) + 1 }} días</span>
-                  </div>
-                  
-                  <div class="d-flex align-center text-caption text-grey mt-1">
-                    <v-icon size="small" class="mr-1">mdi-account-multiple</v-icon>
-                    <span>{{ Math.floor(Math.random() * 500) + 50 }} participantes</span>
-                  </div>
-                </div>
+
               </v-card-item>
               
               <!-- Acciones -->
@@ -192,6 +108,7 @@ const colorDificultad = (dificultad: string) => {
                   size="small"
                   @click.stop="verQuiz(quiz)"
                   block
+                  rounded="lg"
                 >
                   <v-icon start>mdi-play-circle</v-icon>
                   Hacer Quiz
@@ -209,6 +126,7 @@ const colorDificultad = (dificultad: string) => {
             variant="outlined"
             size="large"
             block
+            rounded="lg"
           >
             <v-icon start>{{ mostrarTodos ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
             {{ mostrarTodos ? 'Mostrar menos' : `Mostrar todos (${props.quizzes.length})` }}
@@ -235,6 +153,10 @@ const colorDificultad = (dificultad: string) => {
   padding: 20px;
 }
 
+.QuizzesUsuario__QuizGrid {
+  margin-top: 15px; 
+}
+
 .QuizzesUsuario__Empty {
   text-align: center;
   padding: 40px 20px;
@@ -245,11 +167,12 @@ const colorDificultad = (dificultad: string) => {
 
 .QuizzesUsuario__QuizCol {
   animation: fadeInUp 0.7s ease-out;
+  margin-bottom: 15px; /* Separación entre cards */
 }
 
 .QuizzesUsuario__Quiz {
   height: 100%;
-  border-radius: 12px;
+  border-radius: 16px;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   cursor: pointer;
   border: 1px solid rgba(156, 39, 176, 0.1);
@@ -264,49 +187,26 @@ const colorDificultad = (dificultad: string) => {
 }
 
 .QuizzesUsuario__QuizHeader {
+  height: 80px; /* Más pequeño que el naranja */
+  background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 50%, #E1BEE7 100%);
   position: relative;
-  overflow: hidden;
-}
-
-.QuizzesUsuario__QuizImagen {
-  border-radius: 12px 12px 0 0;
-  transition: transform 0.3s ease;
-}
-
-.QuizzesUsuario__Quiz:hover .QuizzesUsuario__QuizImagen {
-  transform: scale(1.05);
-}
-
-.QuizzesUsuario__QuizOverlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 12px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.QuizzesUsuario__Quiz:hover .QuizzesUsuario__QuizOverlay {
-  opacity: 1;
-}
-
-.QuizzesUsuario__QuizBadges {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center; /* Centrar el icono */
+  padding: 12px 16px;
+  border-radius: 16px 16px 0 0;
 }
 
 .QuizzesUsuario__PlayIcon {
   display: flex;
   align-items: center;
   justify-content: center;
-  align-self: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.QuizzesUsuario__Quiz:hover .QuizzesUsuario__PlayIcon {
+  opacity: 1;
 }
 
 .QuizzesUsuario__QuizInfo {
@@ -376,6 +276,11 @@ const colorDificultad = (dificultad: string) => {
   
   .QuizzesUsuario__Empty {
     padding: 32px 16px;
+  }
+  
+  .QuizzesUsuario__QuizHeader {
+    height: 70px;
+    padding: 10px 12px;
   }
 }
 </style>

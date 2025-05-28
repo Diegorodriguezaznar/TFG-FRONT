@@ -1,4 +1,4 @@
-<!-- src/components/PerfilUsuario/CursosUsuario.vue -->
+<!-- src/components/Perfil/CursosUsuario.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -68,7 +68,7 @@ const formatearFecha = (fecha: string) => {
       </div>
       
       <!-- Lista de cursos -->
-      <div v-else>
+      <div v-else class="CursosUsuario__CursosGrid">
         <v-row>
           <v-col 
             v-for="curso in cursosVisibles" 
@@ -163,6 +163,10 @@ const formatearFecha = (fecha: string) => {
   padding: 20px;
 }
 
+.CursosUsuario__CursosGrid {
+  margin-top: 15px; 
+}
+
 .CursosUsuario__Empty {
   text-align: center;
   padding: 40px 20px;
@@ -173,6 +177,7 @@ const formatearFecha = (fecha: string) => {
 
 .CursosUsuario__CursoCol {
   animation: fadeInUp 0.5s ease-out;
+  margin-bottom: 5px; 
 }
 
 .CursosUsuario__Curso {

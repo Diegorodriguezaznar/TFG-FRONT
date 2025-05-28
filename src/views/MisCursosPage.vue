@@ -124,17 +124,6 @@ onMounted(() => {
               <p class="MisCursosPage__Subtitulo">Cursos en los que estás inscrito</p>
             </div>
           </div>
-          
-          <!-- Información del usuario -->
-          <v-chip 
-            v-if="usuarioLogeadoStore.usuarioActual" 
-            color="primary" 
-            variant="elevated" 
-            class="mb-4"
-          >
-            <v-icon start>mdi-account</v-icon>
-            {{ usuarioLogeadoStore.usuarioActual.nombre }}
-          </v-chip>
         </div>
 
         <!-- --------------------------- Contenido --------------------------- -->

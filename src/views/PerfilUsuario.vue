@@ -34,9 +34,9 @@ const rolInfo = computed(() => {
   if (!usuario.value) return { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
   
   const roles = {
-    1: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' },
+    3: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' },
     2: { name: 'Profesor', color: 'blue', icon: 'mdi-school' },
-    3: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' }
+    1: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' }
   };
   return roles[usuario.value.idRol] || { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
 });
@@ -223,6 +223,7 @@ onMounted(() => {
             <QuizzesUsuario 
               :quizzes="quizzesUsuario" 
               :usuario-nombre="nombreCompleto"
+              class="PerfilUsuario__QuizzesSection"
             />
           </div>
         </div>
@@ -302,6 +303,23 @@ onMounted(() => {
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
   margin-top: 4px;
+}
+
+.PerfilUsuario__Content {
+  margin-top: 20px; /* Separación entre el header naranja y los apartados */
+}
+
+/* Separación entre apartados */
+.PerfilUsuario__CursosSection {
+  margin-bottom: 15px;
+}
+
+.PerfilUsuario__VideosSection {
+  margin-bottom: 15px;
+}
+
+.PerfilUsuario__QuizzesSection {
+  margin-bottom: 15px;
 }
 
 @media (max-width: 768px) {

@@ -40,9 +40,9 @@ const rolInfo = computed(() => {
   if (!usuarioActual.value) return { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
   
   const roles = {
-    1: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' },
+    3: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' },
     2: { name: 'Profesor', color: 'blue', icon: 'mdi-school' },
-    3: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' }
+    1: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' }
   };
   return roles[usuarioActual.value.idRol] || { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
 });

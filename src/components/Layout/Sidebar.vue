@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify';
+import { useRouter } from 'vue-router';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import UserAvatar from '@/components/UserAvatar.vue';
 
@@ -16,6 +17,7 @@ const emit = defineEmits(['update:modelValue']);
 const isExpanded = ref(true);
 const { mobile } = useDisplay();
 const isMobile = computed(() => mobile.value);
+const router = useRouter();
 
 const usuarioStore = useUsuarioLogeadoStore();
 const usuarioActual = computed(() => usuarioStore.usuarioActual);
@@ -63,6 +65,11 @@ const toggleSidebar = () => {
   isExpanded.value = !isExpanded.value;
 };
 
+const logout = () => {
+  usuarioStore.cerrarSesion();
+  router.push('/login');
+};
+
 const drawer = computed({
   get: () => props.modelValue,
   set: (value) => emit('update:modelValue', value)
@@ -96,9 +103,6 @@ const drawer = computed({
         :color="item.color"
         :class="[
           'Sidebar__MenuItem',
-          item.title === 'MarIAno' && 'Sidebar__MarIAno',
-          item.title === 'Mis Cursos' && 'Sidebar__MisCursos',
-          item.color === 'orange' && 'Sidebar__MenuItem--profesor',
           item.color === 'red' && 'Sidebar__MenuItem--admin'
         ]"
       >
@@ -110,6 +114,26 @@ const drawer = computed({
         </template>
       </v-list-item>
     </v-list>
+    
+    <v-divider class="Sidebar__divider" />
+    
+    <!-- Botón de logout -->
+    <div v-if="usuarioActual" class="Sidebar__logout">
+      <v-list density="compact">
+        <v-list-item
+          @click="logout"
+          :title="isExpanded ? 'Cerrar Sesión' : ''"
+          prepend-icon="mdi-logout"
+          class="Sidebar__MenuItem Sidebar__MenuItem--logout"
+        >
+          <template v-if="!isExpanded && !isMobile">
+            <v-tooltip activator="parent" location="end">
+              Cerrar Sesión
+            </v-tooltip>
+          </template>
+        </v-list-item>
+      </v-list>
+    </div>
     
     <v-divider class="Sidebar__divider" />
     
@@ -165,16 +189,6 @@ const drawer = computed({
   border-right: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-.Sidebar__MenuItem--profesor {
-  background: rgba(255, 152, 0, 0.05);
-  border-radius: 8px;
-  margin: 2px 8px;
-}
-
-.Sidebar__MenuItem--profesor:hover {
-  background: rgba(255, 152, 0, 0.1);
-}
-
 .Sidebar__MenuItem--admin {
   background: rgba(244, 67, 54, 0.05);
   border-radius: 8px;
@@ -190,40 +204,23 @@ const drawer = computed({
   border-radius: 6px;
 }
 
-/* ------------------ MarIAno personalizado ------------------ */
-.Sidebar__MarIAno {
-  color: #ff6600 !important;
-  font-weight: bold;
-  font-family: 'Courier New', monospace;
-  border-left: 4px solid #f88112;
-}
-
-.Sidebar__MarIAno .v-icon {
-  color: #e08105 !important;
-}
-
-/* ------------------ Mis Cursos personalizado ------------------ */
-.Sidebar__MisCursos {
-  background: rgba(255, 152, 0, 0.08) !important;
-  color: #FF9800 !important;
-  font-weight: 600;
-  border-left: 4px solid #FF9800;
-  margin: 2px 8px;
-  border-radius: 8px;
-}
-
-.Sidebar__MisCursos:hover {
-  background: rgba(255, 152, 0, 0.15) !important;
-  transform: translateX(2px);
+.Sidebar__MenuItem--logout {
+  color: #f44336 !important;
   transition: all 0.2s ease;
 }
 
-.Sidebar__MisCursos .v-icon {
-  color: #FF9800 !important;
+.Sidebar__MenuItem--logout:hover {
+  background: rgba(244, 67, 54, 0.05);
+  color: #d32f2f !important;
 }
 
-.Sidebar__MisCursos .v-list-item__content {
-  color: #FF9800 !important;
+.Sidebar__MenuItem--logout .v-icon {
+  color: #f44336 !important;
+}
+
+.Sidebar__logout {
+  margin-top: auto;
+  padding: 8px 0;
 }
 
 /* Item de usuario */
@@ -234,10 +231,23 @@ const drawer = computed({
 }
 
 .Sidebar__UserItem:hover {
-  background: rgba(255, 152, 0, 0.08);
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.Sidebar__usuario-titulo {
+  font-size: 0.75rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 16px 4px;
+  font-weight: 600;
+}
+
+.Sidebar__divider {
+  margin: 8px 0;
 }
 </style>

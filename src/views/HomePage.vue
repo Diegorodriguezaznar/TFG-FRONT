@@ -1,30 +1,21 @@
 <template>
   <v-app>
-    <!-- Header -->
     <Header @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
     
-    <!-- Sidebar -->
     <Sidebar v-model="drawer" />
 
-    <!-- Contenido Principal -->
     <v-main class="HomePage">
-      <!-- Hero Section -->
       <HeroSection :nombre-usuario="nombreUsuario" @navegar="navegarA" />
 
-      <!-- Sección de Funcionalidades Principales -->
       <FuncionalidadesPrincipales @navegar="navegarA" />
 
-      <!-- Sección de Funcionalidades Adicionales -->
       <FuncionalidadesAdicionales @navegar="navegarA" />
 
-      <!-- Sección de Estadísticas -->
       <EstadisticasSection />
 
-      <!-- Call to Action Final -->
       <CallToActionSection @navegar="navegarA" />
     </v-main>
 
-    <!-- Footer -->
     <Footer />
   </v-app>
 </template>
@@ -34,7 +25,6 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 
-// Componentes
 import Header from '@/components/Layout/Header.vue';
 import Footer from '@/components/Layout/Footer.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';

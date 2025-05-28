@@ -3,7 +3,6 @@
     <v-container class="HeroSection__Container">
       <v-row align="center" class="fill-height">
         <v-col cols="12" md="6" class="HeroSection__Content">
-          <!-- Logo Grande de AcademIQ -->
           <div class="HeroSection__LogoContainer">
             <AcademIQLogo class="HeroSection__Logo" />
           </div>
@@ -16,19 +15,7 @@
               Tu plataforma integral de aprendizaje donde puedes explorar cursos, 
               ver videos educativos y poner a prueba tus conocimientos con quizzes interactivos.
             </p>
-            <div class="HeroSection__UserGreeting">
-              <v-chip 
-                color="orange" 
-                size="large" 
-                variant="elevated"
-                prepend-icon="mdi-account-circle"
-                class="HeroSection__UserChip"
-              >
-                Hola, {{ nombreUsuario }}
-              </v-chip>
-            </div>
             
-            <!-- Botones de navegación rápida -->
             <div class="HeroSection__QuickActions">
               <v-btn 
                 color="white" 
@@ -56,9 +43,10 @@
         <v-col cols="12" md="6" class="text-center">
           <div class="HeroSection__ImageContainer">
             <v-img
-              src="https://picsum.photos/seed/education/600/400"
-              alt="Educación Online"
+              src="https://images.unsplash.com/photo-1683871268982-a19153dbb35d?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Zm9uZG8lMjBkZSUyMGxhJTIwYmlibGlvdGVjYXxlbnwwfHwwfHx8MA%3D%3D"
+              alt="Librería - Educación y Aprendizaje"
               class="HeroSection__MainImage"
+              cover
             ></v-img>
             <!-- Elementos flotantes decorativos -->
             <div class="HeroSection__FloatingElements">
@@ -81,11 +69,6 @@
 
 <script setup lang="ts">
 import AcademIQLogo from '@/components/AcademIQ.vue';
-
-// Props
-defineProps<{
-  nombreUsuario: string;
-}>();
 
 // Emits
 defineEmits<{
@@ -157,16 +140,6 @@ defineEmits<{
   max-width: 600px;
 }
 
-.HeroSection__UserGreeting {
-  margin-bottom: 2rem;
-}
-
-.HeroSection__UserChip {
-  font-size: 1.1rem;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-}
-
 .HeroSection__QuickActions {
   display: flex;
   gap: 1rem;
@@ -196,6 +169,10 @@ defineEmits<{
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   transform: rotate(-2deg);
   transition: transform 0.3s ease;
+  height: 500px;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .HeroSection__MainImage:hover {
@@ -264,6 +241,10 @@ defineEmits<{
   .HeroSection__QuickBtn {
     width: 100%;
   }
+  
+  .HeroSection__MainImage {
+    height: 350px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -273,6 +254,10 @@ defineEmits<{
   
   .HeroSection {
     min-height: 70vh;
+  }
+  
+  .HeroSection__MainImage {
+    height: 280px;
   }
 }
 </style>
