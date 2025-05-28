@@ -1,8 +1,10 @@
-<!-- src/components/Usuarios/CardUsuario.vue - Versión completa con navegación -->
+<!-- src/components/Usuarios/CardUsuario.vue - Versión actualizada con estadísticas reales -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useUsuarioEstadisticasStore } from '@/stores/UsuarioEstadisticas';
+import { useCursoStore } from '@/stores/Curso'; // AÑADIDO PARA CONTAR CURSOS REALES
+import { useVideoStore } from '@/stores/Video'; // AÑADIDO PARA CONTAR VIDEOS REALES
+import { useQuizStore } from '@/stores/Quiz'; // AÑADIDO PARA CONTAR QUIZZES REALES
 import UserAvatar from '@/components/UserAvatar.vue';
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
@@ -11,12 +13,19 @@ const props = defineProps<{
   usuario: UsuarioDTO;
 }>();
 
-// Router y Store
+// Router y Stores
 const router = useRouter();
-const estadisticasStore = useUsuarioEstadisticasStore();
+const cursoStore = useCursoStore();
+const videoStore = useVideoStore();
+const quizStore = useQuizStore();
 
 // Variables
 const loading = ref(true);
+const estadisticas = ref({
+  totalCursos: 0,
+  totalVideos: 0,
+  totalQuizzes: 0
+});
 
 // Computed
 const rolInfo = computed(() => {
@@ -32,18 +41,67 @@ const nombreCompleto = computed(() => {
   return `${props.usuario.nombre} ${props.usuario.apellidos || ''}`.trim();
 });
 
-const estadisticas = computed(() => {
-  return estadisticasStore.getEstadisticasUsuario(props.usuario.idUsuario);
-});
-
 // Métodos
-const cargarEstadisticas = async () => {
+const cargarEstadisticasReales = async () => {
   loading.value = true;
   
   try {
-    await estadisticasStore.fetchEstadisticasUsuario(props.usuario.idUsuario);
+    console.log(`🔄 Cargando estadísticas para el usuario ${props.usuario.idUsuario} (${nombreCompleto.value})`);
+    
+    // Cargar todos los datos si no están cargados
+    const promesas = [];
+    
+    if (cursoStore.cursos.length === 0) {
+      promesas.push(cursoStore.fetchAllCursos());
+    }
+    
+    if (videoStore.videos.length === 0) {
+      promesas.push(videoStore.fetchAllVideos());
+    }
+    
+    if (quizStore.quizzes.length === 0) {
+      promesas.push(quizStore.fetchAllQuizzes());
+    }
+    
+    // Esperar a que se carguen todos los datos
+    await Promise.all(promesas);
+    
+    // Contar cursos del usuario
+    const cursosUsuario = cursoStore.cursos.filter(curso => 
+      curso.idUsuario === props.usuario.idUsuario
+    );
+    
+    // Contar videos del usuario
+    const videosUsuario = videoStore.videos.filter(video => 
+      video.idUsuario === props.usuario.idUsuario
+    );
+    
+    // Contar quizzes del usuario
+    const quizzesUsuario = quizStore.quizzes.filter(quiz => 
+      quiz.idUsuario === props.usuario.idUsuario
+    );
+    
+    // Actualizar estadísticas
+    estadisticas.value = {
+      totalCursos: cursosUsuario.length,
+      totalVideos: videosUsuario.length,
+      totalQuizzes: quizzesUsuario.length
+    };
+    
+    console.log(`✅ Estadísticas calculadas para ${nombreCompleto.value}:`, {
+      cursos: cursosUsuario.length,
+      videos: videosUsuario.length,
+      quizzes: quizzesUsuario.length
+    });
+    
   } catch (error) {
-    console.error('Error al cargar estadísticas:', error);
+    console.error(`❌ Error al cargar estadísticas para ${nombreCompleto.value}:`, error);
+    // Mantener valores por defecto en caso de error
+    estadisticas.value = {
+      totalCursos: 0,
+      totalVideos: 0,
+      totalQuizzes: 0
+    };
   } finally {
     loading.value = false;
   }
@@ -61,7 +119,7 @@ const verCursos = () => {
 
 // Lifecycle
 onMounted(() => {
-  cargarEstadisticas();
+  cargarEstadisticasReales();
 });
 </script>
 
@@ -112,15 +170,15 @@ onMounted(() => {
       </div>
     </v-card-item>
     
-    <!-- Estadísticas -->
+    <!-- Estadísticas REALES -->
     <v-card-text class="CardUsuario__Stats">
       <div v-if="loading" class="text-center py-4">
         <v-progress-circular indeterminate color="orange" size="24"></v-progress-circular>
         <div class="text-caption text-grey mt-2">Cargando estadísticas...</div>
       </div>
       
-      <div v-else-if="estadisticas" class="CardUsuario__StatsGrid">
-        <!-- Cursos -->
+      <div v-else class="CardUsuario__StatsGrid">
+        <!-- Cursos (DATO REAL) -->
         <div class="CardUsuario__Stat">
           <div class="CardUsuario__StatIcon">
             <v-icon color="orange" size="20">mdi-book-education</v-icon>
@@ -131,7 +189,7 @@ onMounted(() => {
           </div>
         </div>
         
-        <!-- Videos -->
+        <!-- Videos (DATO REAL) -->
         <div class="CardUsuario__Stat">
           <div class="CardUsuario__StatIcon">
             <v-icon color="orange" size="20">mdi-play-circle</v-icon>
@@ -142,7 +200,7 @@ onMounted(() => {
           </div>
         </div>
         
-        <!-- Quizzes -->
+        <!-- Quizzes (DATO REAL) -->
         <div class="CardUsuario__Stat">
           <div class="CardUsuario__StatIcon">
             <v-icon color="orange" size="20">mdi-help-circle</v-icon>
@@ -152,11 +210,6 @@ onMounted(() => {
             <div class="CardUsuario__StatLabel">Quizzes</div>
           </div>
         </div>
-      </div>
-      
-      <div v-else class="text-center py-4">
-        <v-icon color="grey" size="24">mdi-alert-circle-outline</v-icon>
-        <div class="text-caption text-grey mt-1">Error al cargar estadísticas</div>
       </div>
     </v-card-text>
     
@@ -174,6 +227,7 @@ onMounted(() => {
       </v-btn>
       
       <v-btn
+        v-if="estadisticas.totalCursos > 0"
         color="blue"
         size="small"
         prepend-icon="mdi-school"
@@ -181,7 +235,19 @@ onMounted(() => {
         variant="outlined"
         class="flex-grow-1 ml-1"
       >
-        Cursos
+        Cursos ({{ estadisticas.totalCursos }})
+      </v-btn>
+      
+      <v-btn
+        v-else
+        color="grey"
+        size="small"
+        prepend-icon="mdi-school-outline"
+        disabled
+        variant="outlined"
+        class="flex-grow-1 ml-1"
+      >
+        Sin Cursos
       </v-btn>
     </v-card-actions>
   </v-card>
@@ -394,4 +460,4 @@ onMounted(() => {
 .CardUsuario:active {
   transform: translateY(-2px);
 }
-</style>
+</style>  
