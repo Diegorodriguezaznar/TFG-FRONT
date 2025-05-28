@@ -223,6 +223,7 @@ onMounted(() => {
             <QuizzesUsuario 
               :quizzes="quizzesUsuario" 
               :usuario-nombre="nombreCompleto"
+              class="PerfilUsuario__QuizzesSection"
             />
           </div>
         </div>
@@ -302,6 +303,23 @@ onMounted(() => {
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
   margin-top: 4px;
+}
+
+.PerfilUsuario__Content {
+  margin-top: 20px; /* Separación entre el header naranja y los apartados */
+}
+
+/* Separación entre apartados */
+.PerfilUsuario__CursosSection {
+  margin-bottom: 15px;
+}
+
+.PerfilUsuario__VideosSection {
+  margin-bottom: 15px;
+}
+
+.PerfilUsuario__QuizzesSection {
+  margin-bottom: 15px;
 }
 
 @media (max-width: 768px) {

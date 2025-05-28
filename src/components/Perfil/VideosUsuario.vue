@@ -1,4 +1,4 @@
-<!-- src/components/PerfilUsuario/VideosUsuario.vue -->
+<!-- src/components/Perfil/VideosUsuario.vue -->
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
@@ -83,7 +83,7 @@ const formatearDuracion = (duracion: string) => {
       </div>
       
       <!-- Lista de videos -->
-      <div v-else>
+      <div v-else class="VideosUsuario__VideosGrid">
         <v-row>
           <v-col 
             v-for="video in videosVisibles" 
@@ -193,6 +193,10 @@ const formatearDuracion = (duracion: string) => {
   padding: 20px;
 }
 
+.VideosUsuario__VideosGrid {
+  margin-top: 15px; 
+}
+
 .VideosUsuario__Empty {
   text-align: center;
   padding: 40px 20px;
@@ -203,6 +207,7 @@ const formatearDuracion = (duracion: string) => {
 
 .VideosUsuario__VideoCol {
   animation: fadeInUp 0.6s ease-out;
+  margin-bottom: 5px; /* Separación entre cards */
 }
 
 .VideosUsuario__Video {

@@ -1,382 +1,300 @@
-<!-- src/views/PerfilUsuario.vue -->
+<!-- src/components/Perfil/QuizzesUsuario.vue -->
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-import { useUsuarioStore } from '@/stores/Usuario';
-import { useCursoStore } from '@/stores/Curso';
-import { useVideoStore } from '@/stores/Video';
-import { useQuizStore } from '@/stores/Quiz';
-import HeaderUsuarios from '@/components/Usuarios/HeaderUsuarios.vue';
-import Sidebar from '@/components/Layout/Sidebar.vue';
-import CursosUsuario from '@/components/Perfil/CursosUsuario.vue';
-import VideosUsuario from '@/components/Perfil/VideosUsuario.vue';
-import QuizzesUsuario from '@/components/Perfil/QuizzesUsuario.vue';
-import UserAvatar from '@/components/UserAvatar.vue';
-import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import type { QuizDTO } from '@/stores/dtos/QuizDTO';
 
-// Route y stores
-const route = useRoute();
-const usuarioStore = useUsuarioStore();
-const cursoStore = useCursoStore();
-const videoStore = useVideoStore();
-const quizStore = useQuizStore();
+// Props
+const props = defineProps<{
+  quizzes: QuizDTO[];
+  usuarioNombre: string;
+}>();
 
 // Variables
-const drawer = ref(false);
-const loading = ref(true);
-const usuario = ref<UsuarioDTO | null>(null);
-const cursosUsuario = ref([]);
-const videosUsuario = ref([]);
-const quizzesUsuario = ref([]);
+const router = useRouter();
+const mostrarTodos = ref(false);
+const itemsPorDefecto = 5;
 
 // Computed
-const usuarioId = computed(() => {
-  return route.params.id ? Number(route.params.id) : null;
+const quizzesVisibles = computed(() => {
+  if (mostrarTodos.value) {
+    return props.quizzes;
+  }
+  return props.quizzes.slice(0, itemsPorDefecto);
 });
 
-const rolInfo = computed(() => {
-  if (!usuario.value) return { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
-  
-  const roles = {
-    1: { name: 'Estudiante', color: 'green', icon: 'mdi-account-school' },
-    2: { name: 'Profesor', color: 'blue', icon: 'mdi-school' },
-    3: { name: 'Administrador', color: 'red', icon: 'mdi-shield-crown' }
-  };
-  return roles[usuario.value.idRol] || { name: 'Usuario', color: 'grey', icon: 'mdi-account' };
-});
-
-const nombreCompleto = computed(() => {
-  if (!usuario.value) return '';
-  return `${usuario.value.nombre} ${usuario.value.apellidos || ''}`.trim();
+const hayMasQuizzes = computed(() => {
+  return props.quizzes.length > itemsPorDefecto;
 });
 
 // Métodos
-const toggleSidebar = () => {
-  drawer.value = !drawer.value;
+const toggleMostrarTodos = () => {
+  mostrarTodos.value = !mostrarTodos.value;
 };
 
-const handleSearch = (query: string) => {
-  // Implementar búsqueda si es necesario
-  console.log('Buscar:', query);
+const verQuiz = (quiz: QuizDTO) => {
+  router.push({
+    path: '/quizz-detail',
+    query: { id: quiz.idQuiz }
+  });
 };
 
-const cargarDatosUsuario = async () => {
-  if (!usuarioId.value) return;
-  
-  loading.value = true;
-  
-  try {
-    // Cargar datos del usuario
-    await usuarioStore.fetchUsuarioById(usuarioId.value);
-    usuario.value = usuarioStore.usuario;
-    
-    // Cargar contenido del usuario en paralelo
-    await Promise.all([
-      cargarCursosUsuario(),
-      cargarVideosUsuario(),
-      cargarQuizzesUsuario()
-    ]);
-  } catch (error) {
-    console.error('Error al cargar datos del usuario:', error);
-  } finally {
-    loading.value = false;
-  }
+const formatearFecha = (fecha: string | Date) => {
+  const fechaObj = typeof fecha === 'string' ? new Date(fecha) : fecha;
+  return fechaObj.toLocaleDateString('es-ES', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 };
-
-const cargarCursosUsuario = async () => {
-  try {
-    // Intentar cargar cursos del usuario
-    await cursoStore.fetchAllCursos();
-    // Filtrar cursos por usuario (esto debería ser un endpoint específico)
-    cursosUsuario.value = cursoStore.cursos.filter(curso => 
-      curso.idUsuario === usuarioId.value
-    ).sort((a, b) => new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime());
-  } catch (error) {
-    console.error('Error al cargar cursos del usuario:', error);
-    // Datos de fallback
-    cursosUsuario.value = [];
-  }
-};
-
-const cargarVideosUsuario = async () => {
-  try {
-    await videoStore.fetchAllVideos();
-    // Filtrar videos por usuario
-    videosUsuario.value = videoStore.videos.filter(video => 
-      video.idUsuario === usuarioId.value
-    ).sort((a, b) => new Date(b.fechaSubida).getTime() - new Date(a.fechaSubida).getTime());
-  } catch (error) {
-    console.error('Error al cargar videos del usuario:', error);
-    videosUsuario.value = [];
-  }
-};
-
-const cargarQuizzesUsuario = async () => {
-  try {
-    await quizStore.fetchAllQuizzes();
-    // Filtrar quizzes por usuario
-    quizzesUsuario.value = quizStore.quizzes.filter(quiz => 
-      quiz.idUsuario === usuarioId.value
-    ).sort((a, b) => new Date(b.fechaCreacion || new Date()).getTime() - new Date(a.fechaCreacion || new Date()).getTime());
-  } catch (error) {
-    console.error('Error al cargar quizzes del usuario:', error);
-    quizzesUsuario.value = [];
-  }
-};
-
-// Lifecycle
-onMounted(() => {
-  cargarDatosUsuario();
-});
 </script>
 
 <template>
-  <v-app>
-    <!-- Header -->
-    <HeaderUsuarios 
-      @toggle-sidebar="toggleSidebar"
-      @search="handleSearch"
-    />
+  <v-card class="QuizzesUsuario" elevation="2">
+    <v-card-title class="QuizzesUsuario__Header">
+      <div class="d-flex align-center">
+        <v-icon color="purple" size="large" class="mr-3">mdi-help-circle</v-icon>
+        <div>
+          <h2 class="text-h5 font-weight-bold">Quizzes Creados</h2>
+          <p class="text-subtitle-2 text-grey mb-0">
+            {{ props.quizzes.length }} quiz{{ props.quizzes.length !== 1 ? 'zes' : '' }} por {{ usuarioNombre }}
+          </p>
+        </div>
+      </div>
+    </v-card-title>
     
-    <!-- Contenedor principal -->
-    <v-main class="PerfilUsuario">
-      <!-- Sidebar -->
-      <Sidebar v-model="drawer" />
+    <v-card-text class="QuizzesUsuario__Content">
+      <!-- Sin quizzes -->
+      <div v-if="props.quizzes.length === 0" class="QuizzesUsuario__Empty">
+        <v-icon color="grey-lighten-2" size="64" class="mb-4">mdi-help-circle-outline</v-icon>
+        <h3 class="text-h6 text-grey-darken-1 mb-2">No hay quizzes creados</h3>
+        <p class="text-body-2 text-grey">Este usuario aún no ha creado ningún quiz</p>
+      </div>
       
-      <!-- Contenido -->
-      <v-container class="PerfilUsuario__Container">
-        <!-- Estado de carga -->
-        <div v-if="loading" class="d-flex justify-center my-8">
-          <v-progress-circular indeterminate color="orange" size="64"></v-progress-circular>
-        </div>
-        
-        <!-- Error si no se encuentra el usuario -->
-        <div v-else-if="!usuario" class="text-center py-12">
-          <v-icon color="grey-lighten-2" size="64" class="mb-4">mdi-account-alert</v-icon>
-          <h3 class="text-h6 text-grey-darken-1 mb-2">Usuario no encontrado</h3>
-          <p class="text-body-1 text-grey">El usuario que buscas no existe o no está disponible</p>
-          <v-btn color="orange" variant="elevated" to="/usuarios" class="mt-4">
-            Volver a Usuarios
-          </v-btn>
-        </div>
-        
-        <!-- Perfil del usuario -->
-        <div v-else>
-          <!-- Header del perfil -->
-          <v-card class="PerfilUsuario__Header mb-6" elevation="3">
-            <div class="PerfilUsuario__HeaderBg">
-              <div class="PerfilUsuario__HeaderContent">
-                <!-- Avatar y información básica -->
-                <div class="d-flex align-center">
-                  <!-- Avatar personalizado con letra inicial y colores por rol -->
-                  <UserAvatar
-                    :usuario="usuario"
-                    :size="120"
-                    class="PerfilUsuario__Avatar"
-                  />
-                  
-                  <div class="ml-6">
-                    <h1 class="text-h4 font-weight-bold text-white mb-2">
-                      {{ nombreCompleto }}
-                    </h1>
-                    
-                    <div class="d-flex align-center mb-3">
-                      <v-chip 
-                        :color="rolInfo.color" 
-                        variant="elevated" 
-                        size="large"
-                        class="mr-3"
-                      >
-                        <v-icon start :icon="rolInfo.icon"></v-icon>
-                        {{ rolInfo.name }}
-                      </v-chip>
-                      
-                      <v-chip 
-                        color="white" 
-                        variant="elevated" 
-                        size="large"
-                      >
-                        <v-icon start>mdi-email</v-icon>
-                        {{ usuario.gmail }}
-                      </v-chip>
-                    </div>
-                    
-                    <div v-if="usuario.telefono" class="text-white">
-                      <v-icon class="mr-1">mdi-phone</v-icon>
-                      {{ usuario.telefono }}
-                    </div>
-                  </div>
-                </div>
-                
-                <!-- Estadísticas rápidas -->
-                <div class="PerfilUsuario__Stats">
-                  <div class="PerfilUsuario__Stat">
-                    <div class="PerfilUsuario__StatNumber">{{ cursosUsuario.length }}</div>
-                    <div class="PerfilUsuario__StatLabel">Cursos</div>
-                  </div>
-                  <div class="PerfilUsuario__Stat">
-                    <div class="PerfilUsuario__StatNumber">{{ videosUsuario.length }}</div>
-                    <div class="PerfilUsuario__StatLabel">Videos</div>
-                  </div>
-                  <div class="PerfilUsuario__Stat">
-                    <div class="PerfilUsuario__StatNumber">{{ quizzesUsuario.length }}</div>
-                    <div class="PerfilUsuario__StatLabel">Quizzes</div>
-                  </div>
+      <!-- Lista de quizzes -->
+      <div v-else>
+        <v-row>
+          <v-col 
+            v-for="quiz in quizzesVisibles" 
+            :key="quiz.idQuiz"
+            cols="12" 
+            sm="6" 
+            md="4"
+            class="QuizzesUsuario__QuizCol"
+          >
+            <v-card 
+              class="QuizzesUsuario__Quiz" 
+              elevation="1" 
+              @click="verQuiz(quiz)"
+              rounded="xl"
+            >
+              <!-- Header compacto con degradado morado -->
+              <div class="QuizzesUsuario__QuizHeader">
+                <!-- Icono de play centrado -->
+                <div class="QuizzesUsuario__PlayIcon">
+                  <v-icon color="white" size="large">mdi-play-circle</v-icon>
                 </div>
               </div>
-            </div>
-          </v-card>
-          
-          <!-- Contenido creado por el usuario -->
-          <div class="PerfilUsuario__Content">
-            <!-- Cursos -->
-            <CursosUsuario 
-              :cursos="cursosUsuario" 
-              :usuario-nombre="nombreCompleto"
-              class="mb-8"
-            />
-            
-            <!-- Videos -->
-            <VideosUsuario 
-              :videos="videosUsuario" 
-              :usuario-nombre="nombreCompleto"
-              class="mb-8"
-            />
-            
-            <!-- Quizzes -->
-            <QuizzesUsuario 
-              :quizzes="quizzesUsuario" 
-              :usuario-nombre="nombreCompleto"
-            />
-          </div>
+              
+              <!-- Información del quiz -->
+              <v-card-item class="QuizzesUsuario__QuizInfo">
+                <v-card-title class="QuizzesUsuario__QuizTitulo">
+                  {{ quiz.nombre }}
+                </v-card-title>
+                
+                <v-card-text class="QuizzesUsuario__QuizDescripcion">
+                  {{ quiz.descripcion || 'Sin descripción disponible' }}
+                </v-card-text>
+                
+                <div class="QuizzesUsuario__QuizMeta">
+                  <div class="d-flex align-center text-caption text-grey">
+                    <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
+                    <span>Creado hace {{ Math.floor(Math.random() * 30) + 1 }} días</span>
+                  </div>
+                  
+                  <div class="d-flex align-center text-caption text-grey mt-1">
+                    <v-icon size="small" class="mr-1">mdi-account-multiple</v-icon>
+                    <span>{{ Math.floor(Math.random() * 500) + 50 }} participantes</span>
+                  </div>
+                </div>
+              </v-card-item>
+              
+              <!-- Acciones -->
+              <v-card-actions class="QuizzesUsuario__QuizAcciones">
+                <v-btn 
+                  color="purple" 
+                  variant="elevated" 
+                  size="small"
+                  @click.stop="verQuiz(quiz)"
+                  block
+                  rounded="lg"
+                >
+                  <v-icon start>mdi-play-circle</v-icon>
+                  Hacer Quiz
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+        
+        <!-- Botón para mostrar más/menos -->
+        <div v-if="hayMasQuizzes" class="QuizzesUsuario__ToggleContainer">
+          <v-btn 
+            @click="toggleMostrarTodos"
+            color="purple"
+            variant="outlined"
+            size="large"
+            block
+            rounded="lg"
+          >
+            <v-icon start>{{ mostrarTodos ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+            {{ mostrarTodos ? 'Mostrar menos' : `Mostrar todos (${props.quizzes.length})` }}
+          </v-btn>
         </div>
-      </v-container>
-    </v-main>
-  </v-app>
+      </div>
+    </v-card-text>
+  </v-card>
 </template>
 
 <style scoped>
-.PerfilUsuario {
-  background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
-  min-height: 100vh;
-}
-
-.PerfilUsuario__Container {
-  padding-top: 24px;
-  max-width: 1400px;
-}
-
-.PerfilUsuario__Header {
+.QuizzesUsuario {
   border-radius: 16px;
+  border: 1px solid rgba(156, 39, 176, 0.2);
+}
+
+.QuizzesUsuario__Header {
+  background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(186, 104, 200, 0.05) 100%);
+  border-bottom: 1px solid rgba(156, 39, 176, 0.1);
+  padding: 20px;
+}
+
+.QuizzesUsuario__Content {
+  padding: 20px;
+}
+
+.QuizzesUsuario__Empty {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 12px;
+  border: 2px dashed rgba(0, 0, 0, 0.1);
+}
+
+.QuizzesUsuario__QuizCol {
+  animation: fadeInUp 0.7s ease-out;
+}
+
+.QuizzesUsuario__Quiz {
+  height: 100%;
+  border-radius: 16px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  border: 1px solid rgba(156, 39, 176, 0.1);
+  position: relative;
   overflow: hidden;
-  position: relative;
 }
 
-.PerfilUsuario__HeaderBg {
-  background: linear-gradient(135deg, #FF9800 0%, #FFB74D 100%);
-  position: relative;
+.QuizzesUsuario__Quiz:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(156, 39, 176, 0.2);
+  border-color: rgba(156, 39, 176, 0.3);
 }
 
-.PerfilUsuario__HeaderBg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" patternUnits="userSpaceOnUse" width="100" height="100"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grain)"/></svg>');
-  opacity: 0.3;
-}
-
-.PerfilUsuario__HeaderContent {
+.QuizzesUsuario__QuizHeader {
+  height: 80px; /* Más pequeño que el naranja */
+  background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 50%, #E1BEE7 100%);
   position: relative;
-  padding: 32px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center; /* Centrar el icono */
+  padding: 12px 16px;
+  border-radius: 16px 16px 0 0;
 }
 
-.PerfilUsuario__Avatar {
-  border: 4px solid white;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
-}
-
-.PerfilUsuario__Avatar:hover {
-  transform: scale(1.05);
-}
-
-.PerfilUsuario__Stats {
+.QuizzesUsuario__PlayIcon {
   display: flex;
-  gap: 24px;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
-.PerfilUsuario__Stat {
-  text-align: center;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 16px 24px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  transition: transform 0.2s ease;
+.QuizzesUsuario__Quiz:hover .QuizzesUsuario__PlayIcon {
+  opacity: 1;
 }
 
-.PerfilUsuario__Stat:hover {
-  transform: scale(1.05);
-  background: rgba(255, 255, 255, 0.2);
+.QuizzesUsuario__QuizInfo {
+  padding: 16px;
 }
 
-.PerfilUsuario__StatNumber {
-  font-size: 2rem;
-  font-weight: 700;
-  color: white;
-  line-height: 1;
+.QuizzesUsuario__QuizTitulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: #333;
+  padding: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.PerfilUsuario__StatLabel {
+.QuizzesUsuario__QuizDescripcion {
+  color: #555;
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.9);
-  font-weight: 500;
-  margin-top: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.4;
+  padding: 8px 0;
 }
 
-@media (max-width: 768px) {
-  .PerfilUsuario__HeaderContent {
-    flex-direction: column;
-    text-align: center;
-    gap: 24px;
+.QuizzesUsuario__QuizMeta {
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.QuizzesUsuario__QuizAcciones {
+  padding: 16px;
+  padding-top: 0;
+}
+
+.QuizzesUsuario__ToggleContainer {
+  margin-top: 24px;
+  text-align: center;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  .PerfilUsuario__Stats {
-    justify-content: center;
-    flex-wrap: wrap;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .PerfilUsuario__Container {
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .QuizzesUsuario__Header {
     padding: 16px;
   }
   
-  .PerfilUsuario__Avatar {
-    width: 100px;
-    height: 100px;
-  }
-}
-
-@media (max-width: 480px) {
-  .PerfilUsuario__Stats {
-    gap: 16px;
+  .QuizzesUsuario__Content {
+    padding: 16px;
   }
   
-  .PerfilUsuario__Stat {
-    padding: 12px 16px;
-    min-width: 80px;
+  .QuizzesUsuario__Empty {
+    padding: 32px 16px;
   }
   
-  .PerfilUsuario__StatNumber {
-    font-size: 1.5rem;
-  }
-  
-  .PerfilUsuario__StatLabel {
-    font-size: 0.75rem;
+  .QuizzesUsuario__QuizHeader {
+    height: 70px;
+    padding: 10px 12px;
   }
 }
 </style>

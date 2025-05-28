@@ -5,7 +5,7 @@
             <text x="30" y="85" font-family="serif" font-style="italic" font-size="55" fill="black">Academ</text>
             
             <!-- Letra I animada (más cerca) -->
-            <text x="215" y="85" font-family="serif" font-style="italic" font-size="55" fill="#FF8000">
+            <text x="215" y="85" font-family="serif" font-style="italic" font-size="55" fill="white">
               I
               <animate 
                 attributeName="y" 
@@ -18,7 +18,7 @@
             </text>
             
             <!-- Letra Q animada (más cerca) -->
-            <text x="243" y="85" font-family="serif" font-style="italic" font-size="55" fill="#FF8000">
+            <text x="243" y="85" font-family="serif" font-style="italic" font-size="55" fill="white">
               Q
               <animate 
                 attributeName="y" 
