@@ -40,7 +40,7 @@ defineProps<Props>();
             {{ quizData.descripcion }}
           </p>
           <div class="VistaPrevia__chips">
-            <v-chip color="orange" size="large">
+            <v-chip color="purple" size="large">
               {{ preguntasValidas.length }} preguntas
             </v-chip>
             <v-chip v-if="cursoActual" color="blue" size="large">
@@ -56,7 +56,7 @@ defineProps<Props>();
       <v-card class="VistaPrevia__pregunta" elevation="1">
         <v-card-text class="VistaPrevia__pregunta-contenido">
           <div class="VistaPrevia__pregunta-header">
-            <v-chip color="orange" size="small" class="VistaPrevia__numero">
+            <v-chip color="purple" size="small" class="VistaPrevia__numero">
               {{ index + 1 }}
             </v-chip>
             <span class="VistaPrevia__pregunta-texto">{{ pregunta.descripcion }}</span>

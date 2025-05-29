@@ -239,13 +239,13 @@ async function guardarQuiz() {
       }
     }
 
-    console.log('🎉 === QUIZ CREADO EXITOSAMENTE ===');
+    console.log(' === QUIZ CREADO EXITOSAMENTE ===');
     
     const mensaje = cursoActual.value 
       ? `¡Quiz "${quizData.value.nombre}" creado exitosamente para el curso ${cursoActual.value}!`
       : `¡Quiz "${quizData.value.nombre}" creado exitosamente!`;
     
-    alert(`🎉 ${mensaje}\n\n📊 Resumen:\n• ${preguntasCreadas.length} preguntas creadas\n• ${preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0)} respuestas añadidas`);
+    alert(` ${mensaje}\n\n Resumen:\n• ${preguntasCreadas.length} preguntas creadas\n• ${preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0)} respuestas añadidas`);
     
     // Limpiar y redirigir
     resetForm();
@@ -257,8 +257,8 @@ async function guardarQuiz() {
     }
 
   } catch (error: any) {
-    console.error('💥 === ERROR AL CREAR QUIZ ===', error);
-    alert(`❌ Error al crear el quiz: ${error.message}`);
+    console.error(' === ERROR AL CREAR QUIZ ===', error);
+    alert(` Error al crear el quiz: ${error.message}`);
   } finally {
     loading.value = false;
   }
@@ -322,7 +322,7 @@ onMounted(async () => {
   <v-app>
     <!-- App Bar -->
     <v-app-bar app color="white" elevation="2" height="70">
-      <v-btn icon @click="cancelarCreacion" color="orange">
+      <v-btn icon @click="cancelarCreacion" color="purple">
         <v-icon>mdi-close</v-icon>
       </v-btn>
       
@@ -336,7 +336,7 @@ onMounted(async () => {
         @click="guardarQuiz"
         :disabled="!puedeGuardar"
         :loading="loading"
-        color="success"
+        color="purple"
         variant="elevated"
       >
         <v-icon start>mdi-content-save</v-icon>
@@ -413,7 +413,7 @@ onMounted(async () => {
             <v-btn
               v-if="currentStep < pasos.length - 1"
               @click="siguientePaso"
-              color="orange"
+              color="purple"
               variant="elevated"
             >
               Siguiente

@@ -173,7 +173,7 @@ watch(() => props.videos, async (newVideos) => {
               variant="elevated"
               size="small"
               class="VideoCard__etiqueta"
-              color="orange"
+              color="red"
             >
               {{ video.asignatura }}
             </v-chip>
@@ -181,7 +181,7 @@ watch(() => props.videos, async (newVideos) => {
           
           <div class="VideoCard__contenido">
             <div class="VideoCard__info">
-              <v-avatar size="32" color="orange" class="VideoCard__avatar">
+              <v-avatar size="32" color="red" class="VideoCard__avatar">
                 {{ video.autor ? video.autor.charAt(0).toUpperCase() : 'U' }}
               </v-avatar>
 
@@ -202,7 +202,7 @@ watch(() => props.videos, async (newVideos) => {
     </div>
     
     <div v-else-if="cargando" class="ListaVideos__estado">
-      <v-progress-circular indeterminate color="orange" class="ListaVideos__spinner" />
+      <v-progress-circular indeterminate color="red" class="ListaVideos__spinner" />
       <div class="ListaVideos__estado-texto">Cargando videos...</div>
     </div>
     

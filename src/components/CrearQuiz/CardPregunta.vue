@@ -53,7 +53,7 @@ const updateRespuesta = (respuestaIndex: number, field: keyof RespuestaCreacion,
   <v-expansion-panel class="CardPregunta">
     <v-expansion-panel-title>
       <div class="CardPregunta__header">
-        <v-chip color="orange" size="small" class="CardPregunta__numero">
+        <v-chip color="purple" size="small" class="CardPregunta__numero">
           {{ index + 1 }}
         </v-chip>
         <span class="CardPregunta__titulo">

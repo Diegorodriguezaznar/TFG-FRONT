@@ -34,7 +34,7 @@ defineEmits<Emits>();
         >
           <div class="QuizStepper__icono">
             <v-icon
-              :color="index === pasoActual ? 'white' : paso.completado ? 'success' : 'grey'"
+              :color="index === pasoActual ? 'white' : paso.completado ? 'white' : 'grey'"
               :icon="paso.completado ? 'mdi-check' : paso.icono"
             />
           </div>

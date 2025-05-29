@@ -84,7 +84,7 @@ const toggleRespuestaCorrecta = (preguntaIndex: number, respuestaIndex: number) 
       <v-btn
         @click="$emit('agregar-pregunta')"
         :disabled="preguntas.length >= 20"
-        color="orange"
+        color="purple"
         variant="elevated"
       >
         <v-icon start>mdi-plus</v-icon>
@@ -104,7 +104,7 @@ const toggleRespuestaCorrecta = (preguntaIndex: number, respuestaIndex: number) 
     <div v-if="preguntas.length === 0" class="PreguntasQuiz__vacio">
       <v-icon color="grey" size="64" class="PreguntasQuiz__icono-vacio">mdi-help-circle-outline</v-icon>
       <p class="PreguntasQuiz__texto-vacio">No hay preguntas aún</p>
-      <v-btn @click="$emit('agregar-pregunta')" color="orange" variant="elevated" class="PreguntasQuiz__boton-vacio">
+      <v-btn @click="$emit('agregar-pregunta')" color="purple" variant="elevated" class="PreguntasQuiz__boton-vacio">
         <v-icon start>mdi-plus</v-icon>
         Crear Primera Pregunta
       </v-btn>

@@ -61,7 +61,7 @@ onMounted(() => {
   <div class="FiltrosAsignaturas">
     <v-sheet class="FiltrosAsignaturas__contenedor">
       <div v-if="loading" class="FiltrosAsignaturas__loading">
-        <v-progress-circular indeterminate size="24" color="orange" />
+        <v-progress-circular indeterminate size="24" color="red" />
         <span class="FiltrosAsignaturas__texto-loading">Cargando asignaturas...</span>
       </div>
       

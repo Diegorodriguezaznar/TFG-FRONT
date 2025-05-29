@@ -121,10 +121,6 @@ onMounted(async () => {
       <v-col v-for="video in favoritos" :key="video.idVideo" cols="12" sm="6" md="4" lg="3">
         <v-card class="ListaVideosFavoritos__Card" elevation="1" rounded="lg" @click="verVideo(video)">
           <v-img :src="video.miniatura || `https://picsum.photos/seed/${video.idVideo}/400/225`" height="180" cover>
-            <!-- Duración -->
-            <div class="ListaVideosFavoritos__Duracion">
-              {{ video.duracion || '00:00' }}
-            </div>
             
             <!-- Botón de favorito -->
             <v-btn

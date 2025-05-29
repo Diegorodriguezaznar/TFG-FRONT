@@ -231,7 +231,7 @@ const toggleInscripcion = async (event) => {
           <v-btn 
             v-if="!estaInscrito"
             variant="flat" 
-            color="orange" 
+            color="blue" 
             @click.stop="guardarCurso($event)"
             class="curso-card-boton-guardar"
             :class="{ 'btn-hover': isHovering, 'animar': animacionGuardar }"
@@ -244,7 +244,7 @@ const toggleInscripcion = async (event) => {
           <v-btn 
             v-if="estaInscrito"
             variant="flat" 
-            color="orange" 
+            color="red" 
             @click.stop="borrarGuardado($event)"
             class="curso-card-boton-guardar guardado-activo"
             :class="{ 'btn-hover': isHovering, 'animar': animacionGuardar }"

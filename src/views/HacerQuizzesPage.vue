@@ -149,7 +149,7 @@ onMounted(() => {
             <v-btn
               v-if="puedeCrearQuiz"
               @click="crearQuiz"
-              color="orange"
+              color="purple"
               size="large"
               rounded="xl"
               elevation="2"
@@ -166,7 +166,7 @@ onMounted(() => {
               v-for="filter in filters"
               :key="filter"
               :value="filter"
-              color="orange"
+              color="purple"
               variant="elevated"
               rounded="xl"
               class="mr-2"
@@ -180,7 +180,7 @@ onMounted(() => {
         <div v-if="loading" class="text-center py-12">
           <v-progress-circular 
             indeterminate 
-            color="orange" 
+            color="purple" 
             size="48" 
             width="4"
             class="mb-4"
@@ -200,7 +200,7 @@ onMounted(() => {
           <v-btn
             v-if="puedeCrearQuiz && !searchQuery"
             @click="crearQuiz"
-            color="orange"
+            color="purple"
             size="large"
             rounded="xl"
             class="text-white"
@@ -228,8 +228,7 @@ onMounted(() => {
             >
               <!-- Header con gradiente -->
               <div class="quiz-header">
-                <div class="quiz-header-content">
-                  
+                <div class="quiz-header-content">        
                 </div>
               </div>
               
@@ -275,7 +274,7 @@ onMounted(() => {
                 <v-spacer></v-spacer>
                 <v-btn
                   @click="realizarQuizDirecto(quiz)"
-                  color="orange"
+                  color="purple"
                   size="small"
                   rounded="lg"
                   class="text-white font-weight-bold"
@@ -308,13 +307,13 @@ onMounted(() => {
 
 .quiz-card:hover {
   transform: translateY(-4px);
-  border-color: #ff9800;
+  border-color: purple;
   box-shadow: 0 8px 25px rgba(255, 152, 0, 0.15);
 }
 
 .quiz-header {
   height: 120px;
-  background: linear-gradient(135deg, #ff9800 0%, #ff6f00 100%);
+  background: linear-gradient(135deg, purple 0%, #c477d3 100%);
   border-radius: 16px 16px 0 0;
   position: relative;
   display: flex;

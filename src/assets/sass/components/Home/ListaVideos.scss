@@ -73,7 +73,7 @@
 .VideoCard {
   background: white;
   border-radius: 12px;
-  border: 2px solid #FF9800;
+  border: 2px solid red;
   overflow: hidden;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -88,7 +88,7 @@
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 25px rgba(255, 152, 0, 0.15);
-    border-color: #F57C00;
+    border-color: red;
   }
 
   &__imagen {

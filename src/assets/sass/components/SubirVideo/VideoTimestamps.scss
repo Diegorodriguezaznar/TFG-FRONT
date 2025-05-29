@@ -89,14 +89,14 @@
 
     &--activo {
       background-color: rgba(255, 152, 0, 0.1);
-      border-left: 3px solid #FF9800;
+      border-left: 3px solid #e45050;
     }
   }
 
   &__tiempo {
     min-width: 60px;
     font-weight: 700;
-    color: #FF9800;
+    color: red;
     font-size: 0.875rem;
 
     @media (min-width: 768px) {

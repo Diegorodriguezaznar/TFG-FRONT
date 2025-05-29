@@ -23,20 +23,20 @@
 
     &--activo {
       .QuizStepper__icono {
-        background: #FF9800;
+        background: #c477d3;
         color: white;
         transform: scale(1.1);
       }
 
       .QuizStepper__titulo {
-        color: #FF9800;
+        color: purple;
         font-weight: 600;
       }
     }
 
     &--completado {
       .QuizStepper__icono {
-        background: #4CAF50;
+        background: #c477d3;
         color: white;
       }
     }
@@ -87,7 +87,7 @@
     }
 
     &--activo {
-      background: #4CAF50;
+      background: #c477d3;
     }
   }
 }

@@ -183,7 +183,7 @@ onMounted(() => {
               
               <div class="HomePage__Actions">
                 <v-chip 
-                  color="orange" 
+                  color="red" 
                   variant="elevated" 
                   class="HomePage__VideoCount"
                   size="large"
@@ -194,7 +194,7 @@ onMounted(() => {
                 
                 <v-btn 
                   v-if="puedeSubirVideo" 
-                  color="success" 
+                  color="warning" 
                   variant="elevated" 
                   size="small" 
                   class="HomePage__UploadButton" 

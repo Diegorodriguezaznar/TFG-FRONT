@@ -295,7 +295,7 @@ watch(() => props.modelValue, (isOpen) => {
         <!-- Descripción -->
         <div class="mb-4" v-if="quiz.descripcion">
           <h3 class="text-h6 font-weight-bold mb-3">
-            <v-icon class="mr-2" color="orange">mdi-information</v-icon>
+            <v-icon class="mr-2" color="purple">mdi-information</v-icon>
             Descripción
           </h3>
           <p class="text-body-1">
@@ -313,7 +313,7 @@ watch(() => props.modelValue, (isOpen) => {
           </h3>
           
           <div class="text-center">
-            <v-icon color="orange" size="48">mdi-help-circle</v-icon>
+            <v-icon color="purple" size="48">mdi-help-circle</v-icon>
             <div class="text-h4 font-weight-bold mt-2">{{ totalPreguntas }}</div>
             <div class="text-body-1 text-grey">{{ totalPreguntas === 1 ? 'Pregunta' : 'Preguntas' }}</div>
           </div>
@@ -324,28 +324,28 @@ watch(() => props.modelValue, (isOpen) => {
           <v-divider class="my-4"></v-divider>
           
           <h3 class="text-h6 font-weight-bold mb-3">
-            <v-icon class="mr-2" color="success">mdi-format-list-checks</v-icon>
+            <v-icon class="mr-2" color="purple">mdi-format-list-checks</v-icon>
             ¿Cómo funciona?
           </h3>
           
           <v-list density="compact" class="QuizInfoModal__Instructions">
             <v-list-item>
               <template v-slot:prepend>
-                <v-icon color="success" size="small">mdi-numeric-1-circle</v-icon>
+                <v-icon color="orange" size="small">mdi-numeric-1-circle</v-icon>
               </template>
               <v-list-item-title class="text-body-2">Responde cada pregunta seleccionando una opción</v-list-item-title>
             </v-list-item>
             
             <v-list-item>
               <template v-slot:prepend>
-                <v-icon color="info" size="small">mdi-numeric-2-circle</v-icon>
+                <v-icon color="orange" size="small">mdi-numeric-2-circle</v-icon>
               </template>
               <v-list-item-title class="text-body-2">Puedes navegar entre preguntas libremente</v-list-item-title>
             </v-list-item>
             
             <v-list-item>
               <template v-slot:prepend>
-                <v-icon color="warning" size="small">mdi-numeric-3-circle</v-icon>
+                <v-icon color="orange" size="small">mdi-numeric-3-circle</v-icon>
               </template>
               <v-list-item-title class="text-body-2">Al finalizar verás tu puntuación y respuestas correctas</v-list-item-title>
             </v-list-item>
@@ -361,7 +361,7 @@ watch(() => props.modelValue, (isOpen) => {
             <v-btn
               @click="iniciarQuiz"
               :disabled="totalPreguntas === 0"
-              color="orange"
+              color="purple"
               size="large"
               block
               variant="elevated"
@@ -420,7 +420,7 @@ watch(() => props.modelValue, (isOpen) => {
       <v-card-text class="text-center py-12">
         <v-progress-circular
           indeterminate
-          color="orange"
+          color="purple"
           size="64"
           width="6"
           class="mb-4"
@@ -526,7 +526,7 @@ watch(() => props.modelValue, (isOpen) => {
 }
 
 .QuizInfoModal__HeaderGradient {
-  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 50%, #FFB366 100%);
+  background: linear-gradient(135deg, purple 0%, #c42ef1 50%, #c881da 100%);
   height: 180px;
   position: relative;
 }

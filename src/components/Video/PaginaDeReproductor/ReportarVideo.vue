@@ -60,7 +60,7 @@ const enviarReporte = async () => {
   <div>
     <v-btn
       class="mt-4"
-      color="warning"
+      color="red"
       variant="outlined"
       prepend-icon="mdi-flag"
       block

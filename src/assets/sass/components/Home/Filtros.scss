@@ -11,7 +11,7 @@
     align-items: center;
     justify-content: center;
     padding: 0.5rem 0;
-    color: #FF9800;
+    color: red;
   }
 
   &__texto-loading {
@@ -25,9 +25,9 @@
 
   &__chip {
     margin: 0.5rem;
-    border: 2px solid #FF9800 !important;
+    border: 2px solid red !important;
     background-color: white !important;
-    color: #FF9800 !important;
+    color: red !important;
     transition: all 0.2s ease;
 
     @media (min-width: 768px) {
@@ -35,7 +35,7 @@
     }
 
     &--activo {
-      background-color: #FF9800 !important;
+      background-color: rgb(226, 89, 89) !important;
       color: white !important;
     }
 
