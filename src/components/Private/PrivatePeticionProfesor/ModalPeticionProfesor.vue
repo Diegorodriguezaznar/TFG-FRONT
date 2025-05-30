@@ -2,10 +2,10 @@
 import { ref } from "vue";
 import { usePeticionProfesorStore } from "@/stores/PeticionProfesor";
 import { useUsuarioStore } from "@/stores/Usuario";
-import type { PeticionProfesorUI } from "@/stores/dtos/PeticionProfesorDTO";
+import type { PeticionProfesorUI, PeticionProfesorDTO } from "@/stores/dtos/PeticionProfesorDTO";
 
 const props = defineProps<{
-  peticion: PeticionProfesorUI;
+  peticion: PeticionProfesorDTO;
 }>();
 
 const emit = defineEmits(["cerrar", "accionRealizada"]);
@@ -59,7 +59,6 @@ async function rechazar() {
         </p>
         <p class="mt-2"><strong>Motivo:</strong></p>
         <p>{{ peticion.razon }}</p>
-        <p class="mt-2"><strong>Fecha:</strong> {{ peticion.fecha }}</p>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>

@@ -107,15 +107,20 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
       const result = await response.json();
       
       const peticionesUI = result.map((peticion: any) => ({
-        id: peticion.id,
-        user: peticion.nombreUsuario || `Usuario ${peticion.idUsuario}`,
-        avatar: peticion.avatarUrl || '/avatars/default.png',
-        documentoUrl: peticion.documentacionUrl,
-        razon: peticion.texto,
-        fecha: new Date(peticion.fechaCreacion).toLocaleDateString('es-ES'),
-        estado: peticion.estado,
-        idUsuario: peticion.idUsuario
-      }));
+      id: peticion.id,
+      user: peticion.usuario
+        ? `${peticion.usuario.nombre} ${peticion.usuario.apellidos ?? ""}`.trim()
+        : `Usuario ${peticion.idUsuario}`,
+      avatar: peticion.usuario?.gmail
+        ? `https://api.dicebear.com/6.x/initials/svg?seed=${peticion.usuario.nombre}+${peticion.usuario.apellidos}`
+        : '/avatars/default.png',
+      documentoUrl: peticion.documentacionUrl,
+      razon: peticion.texto,
+      fecha: new Date(peticion.fechaCreacion).toLocaleDateString('es-ES'),
+      estado: peticion.estado,
+      idUsuario: peticion.idUsuario
+    }));
+
       
       return peticionesUI;
     } catch (err) {

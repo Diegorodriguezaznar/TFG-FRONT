@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import Cabecera from '@/components/Layout/Header.vue';
+import HeaderFavoritos from '@/components/Layout/HeaderFavoritos.vue';
 import BarraLateral from '@/components/Layout/Sidebar.vue';
 import ListaVideosFavoritos from '@/components/ListaVideosFavoritos.vue';
 
@@ -23,7 +23,7 @@ onMounted(async () => {
 
 <template>
   <v-app>
-    <Cabecera @toggle-sidebar="toggleSidebar" @update-search="updateSearch" />
+    <HeaderFavoritos @toggle-sidebar="toggleSidebar" @update-search="updateSearch" />
     <BarraLateral v-model="sidebarOpen" />
     
     <v-main>

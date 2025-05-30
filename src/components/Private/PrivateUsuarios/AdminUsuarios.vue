@@ -79,7 +79,6 @@ function crearUsuario() {
 
     <v-data-table
       :headers="[
-        { title: 'Avatar', value: 'avatar', class: 'd-none d-md-table-cell' },
         { title: 'Nombre', value: 'nombre' },
         { title: 'Apellidos', value: 'apellidos', class: 'd-none d-md-table-cell' },
         { title: 'Email', value: 'gmail' },
@@ -90,11 +89,6 @@ function crearUsuario() {
       :items="usuarioStore.usuarios"
       class="elevation-1"
     >
-      <template #item.avatar="{ item }">
-        <v-avatar size="40" class="d-none d-md-flex">
-          <img :src="item.avatar" alt="Avatar" />
-        </v-avatar>
-      </template>
 
       <template #item.apellidos="{ item }">
         <span class="d-none d-md-inline">{{ item.apellidos }}</span>

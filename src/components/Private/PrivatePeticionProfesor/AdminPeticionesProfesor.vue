@@ -21,9 +21,7 @@
       <tbody>
         <tr v-for="p in peticiones" :key="p.id">
           <td>
-            <v-avatar size="32" class="mr-2">
-              <img :src="p.avatar" alt="avatar" />
-            </v-avatar>
+
             {{ p.user }}
           </td>
           <td>

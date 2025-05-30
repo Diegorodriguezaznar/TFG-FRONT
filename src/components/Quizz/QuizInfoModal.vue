@@ -240,9 +240,10 @@ watch(() => props.modelValue, (isOpen) => {
   >
     <v-card v-if="!loading && quiz" class="QuizInfoModal">
       <!-- Header con gradiente -->
-      <div class="QuizInfoModal__Header">
+     <div class="QuizInfoModal__Header">
         <div class="QuizInfoModal__HeaderGradient">
-          <div class="QuizInfoModal__HeaderContent">
+          <div class="QuizInfoModal__HeaderContent d-flex flex-column align-center justify-center">
+            
             <!-- Botón cerrar -->
             <v-btn
               @click="cerrarModal"
@@ -253,19 +254,9 @@ watch(() => props.modelValue, (isOpen) => {
             >
               <v-icon>mdi-close</v-icon>
             </v-btn>
-            
-            <!-- Badge de asignatura (solo si existe) -->
-            <div class="QuizInfoModal__Badges" v-if="asignatura">
-              <v-chip
-                color="white"
-                variant="elevated"
-                size="small"
-                class="mb-2"
-              >
-                <v-icon start size="small">mdi-book-open-variant</v-icon>
-                {{ asignatura.nombre }}
-              </v-chip>
-            </div>
+
+            <!-- Icono -->
+            <v-icon size="64" color="white" class="mb-2">mdi-book-open-page-variant</v-icon>
 
             <!-- Título -->
             <h2 class="QuizInfoModal__Title text-white mb-2">
@@ -274,21 +265,14 @@ watch(() => props.modelValue, (isOpen) => {
 
             <!-- Autor -->
             <div class="QuizInfoModal__Author">
-              <v-avatar size="32" class="mr-2">
-                <v-img :src="`https://picsum.photos/seed/user${quiz.idUsuario}/32/32`"></v-img>
-              </v-avatar>
-              <div>
-                <div class="text-white font-weight-medium text-body-2">
-                  {{ quiz.nombreUsuario }}
-                </div>
-                <div class="text-white opacity-80 text-caption">
-                  {{ quiz.fechaCreacion }}
-                </div>
+              <div class="text-white opacity-80 text-caption">
+                {{ quiz.fechaCreacion }}
               </div>
             </div>
           </div>
         </div>
       </div>
+
 
       <!-- Contenido principal -->
       <v-card-text class="QuizInfoModal__Content pa-6">
@@ -315,7 +299,7 @@ watch(() => props.modelValue, (isOpen) => {
           <div class="text-center">
             <v-icon color="purple" size="48">mdi-help-circle</v-icon>
             <div class="text-h4 font-weight-bold mt-2">{{ totalPreguntas }}</div>
-            <div class="text-body-1 text-grey">{{ totalPreguntas === 1 ? 'Pregunta' : 'Preguntas' }}</div>
+            <div class="text-body-1 text-grey"> {{ totalPreguntas === 1 ? 'Pregunta' : 'Preguntas' }}</div>
           </div>
         </div>
 

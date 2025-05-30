@@ -19,7 +19,7 @@ const emit = defineEmits(['ver', 'eliminar'])
       />
     </td>
     <td>{{ video.titulo }}</td>
-    <td>{{ video.nombreAutor || video.usuario?.nombre || 'Sin nombre' }}</td>
+    <td>{{ video.autor || video.usuario?.nombre || 'Sin nombre' }}</td>
     <td>{{ video.asignatura }}</td>
     <td>{{ video.idCurso }}</td>
     <td class="text-center">

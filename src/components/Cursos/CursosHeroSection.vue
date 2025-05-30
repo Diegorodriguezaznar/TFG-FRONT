@@ -4,10 +4,6 @@
       <v-row align="center" class="fill-height">
         <v-col cols="12" md="6" class="CursosHero__Content">
           <div class="CursosHero__Badge">
-            <v-chip color="blue" variant="elevated" size="large" class="CursosHero__Chip">
-              <v-icon start>mdi-book-education</v-icon>
-              Catálogo de Cursos
-            </v-chip>
           </div>
           
           <h1 class="CursosHero__Title">
@@ -49,7 +45,7 @@
 <style scoped>
 .CursosHero {
   background: linear-gradient(135deg, #2196F3 0%, #1976D2 50%, #1565C0 100%);
-  min-height: 70vh;
+  min-height: 7vh;
   display: flex;
   align-items: center;
   position: relative;
@@ -77,10 +73,6 @@
   margin-bottom: 1.5rem;
 }
 
-.CursosHero__Chip {
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
 
 .CursosHero__Title {
   font-size: 3.5rem;

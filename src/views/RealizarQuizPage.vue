@@ -232,18 +232,18 @@ const confirmarFinalizacion = async () => {
     const backupKey = `quiz_backup_${quizId.value}_${Date.now()}`;
     localStorage.setItem(backupKey, JSON.stringify(resultado));
     
-    console.log('✅ Resultado guardado en sessionStorage');
-    console.log('🔑 Clave:', resultadoKey);
+    console.log(' Resultado guardado en sessionStorage');
+    console.log(' Clave:', resultadoKey);
 
     // Simular un pequeño delay para mejor UX
     await new Promise(resolve => setTimeout(resolve, 500));
 
     // Navegar a la página de resultados
-    console.log('🎉 Navegando a resultados...');
+    console.log(' Navegando a resultados...');
     router.push(`/quiz/${quizId.value}/resultado`);
 
   } catch (error) {
-    console.error('❌ Error al finalizar quiz:', error);
+    console.error(' Error al finalizar quiz:', error);
     alert('Error al procesar el resultado. Por favor, inténtalo de nuevo.');
   } finally {
     loading.value = false;
@@ -302,7 +302,7 @@ onUnmounted(() => {
   <v-app>
     <!-- App Bar fijo -->
     <v-app-bar app color="white" elevation="2" height="70">
-      <v-btn icon @click="salirQuiz" color="orange">
+      <v-btn icon @click="salirQuiz" color="purple">
         <v-icon>mdi-arrow-left</v-icon>
       </v-btn>
       
@@ -318,16 +318,7 @@ onUnmounted(() => {
           {{ preguntaActual + 1 }} de {{ preguntas.length }}
         </span>
         
-        <v-btn
-          @click="finalizarQuiz"
-          color="orange"
-          variant="elevated"
-          size="small"
-          :disabled="totalRespuestas === 0"
-        >
-          <v-icon start>mdi-check</v-icon>
-          Finalizar
-        </v-btn>
+        
       </div>
     </v-app-bar>
 
@@ -338,7 +329,7 @@ onUnmounted(() => {
         <div class="text-center">
           <v-progress-circular
             indeterminate
-            color="orange"
+            color="purple"
             size="64"
             width="6"
             class="mb-4"
@@ -353,7 +344,7 @@ onUnmounted(() => {
         <!-- Barra de progreso -->
         <v-progress-linear
           :model-value="progreso"
-          color="orange"
+          color="purple"
           height="6"
           class="RealizarQuizPage__Progress"
         ></v-progress-linear>
@@ -365,7 +356,7 @@ onUnmounted(() => {
               <v-btn
                 v-for="(pregunta, index) in preguntas"
                 :key="pregunta.idPregunta"
-                :color="respuestasUsuario.has(pregunta.idPregunta) ? 'orange' : 'grey'"
+                :color="respuestasUsuario.has(pregunta.idPregunta) ? 'purple' : 'grey'"
                 :variant="index === preguntaActual ? 'elevated' : 'outlined'"
                 size="small"
                 @click="irAPregunta(index)"
@@ -388,7 +379,7 @@ onUnmounted(() => {
                     <v-btn
                       v-for="(pregunta, index) in preguntas"
                       :key="pregunta.idPregunta"
-                      :color="respuestasUsuario.has(pregunta.idPregunta) ? 'orange' : 'grey'"
+                      :color="respuestasUsuario.has(pregunta.idPregunta) ? 'purple' : 'grey'"
                       :variant="index === preguntaActual ? 'elevated' : 'outlined'"
                       size="small"
                       class="ma-1"
@@ -407,7 +398,7 @@ onUnmounted(() => {
                     </p>
                     <v-progress-linear
                       :model-value="(totalRespuestas / preguntas.length) * 100"
-                      color="orange"
+                      color="purple"
                       height="8"
                       rounded
                       class="mt-2"
@@ -427,7 +418,7 @@ onUnmounted(() => {
                 <v-card-text class="pa-6">
                   <!-- Número de pregunta -->
                   <div class="d-flex align-center mb-4">
-                    <v-chip color="orange" size="large" class="mr-3">
+                    <v-chip color="purple" size="large" class="mr-3">
                       Pregunta {{ preguntaActual + 1 }}
                     </v-chip>
                     <span class="text-body-2 text-grey">
@@ -490,7 +481,7 @@ onUnmounted(() => {
                     v-if="!esUltimaPregunta"
                     @click="siguientePregunta"
                     :disabled="!puedeAvanzar"
-                    color="orange"
+                    color="purple"
                     variant="elevated"
                   >
                     Siguiente
@@ -501,8 +492,8 @@ onUnmounted(() => {
                     v-else
                     @click="finalizarQuiz"
                     :disabled="totalRespuestas === 0"
-                    color="success"
-                    variant="elevated"
+                    color="purple"
+                    variant="outlined"
                     size="large"
                   >
                     <v-icon start>mdi-check</v-icon>
@@ -523,7 +514,7 @@ onUnmounted(() => {
           <p class="text-body-1 mb-4">
             No se pudo cargar el quiz solicitado. Puede que no exista o no tenga preguntas configuradas.
           </p>
-          <v-btn color="orange" variant="elevated" @click="router.push('/quizz-time!')">
+          <v-btn color="purple" variant="elevated" @click="router.push('/quizz-time!')">
             <v-icon start>mdi-arrow-left</v-icon>
             Volver a Quizzes
           </v-btn>
@@ -567,7 +558,7 @@ onUnmounted(() => {
           </v-btn>
           <v-btn 
             @click="confirmarFinalizacion" 
-            color="success" 
+            color="purple" 
             variant="elevated"
             :loading="loading"
           >

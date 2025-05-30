@@ -2,9 +2,9 @@
 import { ref, computed, onMounted } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import { useCursoStore } from '@/stores/Curso';
-import Header from '@/components/Layout/Header.vue';
+import HeaderCursos from '@/components/Layout/HeaderCursos.vue';
 import Footer from '@/components/Layout/Footer.vue';
-import SideBarCursos from '@/components/Layout/SideBarCursos.vue';
+import SideBar from '@/components/Layout/SideBar.vue';
 import CursosHeroSection from '@/components/Cursos/CursosHeroSection.vue';
 import CursosListSection from '@/components/Cursos/CursosListSection.vue';
 
@@ -49,8 +49,8 @@ onMounted(() => {
 
 <template>
   <v-app>
-    <Header @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
-    <SideBarCursos v-model="drawer" />
+    <HeaderCursos @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
+    <SideBar v-model="drawer" />
 
     <v-main class="CursosPage">
       <CursosHeroSection />
