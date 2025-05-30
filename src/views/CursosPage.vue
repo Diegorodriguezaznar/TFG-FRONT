@@ -1,51 +1,50 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
+import { useCursoStore } from '@/stores/Curso';
 import Header from '@/components/Layout/Header.vue';
 import Footer from '@/components/Layout/Footer.vue';
 import SideBarCursos from '@/components/Layout/SideBarCursos.vue';
-import CardCurso from '@/components/CardCurso.vue';
+import CursosHeroSection from '@/components/Cursos/CursosHeroSection.vue';
+import CursosListSection from '@/components/Cursos/CursosListSection.vue';
 
-const items = ref([{ title: 'Cursos', disabled: true, href: '/cursos' }]);
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
+const cursoStore = useCursoStore();
 
 const drawer = ref(false);
-const mostrarLogin = ref(false);
-const cursos = ref([]);
-
 const searchQuery = ref('');
+const loading = ref(true);
+
 const cursosFiltrados = computed(() => {
-  if (!searchQuery.value) return cursos.value;
-  return cursos.value.filter(curso =>
-    curso.nombre.toLowerCase().includes(searchQuery.value.toLowerCase())
+  if (!searchQuery.value) return cursoStore.cursos;
+  return cursoStore.cursos.filter(curso =>
+    curso.nombre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    (curso.descripcion && curso.descripcion.toLowerCase().includes(searchQuery.value.toLowerCase()))
   );
 });
 
 const fetchCursos = async () => {
+  loading.value = true;
   try {
-    const response = await fetch("http://localhost:5190/api/Curso", {
-      headers: usuarioLogeadoStore.usuarioActual 
-        ? { 'Authorization': `Bearer ${usuarioLogeadoStore.usuarioActual.token}` }
-        : {}
-    });
-    
-    if (!response.ok) throw new Error("Error al obtener los cursos");
-
-    cursos.value = await response.json();
+    await cursoStore.fetchAllCursos();
   } catch (error) {
-    // Error manejado silenciosamente
+    console.error('Error al cargar cursos:', error);
+  } finally {
+    loading.value = false;
   }
 };
 
 const handleCursoGuardado = (cursoId) => {
-  // Lógica de curso guardado
+  console.log('Curso guardado:', cursoId);
 };
 
 const handleCursoEliminado = (cursoId) => {
-  // Lógica de curso eliminado
+  console.log('Curso eliminado:', cursoId);
 };
 
-onMounted(fetchCursos);
+onMounted(() => {
+  fetchCursos();
+});
 </script>
 
 <template>
@@ -53,48 +52,26 @@ onMounted(fetchCursos);
     <Header @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
     <SideBarCursos v-model="drawer" />
 
-    <div class="CursosPage">
-      <v-breadcrumbs class="CursosPage__Breadcrumb" :items="items">
-        <template v-slot:prepend>
-          <v-icon icon="mdi-book-open-variant" size="small"></v-icon>
-        </template>
-      </v-breadcrumbs>
-
-      <v-container class="CursosPage__Container">
-        <div class="CursosPage__Header">
-          <h1 class="CursosPage__Title">Explora nuestros cursos</h1>
-        </div>
-
-        <div class="CursosPage__Content">
-          <v-container class="CursosPage__Grid">
-            <v-row align="stretch" justify="start">
-              <v-col v-for="curso in cursosFiltrados" :key="curso.idCurso" cols="12" sm="6" md="4" lg="3" class="CursosPage__GridItem">
-                <CardCurso 
-                  :id="curso.idCurso"
-                  :titulo="curso.nombre"
-                  :subtitulo="curso.subtitulo"
-                  :descripcion="curso.descripcion"
-                  :imagen="curso.imagen"
-                  @guardado="handleCursoGuardado"
-                  @eliminado="handleCursoEliminado"
-                />
-              </v-col>
-            </v-row>
-          </v-container>
-        </div>
-      </v-container>
-    </div>
+    <v-main class="CursosPage">
+      <CursosHeroSection />
+      
+      <CursosListSection 
+        :cursos="cursosFiltrados"
+        :loading="loading"
+        :search-query="searchQuery"
+        @refresh="fetchCursos"
+        @clear-search="searchQuery = ''"
+        @curso-guardado="handleCursoGuardado"
+        @curso-eliminado="handleCursoEliminado"
+      />
+    </v-main>
     
     <Footer />
-
-    <Login 
-      v-if="mostrarLogin" 
-      :mostrar="mostrarLogin" 
-      @cerrar="mostrarLogin = false" 
-    />
   </v-app>
 </template>
 
-<style lang="scss" scoped>
-@import "@/assets/sass/pages/CursosPage";
+<style scoped>
+.CursosPage {
+  background: #f5f5f5;
+}
 </style>

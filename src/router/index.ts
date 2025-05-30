@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import PerfilPage from "../views/PerfilPage.vue";
 import HomePage from "../views/HomePage.vue"; // NUEVA PÁGINA PRINCIPAL
 import CursosPage from "../views/CursosPage.vue"; // RENOMBRADA
+import ExplorarPage from "../views/ExplorarPage.vue"; // 🆕 NUEVA PÁGINA DE EXPLORACIÓN
 import ReproductorVideo from "@/views/ReproductorVideo.vue";
 import Videos from "@/views/Home.vue";
 import SubirVideos from "../views/SubirVideoPage.vue";
@@ -11,7 +12,6 @@ import PerfilUsuario from "../views/PerfilUsuario.vue";
 import Login from '../views/Login.vue';
 import AdminPage from "@/views/AdminPage.vue";
 import VideosFavoritos from '../views/FavoritosPage.vue'
-
 
 // === PÁGINAS DE QUIZZES NUEVAS ===
 import HacerQuizzesPage from "../views/HacerQuizzesPage.vue";
@@ -23,19 +23,25 @@ import CrearQuizPage from "../views/CrearQuizPage.vue";
 import Quizzes from "../views/Quizzes.vue";
 import QuizDetalle from "../views/QuizDetalle.vue";
 
-// ADMIN
+// ADMIN Y OTRAS PÁGINAS
 import PeticionProfesorPage from '../views/PeticionProfesorPage.vue';
 import CrearAsignaturas from '../views/CrearAsignaturas.vue';
-
-// === NUEVA PÁGINA MIS CURSOS ===
 import MisCursosPage from '../views/MisCursosPage.vue';
 
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 const routes = [
   // === AUTENTICACIÓN ===
-  { path: "/", component: Login },
-  { path: '/login', component: Login },
+  { 
+    path: "/", 
+    component: Login,
+    name: 'login-root'
+  },
+  { 
+    path: '/login', 
+    component: Login,
+    name: 'login'
+  },
   
   // === NUEVA PÁGINA PRINCIPAL DESPUÉS DEL LOGIN ===
   { 
@@ -52,19 +58,78 @@ const routes = [
     meta: { requiresAuth: true },
     name: 'cursos'
   },
-  { path: "/curso/:id", component: Videos, props: true, meta: { requiresAuth: true } },
-  { path: "/subir-video", component: SubirVideos, meta: { requiresAuth: true } },
-  { path: "/reproductor-video", component: ReproductorVideo, meta: { requiresAuth: true } },
-  { path: "/perfil", component: PerfilPage, meta: { requiresAuth: true } },
-  { path: "/usuarios", component: UsuariosPage, meta: { requiresAuth: true } },
-  { path: "/usuario/:id", component: PerfilUsuario, props: true, meta: { requiresAuth: true } },
   
-  // === NUEVA RUTA MIS CURSOS ===
+  // === 🆕 NUEVA PÁGINA DE EXPLORACIÓN DE VIDEOS ===
+  { 
+    path: "/explorar", 
+    component: ExplorarPage, 
+    meta: { requiresAuth: true },
+    name: 'explorar'
+  },
+  
+  // === PÁGINAS DE CURSOS Y VIDEOS ===
+  { 
+    path: "/curso/:id", 
+    component: Videos, 
+    props: true, 
+    meta: { requiresAuth: true },
+    name: 'curso-detalle'
+  },
+  { 
+    path: "/subir-video", 
+    component: SubirVideos, 
+    meta: { requiresAuth: true },
+    name: 'subir-video'
+  },
+  { 
+    path: "/subir-video/:idCurso",
+    component: SubirVideos,
+    props: true,
+    meta: { requiresAuth: true, allowRoles: [2, 3] },
+    name: 'subir-video-curso'
+  },
+  { 
+    path: "/reproductor-video", 
+    component: ReproductorVideo, 
+    meta: { requiresAuth: true },
+    name: 'reproductor-video'
+  },
+  
+  // === PÁGINAS DE USUARIOS ===
+  { 
+    path: "/perfil", 
+    component: PerfilPage, 
+    meta: { requiresAuth: true },
+    name: 'perfil'
+  },
+  { 
+    path: "/usuarios", 
+    component: UsuariosPage, 
+    meta: { requiresAuth: true },
+    name: 'usuarios'
+  },
+  { 
+    path: "/usuario/:id", 
+    component: PerfilUsuario, 
+    props: true, 
+    meta: { requiresAuth: true },
+    name: 'perfil-usuario'
+  },
+  
+  // === MIS CURSOS ===
   { 
     path: "/mis-cursos", 
     component: MisCursosPage, 
     meta: { requiresAuth: true },
     name: 'mis-cursos'
+  },
+  
+  // === FAVORITOS ===
+  {
+    path: '/favoritos',
+    component: VideosFavoritos,
+    meta: { requiresAuth: true },
+    name: 'favoritos'
   },
   
   // === SISTEMA DE QUIZZES COMPLETO ===
@@ -95,29 +160,34 @@ const routes = [
     name: 'crear-quiz'
   },
   
-  // === RUTAS LEGACY (mantener por compatibilidad) ===
-  { path: "/quizz-detail", component: QuizDetalle, meta: { requiresAuth: true } },
-  { path: "/quizz-detail/:id", component: QuizDetalle, props: true, meta: { requiresAuth: true } },
+  // === RUTAS LEGACY DE QUIZZES (mantener por compatibilidad) ===
+  { 
+    path: "/quizz-detail", 
+    component: QuizDetalle, 
+    meta: { requiresAuth: true },
+    name: 'quiz-detalle-legacy'
+  },
+  { 
+    path: "/quizz-detail/:id", 
+    component: QuizDetalle, 
+    props: true, 
+    meta: { requiresAuth: true },
+    name: 'quiz-detalle-legacy-id'
+  },
 
-  // === PANEL DE ADMINISTRACIÓN ===
-
-  { path: "/login", component: Login },
-  { path: "/cursos", component: HomePage },
+  // === PÁGINAS ESPECIALES ===
   {
     path: "/peticion-profesor",
     component: PeticionProfesorPage,
-    meta: { requiresAuth: true, allowRoles: [1] }
+    meta: { requiresAuth: true, allowRoles: [1] },
+    name: 'peticion-profesor'
   },
-  { path: "/curso/:idCurso/asignaturas", component: CrearAsignaturas },
-  {
-    path: "/subir-video/:idCurso",
-    component: SubirVideos,
+  { 
+    path: "/curso/:idCurso/asignaturas", 
+    component: CrearAsignaturas,
     props: true,
-    meta: { requiresAuth: true, allowRoles: [2, 3] }
-  },
-  {
-    path: "/subir-video",
-    redirect: "/cursos"
+    meta: { requiresAuth: true, allowRoles: [2, 3] },
+    name: 'crear-asignaturas'
   },
   {
     path: '/ia',
@@ -128,43 +198,8 @@ const routes = [
   {
     path: "/crear-curso",
     component: () => import("@/views/CrearCurso.vue"),
-    meta: { requiresAuth: true, allowRoles: [2, 3] }
-  },
-  {
-    path: "/curso/:id",
-    component: Videos,
-    props: true,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/reproductor-video",
-    component: ReproductorVideo,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/perfil",
-    component: PerfilPage,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/quizz-time!",
-    component: Quizzes,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/quizz-detail",
-    component: QuizDetalle,
-    meta: { requiresAuth: true }
-  },
-  {
-    path: "/quizz-detail/:id",
-    component: QuizDetalle,
-    props: true
-  },
-  {
-    path: '/favoritos',
-    component: VideosFavoritos,
-    name: 'VideosFavoritos', 
+    meta: { requiresAuth: true, allowRoles: [2, 3] },
+    name: 'crear-curso'
   },
   {
     path: '/ranking',
@@ -172,10 +207,13 @@ const routes = [
     component: () => import('@/views/RankingAportaciones.vue'),
     meta: { requiresAuth: true, adminOnly: true }
   },
+  
+  // === PANEL DE ADMINISTRACIÓN ===
   {
     path: "/admin",
     component: AdminPage,
     meta: { requiresAuth: true, requiresAdmin: true },
+    name: 'admin',
     children: [
       {
         path: "",
@@ -184,34 +222,47 @@ const routes = [
       {
         path: "usuarios",
         component: () => import("@/components/Private/PrivateUsuarios/AdminUsuarios.vue"),
-        meta: { requiresAdmin: true }
+        meta: { requiresAdmin: true },
+        name: 'admin-usuarios'
       },
       {
         path: "cursos",
         component: () => import("@/components/Private/PrivateCursos/AdminCursos.vue"),
-        meta: { requiresAdmin: true }
+        meta: { requiresAdmin: true },
+        name: 'admin-cursos'
       },
       {
         path: "reportes",
         component: () => import("@/components/Private/PrivateVideosR/AdminVideosReportados.vue"),
-        meta: { requiresAdmin: true }
+        meta: { requiresAdmin: true },
+        name: 'admin-reportes'
       },
       {
         path: "peticiones-profesor",
         component: () => import("@/components/Private/PrivatePeticionProfesor/AdminPeticionesProfesor.vue"),
-        meta: { requiresAdmin: true }
+        meta: { requiresAdmin: true },
+        name: 'admin-peticiones'
       },
       {
         path: "estadisticas",
         component: () => import("@/components/Private/PrivateEstadisticas/AdminEstadisticas.vue"),
-        meta: { requiresAdmin: true }
+        meta: { requiresAdmin: true },
+        name: 'admin-estadisticas'
       },
       {
         path: "comentarios-reportados",
         component: () => import("@/components/Private/PrivateComentariosR/AdminComentariosReportados.vue"),
-        meta: { requiresAdmin: true }
+        meta: { requiresAdmin: true },
+        name: 'admin-comentarios'
       }
     ]
+  },
+  
+  // === REDIRECCIONES ===
+  {
+    path: "/subir-video",
+    redirect: "/cursos",
+    name: 'subir-video-redirect'
   }
 ];
 
@@ -220,56 +271,63 @@ const router = createRouter({
   routes
 });
 
+
 router.beforeEach((to, from, next) => {
   if (to.path !== from.path) {
     console.clear();
-    console.log(`%c Estas en: ${to.path}`, 'color: #42b883; font-weight: bold;');
+    console.log(`%c 🚀 Navegando a: ${to.path}`, 'color: #F44336; font-weight: bold; font-size: 14px;');
   }
   next();
 });
 
 // Protección por autenticación y roles
 router.beforeEach((to, from, next) => {
-  console.clear();
-  console.log(`%c Estas en: ${to.path}`, 'color: #42b883; font-weight: bold;');
-
   const usuarioLogeadoStore = useUsuarioLogeadoStore();
   const usuario = usuarioLogeadoStore.usuarioActual;
   const idRol = usuario?.idRol || usuario?.rol?.idRol || usuario?.rol?.id;
 
-  // Ruta pública
+  // 🟢 Ruta pública - permitir acceso
   if (!to.meta.requiresAuth) {
     next();
     return;
   }
 
-  // No autenticado
+  // 🔴 No autenticado - redirigir al login  
   if (!usuarioLogeadoStore.estaAutenticado || !usuario) {
+    console.log('❌ Usuario no autenticado, redirigiendo a login');
     next("/login");
     return;
   }
 
-  // Requiere admin
+  // 🔴 Requiere admin (rol 3)
   if (to.meta.requiresAdmin && idRol !== 3) {
-    alert("No tienes permisos de administrador");
-    next("/home"); // CAMBIO: Redirigir a /home en lugar de /peticion-profesor
+    console.log('❌ Acceso denegado: requiere permisos de administrador');
+    alert("❌ No tienes permisos de administrador");
+    next("/home");
     return;
   }
 
-  // Requiere creador de quizzes (roles 2 y 3)
+  // 🔴 Requiere creador de quizzes (roles 2 y 3)
   if (to.meta.requiresQuizCreator && !(idRol === 2 || idRol === 3)) {
-    alert("No tienes permisos para crear quizzes. Solo profesores y gestores pueden crear quizzes.");
+    console.log('❌ Acceso denegado: requiere permisos para crear quizzes');
+    alert("❌ No tienes permisos para crear quizzes. Solo profesores y administradores pueden crear quizzes.");
     next("/quizz-time!");
     return;
   }
 
-  // Permisos por rol específico
+  // 🔴 Permisos por rol específico
   if (to.meta.allowRoles && !to.meta.allowRoles.includes(idRol)) {
+    console.log('❌ Acceso denegado: rol no permitido para esta ruta');
     next("/peticion-profesor");
     return;
   }
 
+  console.log(` Acceso permitido a ${to.path} (Rol: ${idRol})`);
   next();
+});
+
+router.onError((error) => {
+  console.error('❌ Error de navegación:', error);
 });
 
 export default router;

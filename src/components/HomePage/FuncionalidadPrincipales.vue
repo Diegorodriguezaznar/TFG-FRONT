@@ -31,7 +31,7 @@
           </div>
         </v-col>
 
-        <!-- Videos -->
+        <!-- Videos - ARREGLADO: Ahora redirige a /explorar -->
         <v-col cols="12" md="4" lg="4" xl="4">
           <div class="FuncionalidadesPrincipales__CardWrapper">
             <FeatureCard
@@ -43,11 +43,11 @@
                 'Gran catalogo de contenido',
                 'Marcadores de tiempo para navegación',
                 'Comentarios e interacción',
-                'Listas de reproducción personalizadas'
+                'Filtros avanzados de búsqueda'
               ]"
               texto-boton="Explorar Videos"
               icono-boton="mdi-play"
-              ruta="/cursos"
+              ruta="/explorar"
               @navegar="$emit('navegar', $event)"
             />
           </div>

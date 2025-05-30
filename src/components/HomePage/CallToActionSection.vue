@@ -17,11 +17,12 @@
             <v-icon start>mdi-book-education</v-icon>
             Explorar Cursos
           </v-btn>
+          <!-- ARREGLADO: Ahora va a /explorar -->
           <v-btn 
             color="red" 
             size="x-large" 
             variant="elevated"
-            @click="$emit('navegar', '/cursos')"
+            @click="$emit('navegar', '/explorar')"
             class="CallToActionSection__Button"
           >
             <v-icon start>mdi-play-circle</v-icon>
