@@ -3,16 +3,21 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useCursoStore } from '@/stores/Curso';
 import { useVideoStore } from '@/stores/Video';
+import { useQuizStore } from '@/stores/Quiz';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado'; 
 import HeaderCursos from '@/components/Layout/HeaderCursos.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
-import Filtros from '@/components/Video/Home/Filtros.vue';
-import ListaVideos from '@/components/Video/Home/ListaVideos.vue';
 import BotonQuizes from '@/components/Video/Home/BotonQuizes.vue';
+// 🆕 Importar los nuevos componentes
+import VideosCurso from '@/components/Cursos/DetalleCurso/VideosCurso.vue';
+import QuizzesCurso from '@/components/Cursos/DetalleCurso/QuizzesCurso.vue';
+// 🆕 Importar el modal de información del quiz
+import QuizInfoModal from '@/components/Quizz/QuizInfoModal.vue';
 
 const route = useRoute();
 const cursoStore = useCursoStore();
 const videoStore = useVideoStore();
+const quizStore = useQuizStore(); // 🆕 Añadir store de quizzes
 const usuarioLogeadoStore = useUsuarioLogeadoStore(); 
 
 const drawer = ref(false);
@@ -21,7 +26,16 @@ const filtroSeleccionado = ref('Todos');
 const paginaActual = ref(1);
 const loading = computed(() => videoStore.loading || cursoStore.loading);
 const curso = computed(() => cursoStore.curso);
-const mostrarModalAsignatura = ref(false);
+
+// 🆕 Variables para videos y quizzes del curso
+const videosCurso = ref([]);
+const quizzesCurso = ref([]);
+const loadingVideos = ref(false);
+const loadingQuizzes = ref(false);
+
+// 🆕 Variables para el modal de quiz
+const showQuizModal = ref(false);
+const selectedQuizId = ref(null);
 
 const cursoId = computed(() => {
   if (route.path.startsWith('/curso/')) {
@@ -100,6 +114,44 @@ const cargarVideos = async () => {
   }
 };
 
+// 🆕 Cargar videos específicos del curso para la sección
+const cargarVideosCurso = async () => {
+  if (!cursoId.value) return;
+  
+  loadingVideos.value = true;
+  try {
+    // Obtener todos los videos del curso
+    await videoStore.fetchAllVideos();
+    videosCurso.value = videoStore.videos.filter(video => 
+      video.idCurso === cursoId.value
+    ).sort((a, b) => new Date(b.fechaSubida).getTime() - new Date(a.fechaSubida).getTime());
+  } catch (error) {
+    console.error('Error al cargar videos del curso:', error);
+    videosCurso.value = [];
+  } finally {
+    loadingVideos.value = false;
+  }
+};
+
+// 🆕 Cargar quizzes específicos del curso para la sección
+const cargarQuizzesCurso = async () => {
+  if (!cursoId.value) return;
+  
+  loadingQuizzes.value = true;
+  try {
+    // Obtener todos los quizzes del curso
+    await quizStore.fetchQuizzesByCurso(cursoId.value);
+    quizzesCurso.value = quizStore.quizzes.sort((a, b) => 
+      new Date(b.fechaCreacion || new Date()).getTime() - new Date(a.fechaCreacion || new Date()).getTime()
+    );
+  } catch (error) {
+    console.error('Error al cargar quizzes del curso:', error);
+    quizzesCurso.value = [];
+  } finally {
+    loadingQuizzes.value = false;
+  }
+};
+
 const cambiarPagina = async (nuevaPagina: number) => {
   if (nuevaPagina < 1 || nuevaPagina > totalPaginas.value) return;
   
@@ -136,10 +188,25 @@ const actualizarFiltro = (filtro: string | number) => {
   filtroSeleccionado.value = filtro;
 };
 
+// 🆕 Función para mostrar el modal de información del quiz
+const mostrarInfoQuiz = (quizId: number) => {
+  selectedQuizId.value = quizId;
+  showQuizModal.value = true;
+};
+
+// 🆕 Función para cerrar el modal
+const cerrarModalQuiz = () => {
+  showQuizModal.value = false;
+  selectedQuizId.value = null;
+};
+
 watch(() => route.params.id, () => {
   filtroSeleccionado.value = 'Todos';
   paginaActual.value = 1;
   cargarVideos();
+  // 🆕 Recargar videos y quizzes del curso cuando cambie el ID
+  cargarVideosCurso();
+  cargarQuizzesCurso();
 });
 
 onMounted(() => {
@@ -147,12 +214,15 @@ onMounted(() => {
     usuarioLogeadoStore.cargarUsuarioDesdeStorage();
   }
   cargarVideos();
+  // 🆕 Cargar videos y quizzes del curso al montar
+  cargarVideosCurso();
+  cargarQuizzesCurso();
 });
 </script>
 
 <template>
   <v-app>
-    <HeaderCursos @toggle-sidebar="drawer = !drawer" @update-search="actualizarBusqueda"/>
+    <HeaderCursos @toggle-sidebar="drawer = !drawer" @update-search="actualizarBusqueda" />
     
     <v-main class="HomePage">
       <Sidebar v-model="drawer" />
@@ -179,7 +249,6 @@ onMounted(() => {
               </p>
               
               <div class="HomePage__Actions">
-                
                 <v-btn 
                   v-if="puedeSubirVideo" 
                   color="warning" 
@@ -214,58 +283,41 @@ onMounted(() => {
           </div>
           
           <template v-else>
-            <Filtros 
-              @filtro-seleccionado="actualizarFiltro" 
-              :filtro-actual="filtroSeleccionado"
-              :curso-id="cursoId"
-            />
-            
-            <v-divider class="HomePage__Divider"></v-divider>
-            
-            <ListaVideos :videos="videosFiltrados" />
-            
-            <v-alert
-              v-if="videosFiltrados.length === 0"
-              type="info"
-              text="No se encontraron videos con los filtros actuales."
-              class="HomePage__NoVideos"
-            ></v-alert>
-
-            <!-- Paginación -->
-            <div v-if="totalPaginas > 1" class="HomePage__Pagination">
-              <v-btn 
-                icon="mdi-chevron-left"
-                :disabled="!hayPaginaAnterior"
-                @click="paginaAnterior"
-                variant="text"
-                size="small"
-              ></v-btn>
+            <!-- 🆕 NUEVAS SECCIONES: Videos y Quizzes del Curso -->
+            <div v-if="cursoId && curso" class="HomePage__CursoSections">
+              <!-- Sección de Videos del Curso -->
+              <VideosCurso 
+                v-if="!loadingVideos"
+                :videos="videosCurso"
+                :curso-nombre="curso.nombre"
+                :curso-id="cursoId"
+                class="mb-6"
+              />
               
-              <span class="HomePage__PageInfo">
-                {{ paginaActual }} / {{ totalPaginas }}
-              </span>
-              
-              <v-btn 
-                icon="mdi-chevron-right"
-                :disabled="!hayPaginaSiguiente"
-                @click="paginaSiguiente"
-                variant="text"
-                size="small"
-              ></v-btn>
+              <!-- Sección de Quizzes del Curso -->
+              <QuizzesCurso 
+                v-if="!loadingQuizzes"
+                :quizzes="quizzesCurso"
+                :curso-nombre="curso.nombre"
+                :curso-id="cursoId"
+                class="mb-6"
+                @mostrar-info-quiz="mostrarInfoQuiz"
+              />
             </div>
           </template>
         </v-container>
       </div>
     </v-main>
 
-    <AgregarAsignaturaModal
-      :mostrar="mostrarModalAsignatura"
-      :curso-id="cursoId || 0"
-      @cerrar="mostrarModalAsignatura = false"
-      @asignatura-creada="asignaturaCreada"
-    />
-
     <BotonQuizes :curso-id="cursoId" />
+    
+    <!-- 🆕 Modal de información del quiz -->
+    <QuizInfoModal
+      v-model="showQuizModal"
+      :quiz-id="selectedQuizId"
+      @quiz-deleted="cargarQuizzesCurso"
+      @quiz-updated="cargarQuizzesCurso"
+    />
   </v-app>
 </template>
 
@@ -287,5 +339,15 @@ onMounted(() => {
   color: rgba(var(--v-theme-on-surface), 0.87);
   min-width: 60px;
   text-align: center;
+}
+
+.HomePage__CursoSections {
+  margin-top: 24px;
+}
+
+@media (max-width: 600px) {
+  .HomePage__CursoSections {
+    margin-top: 16px;
+  }
 }
 </style>

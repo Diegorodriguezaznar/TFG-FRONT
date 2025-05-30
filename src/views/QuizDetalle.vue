@@ -1,6 +1,3 @@
-// src/views/QuizDetalle.vue
-// Versión corregida para obtener ID desde query params
-
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
 import { useQuizStore } from '../stores/Quiz';
