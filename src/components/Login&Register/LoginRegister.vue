@@ -12,21 +12,21 @@
     <!-- Contenedor principal -->
     <v-container fluid class="auth-container">
       <v-row no-gutters class="fill-height align-center justify-center">
-        <v-col cols="12" sm="10" md="8" lg="6" xl="4">
-          <!-- Logo y branding -->
-          <div class="text-center mb-8">
+        <v-col cols="12" sm="10" md="8" lg="5" xl="4">
+          <!-- Logo y branding compacto -->
+          <div class="text-center mb-4">
             <div class="logo-container">
-              <v-avatar size="80" class="logo-avatar">
-                <v-icon size="50" color="white">mdi-school</v-icon>
+              <v-avatar size="60" class="logo-avatar">
+                <v-icon size="35" color="white">mdi-school</v-icon>
               </v-avatar>
             </div>
             <h1 class="logo-text">AcademIQ</h1>
             <p class="logo-subtitle">Tu plataforma de aprendizaje</p>
           </div>
 
-          <!-- Card principal -->
-          <v-card class="auth-card" elevation="24">
-            <!-- Pestañas mejoradas -->
+          <!-- Card principal compacto -->
+          <v-card class="auth-card" elevation="16">
+            <!-- Pestañas compactas -->
             <div class="tabs-container">
               <div class="tabs-wrapper">
                 <button 
@@ -48,18 +48,19 @@
             </div>
 
             <v-card-text class="auth-content">
-              <!-- Alertas mejoradas -->
+              <!-- Alertas compactas -->
               <v-alert
                 v-if="alert.show"
                 :type="alert.type"
                 variant="tonal"
-                class="custom-alert mb-6"
+                class="custom-alert mb-3"
                 border="start"
                 closable
                 @click:close="alert.show = false"
+                density="compact"
               >
                 <template v-slot:prepend>
-                  <v-icon>{{ getAlertIcon(alert.type) }}</v-icon>
+                  <v-icon size="small">{{ getAlertIcon(alert.type) }}</v-icon>
                 </template>
                 {{ alert.message }}
               </v-alert>
@@ -68,10 +69,10 @@
               <div class="tab-content">
                 <!-- Login Form -->
                 <div v-if="tab === 'login'" class="form-container">
-                  <h2 class="form-title">¡Bienvenido de vuelta!</h2>
-                  <p class="form-subtitle">Ingresa tus credenciales para continuar</p>
+                  <h2 class="form-title">¡Bienvenido!</h2>
+                  <p class="form-subtitle">Ingresa tus credenciales</p>
 
-                  <v-form ref="loginForm" v-model="loginValid" @submit.prevent="handleLogin" class="mt-6">
+                  <v-form ref="loginForm" v-model="loginValid" @submit.prevent="handleLogin" class="mt-4">
                     <div class="input-group">
                       <v-text-field
                         v-model="loginEmail"
@@ -84,6 +85,7 @@
                         prepend-inner-icon="mdi-email-outline"
                         :disabled="loading"
                         autocomplete="email"
+                        density="compact"
                       ></v-text-field>
                     </div>
 
@@ -101,6 +103,7 @@
                         @click:append-inner="showPassword = !showPassword"
                         :disabled="loading"
                         autocomplete="current-password"
+                        density="compact"
                       ></v-text-field>
                     </div>
 
@@ -132,10 +135,10 @@
                     <v-btn
                       type="submit"
                       color="primary"
-                      size="x-large"
+                      size="large"
                       block
                       :loading="loading"
-                      class="submit-btn mt-6"
+                      class="submit-btn mt-4"
                       variant="elevated"
                     >
                       <v-icon start>mdi-login</v-icon>
@@ -147,10 +150,10 @@
                 <!-- Register Form -->
                 <div v-else class="form-container">
                   <h2 class="form-title">¡Únete a nosotros!</h2>
-                  <p class="form-subtitle">Crea tu cuenta de estudiante y comienza a aprender</p>
+                  <p class="form-subtitle">Crea tu cuenta de estudiante</p>
 
-                  <v-form ref="registerForm" v-model="registerValid" @submit.prevent="handleRegister" class="mt-6">
-                    <v-row>
+                  <v-form ref="registerForm" v-model="registerValid" @submit.prevent="handleRegister" class="mt-4">
+                    <v-row dense>
                       <v-col cols="12" sm="6">
                         <div class="input-group">
                           <v-text-field
@@ -164,6 +167,7 @@
                             :disabled="loading"
                             autocomplete="given-name"
                             required
+                            density="compact"
                           ></v-text-field>
                         </div>
                       </v-col>
@@ -180,6 +184,7 @@
                             :disabled="loading"
                             autocomplete="family-name"
                             required
+                            density="compact"
                           ></v-text-field>
                         </div>
                       </v-col>
@@ -198,6 +203,7 @@
                         :disabled="loading"
                         autocomplete="email"
                         required
+                        density="compact"
                       ></v-text-field>
                     </div>
 
@@ -215,10 +221,11 @@
                         autocomplete="tel"
                         required
                         placeholder="+34 123 456 789"
+                        density="compact"
                       ></v-text-field>
                     </div>
 
-                    <v-row>
+                    <v-row dense>
                       <v-col cols="12" sm="6">
                         <div class="input-group">
                           <v-text-field
@@ -235,6 +242,7 @@
                             :disabled="loading"
                             autocomplete="new-password"
                             required
+                            density="compact"
                           ></v-text-field>
                         </div>
                       </v-col>
@@ -252,6 +260,7 @@
                             :disabled="loading"
                             autocomplete="new-password"
                             required
+                            density="compact"
                           ></v-text-field>
                         </div>
                       </v-col>
@@ -264,6 +273,7 @@
                         color="primary"
                         density="compact"
                         :disabled="loading"
+                        hide-details="auto"
                       >
                         <template v-slot:label>
                           <span class="terms-label">
@@ -274,30 +284,31 @@
                       </v-checkbox>
                     </div>
 
-                    <!-- Información sobre el tipo de cuenta -->
+                    <!-- Información compacta sobre el tipo de cuenta -->
                     <v-alert
                       type="info"
                       variant="tonal"
-                      class="mb-4"
+                      class="mb-3"
                       border="start"
+                      density="compact"
                     >
                       <template v-slot:prepend>
-                        <v-icon>mdi-information</v-icon>
+                        <v-icon size="small">mdi-information</v-icon>
                       </template>
-                      <strong>Cuenta de Estudiante:</strong> Te registrarás como estudiante. Si eres profesor, puedes solicitar permisos desde tu perfil una vez registrado.
+                      <small><strong>Cuenta de Estudiante:</strong> Te registrarás como estudiante.</small>
                     </v-alert>
 
                     <v-btn
                       type="submit"
                       color="primary"
-                      size="x-large"
+                      size="large"
                       block
                       :loading="loading"
-                      class="submit-btn mt-4"
+                      class="submit-btn mt-3"
                       variant="elevated"
                     >
                       <v-icon start>mdi-account-plus</v-icon>
-                      Crear Cuenta de Estudiante
+                      Crear Cuenta
                     </v-btn>
                   </v-form>
                 </div>
@@ -305,7 +316,7 @@
             </v-card-text>
           </v-card>
 
-          <!-- Footer -->
+          <!-- Footer compacto -->
           <div class="auth-footer">
             <p>&copy; 2025 AcademIQ. Todos los derechos reservados.</p>
           </div>
@@ -437,7 +448,6 @@ export default {
         this.showMessage('success', '¡Bienvenido de vuelta!');
         
         setTimeout(() => {
-          // CAMBIO: Redirigir a /home en lugar de /cursos
           this.$router.push('/home');
         }, 1200);
       } catch (error) {
@@ -451,7 +461,6 @@ export default {
     async handleRegister() {
       if (!this.$refs.registerForm.validate()) return;
 
-      // Validación adicional para asegurar que todos los campos están completos
       if (!this.registerNombre.trim() || !this.registerApellido.trim() || 
           !this.registerEmail.trim() || !this.registerTelefono.trim() || 
           !this.registerPassword.trim() || !this.termsAccepted) {
@@ -462,14 +471,13 @@ export default {
       this.loading = true;
 
       try {
-        // SIEMPRE usar idRol = 1 (Alumno/Estudiante)
         const nuevoUsuario = {
           nombre: this.registerNombre.trim(),
           apellidos: this.registerApellido.trim(),
           gmail: this.registerEmail.trim(),
           telefono: this.registerTelefono.trim(),
           contraseña: this.registerPassword.trim(),
-          idRol: 1 // ROL FIJO: Siempre estudiante/alumno
+          idRol: 1
         };
 
         console.log("📝 Registrando usuario como estudiante:", {
@@ -496,7 +504,7 @@ export default {
           gmail: this.registerEmail.trim(),
           apellidos: this.registerApellido.trim(),
           telefono: this.registerTelefono.trim(),
-          idRol: 1, // ROL FIJO: Estudiante
+          idRol: 1,
           rol: { id: 1, nombre: 'Estudiante' }
         };
 
@@ -506,10 +514,9 @@ export default {
           token: data.token
         });
 
-        this.showMessage('success', '¡Cuenta de estudiante creada exitosamente! Bienvenido a AcademIQ');
+        this.showMessage('success', '¡Cuenta creada exitosamente! Bienvenido a AcademIQ');
         
         setTimeout(() => {
-          // CAMBIO: Redirigir a /home en lugar de /cursos
           this.$router.push('/home');
         }, 1500);
       } catch (error) {
@@ -542,9 +549,9 @@ export default {
   --text-primary: #212121;
   --text-secondary: #757575;
   --background-light: #FAFAFA;
-  --shadow-main: 0 8px 32px rgba(0, 0, 0, 0.1);
-  --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.15);
-  --border-radius: 16px;
+  --shadow-main: 0 6px 24px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --border-radius: 12px;
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -570,54 +577,54 @@ export default {
 .floating-shape {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  animation: float 4s ease-in-out infinite;
+  background: rgba(255, 255, 255, 0.1);
+  animation: float 6s ease-in-out infinite;
   backdrop-filter: blur(2px);
 }
 
 .shape-1 {
-  width: 80px;
-  height: 80px;
-  top: 10%;
+  width: 60px;
+  height: 60px;
+  top: 15%;
   left: 10%;
   animation-delay: 0s;
-  background: rgba(255, 152, 0, 0.2);
+  background: rgba(255, 152, 0, 0.15);
 }
 
 .shape-2 {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   top: 70%;
   left: 80%;
-  animation-delay: 0.8s;
-  background: rgba(255, 193, 7, 0.25);
+  animation-delay: 1s;
+  background: rgba(255, 193, 7, 0.2);
 }
 
 .shape-3 {
-  width: 60px;
-  height: 60px;
-  top: 20%;
-  right: 10%;
-  animation-delay: 1.6s;
-  background: rgba(255, 183, 77, 0.3);
+  width: 40px;
+  height: 40px;
+  top: 25%;
+  right: 15%;
+  animation-delay: 2s;
+  background: rgba(255, 183, 77, 0.25);
 }
 
 .shape-4 {
-  width: 100px;
-  height: 100px;
-  bottom: 20%;
-  left: 20%;
-  animation-delay: 2.4s;
-  background: rgba(255, 112, 67, 0.2);
+  width: 70px;
+  height: 70px;
+  bottom: 25%;
+  left: 15%;
+  animation-delay: 3s;
+  background: rgba(255, 112, 67, 0.15);
 }
 
 .shape-5 {
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   top: 50%;
   left: 50%;
-  animation-delay: 3.2s;
-  background: rgba(255, 138, 101, 0.25);
+  animation-delay: 4s;
+  background: rgba(255, 138, 101, 0.2);
 }
 
 @keyframes float {
@@ -625,10 +632,10 @@ export default {
     transform: translateY(0px) rotate(0deg) scale(1);
   }
   33% {
-    transform: translateY(-25px) rotate(120deg) scale(1.1);
+    transform: translateY(-20px) rotate(120deg) scale(1.05);
   }
   66% {
-    transform: translateY(15px) rotate(240deg) scale(0.9);
+    transform: translateY(10px) rotate(240deg) scale(0.95);
   }
 }
 
@@ -636,12 +643,12 @@ export default {
 .auth-container {
   position: relative;
   z-index: 1;
-  padding: 2rem;
+  padding: 1.5rem;
 }
 
-/* Logo y branding */
+/* Logo y branding compacto */
 .logo-container {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .logo-avatar {
@@ -651,37 +658,38 @@ export default {
 }
 
 .logo-text {
-  font-size: 3rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: white;
-  margin: 1rem 0 0.5rem;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  letter-spacing: -1px;
+  margin: 0.8rem 0 0.3rem;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.5px;
 }
 
 .logo-subtitle {
   color: rgba(255, 255, 255, 0.9);
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   margin: 0;
   font-weight: 300;
 }
 
-/* Card principal */
+/* Card principal compacto */
 .auth-card {
-  border-radius: 24px;
+  border-radius: 20px;
   backdrop-filter: blur(20px);
   background: rgba(255, 255, 255, 0.95);
   border: 1px solid rgba(255, 255, 255, 0.2);
   overflow: hidden;
   transition: var(--transition);
+  max-width: 100%;
 }
 
 .auth-card:hover {
   box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-/* Pestañas mejoradas */
+/* Pestañas compactas */
 .tabs-container {
   position: relative;
   background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
@@ -695,18 +703,18 @@ export default {
 
 .tab-button {
   flex: 1;
-  padding: 1.5rem 2rem;
+  padding: 1rem 1.5rem;
   border: none;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   position: relative;
   z-index: 2;
 }
@@ -716,7 +724,7 @@ export default {
 }
 
 .tab-icon {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .tab-indicator {
@@ -724,7 +732,7 @@ export default {
   bottom: 0;
   left: 0;
   width: 50%;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
   transition: var(--transition);
   border-radius: 2px 2px 0 0;
@@ -734,13 +742,13 @@ export default {
   left: 50%;
 }
 
-/* Contenido */
+/* Contenido compacto */
 .auth-content {
-  padding: 3rem;
+  padding: 2rem 1.5rem 1.5rem;
 }
 
 .tab-content {
-  min-height: 500px;
+  min-height: auto;
 }
 
 .form-container {
@@ -748,10 +756,10 @@ export default {
 }
 
 .form-title {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
   text-align: center;
 }
 
@@ -759,17 +767,17 @@ export default {
   color: var(--text-secondary);
   text-align: center;
   margin-bottom: 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
-/* Grupos de inputs */
+/* Grupos de inputs compactos */
 .input-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-/* Inputs personalizados */
+/* Inputs personalizados compactos */
 :deep(.custom-input .v-field) {
-  border-radius: 12px;
+  border-radius: 10px;
   background: rgba(248, 250, 252, 0.8);
   backdrop-filter: blur(10px);
 }
@@ -778,46 +786,48 @@ export default {
   box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
 }
 
-:deep(.custom-input .v-field__input) {
-  padding: 1rem 1rem 1rem 3rem;
-  font-size: 1rem;
+:deep(.custom-input.v-text-field--density-compact .v-field__input) {
+  padding: 0.5rem 0.8rem 0.5rem 2.5rem;
+  font-size: 0.95rem;
+  min-height: 40px;
 }
 
 :deep(.custom-input .v-field__prepend-inner) {
-  padding-left: 1rem;
+  padding-left: 0.8rem;
 }
 
-/* Opciones del formulario */
+/* Opciones del formulario compactas */
 .form-options {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 1.5rem 0;
+  margin: 1rem 0;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.8rem;
 }
 
 .checkbox-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
 .forgot-password-btn {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-decoration: none;
+  padding: 0.2rem;
 }
 
 .forgot-password-btn:hover {
   text-decoration: underline;
 }
 
-/* Términos */
+/* Términos compactos */
 .terms-container {
-  margin: 1.5rem 0;
+  margin: 1rem 0 0.5rem;
 }
 
 .terms-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: var(--text-secondary);
 }
 
@@ -831,67 +841,41 @@ export default {
   text-decoration: underline;
 }
 
-/* Botón de envío */
+/* Botón de envío compacto */
 .submit-btn {
-  border-radius: 12px;
-  font-size: 1.1rem;
+  border-radius: 10px;
+  font-size: 1rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   text-transform: none;
   box-shadow: var(--shadow-main);
   background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  height: 48px;
 }
 
 .submit-btn:hover {
   box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
-/* Alertas personalizadas */
+/* Alertas personalizadas compactas */
 .custom-alert {
-  border-radius: 12px;
+  border-radius: 10px;
   backdrop-filter: blur(10px);
-  border-left-width: 4px;
-}
-
-/* Footer */
-.auth-footer {
-  text-align: center;
-  margin-top: 2rem;
-  color: rgba(255, 255, 255, 0.8);
+  border-left-width: 3px;
   font-size: 0.9rem;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .auth-content {
-    padding: 2rem 1.5rem;
-  }
-  
-  .logo-text {
-    font-size: 2.5rem;
-  }
-  
-  .form-title {
-    font-size: 1.75rem;
-  }
-  
-  .tab-button {
-    padding: 1.25rem 1rem;
-    font-size: 0.9rem;
-  }
-  
-  .form-options {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+/* Footer compacto */
+.auth-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
 }
 
-@media (max-width: 480px) {
-  .auth-container {
-    padding: 1rem;
-  }
-  
+/* Responsive mejorado */
+@media (max-width: 768px) {
   .auth-content {
     padding: 1.5rem 1rem;
   }
@@ -900,20 +884,49 @@ export default {
     font-size: 2rem;
   }
   
-  .tab-content {
-    min-height: auto;
+  .form-title {
+    font-size: 1.4rem;
+  }
+  
+  .tab-button {
+    padding: 0.8rem 0.8rem;
+    font-size: 0.85rem;
+  }
+  
+  .form-options {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 }
 
-/* Animaciones */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 1rem 0.5rem;
+  }
+  
+  .auth-content {
+    padding: 1.2rem 0.8rem;
+  }
+  
+  .logo-text {
+    font-size: 1.8rem;
+  }
+  
+  .input-group {
+    margin-bottom: 0.8rem;
+  }
+}
+
+/* Animaciones sutiles */
 .form-container {
-  animation: fadeInUp 0.4s ease-out;
+  animation: fadeInUp 0.3s ease-out;
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
@@ -935,5 +948,83 @@ export default {
 :deep(.v-field--focused .v-field__outline) {
   border-color: var(--primary-color);
   border-width: 2px;
+}
+
+/* Ajustes específicos para densidad compacta */
+:deep(.v-checkbox--density-compact .v-selection-control__wrapper) {
+  height: 24px;
+}
+
+:deep(.v-alert--density-compact) {
+  padding: 8px 16px;
+}
+
+:deep(.v-alert--density-compact .v-alert__content) {
+  padding: 4px 0;
+}
+
+/* Optimización de espaciado vertical */
+.v-row.dense {
+  margin: -4px;
+}
+
+.v-row.dense .v-col {
+  padding: 4px;
+}
+
+/* Ajustes finales para eliminar scroll */
+.auth-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-height: 700px) {
+  .auth-container {
+    padding: 0.5rem;
+  }
+  
+  .logo-container {
+    margin-bottom: 0.5rem;
+  }
+  
+  .logo-text {
+    font-size: 1.8rem;
+    margin: 0.5rem 0 0.2rem;
+  }
+  
+  .auth-content {
+    padding: 1rem;
+  }
+  
+  .input-group {
+    margin-bottom: 0.7rem;
+  }
+  
+  .form-options {
+    margin: 0.7rem 0;
+  }
+  
+  .terms-container {
+    margin: 0.7rem 0 0.3rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .logo-avatar {
+    display: none;
+  }
+  
+  .logo-text {
+    font-size: 1.6rem;
+  }
+  
+  .form-title {
+    font-size: 1.3rem;
+  }
+  
+  .form-subtitle {
+    font-size: 0.8rem;
+  }
 }
 </style>

@@ -27,18 +27,21 @@ const esProfesor = computed(() => idRol.value === 2 || idRol.value === 3);
 const esAdmin = computed(() => idRol.value === 3);
 
 const menuItemsBase = [
-  { title: 'Inicio', icon: 'mdi-home', route: '/cursos' },
+  { title: 'Inicio', icon: 'mdi-home', route: '/home', hoverColor: 'orange' },
+  { title: 'Cursos', icon: 'mdi-book', route: '/cursos', hoverColor: 'blue' },
   { title: 'Mis Cursos', icon: 'mdi-bookmark-multiple', route: '/mis-cursos' },
-  { title: 'Explorar', icon: 'mdi-compass', route: '/explorar' },
+  ...(esProfesor.value ? [
+    { title: 'Crear Curso', icon: 'mdi-plus-box', route: '/crear-curso' }
+  ] : []),
+  { title: 'Explorar', icon: 'mdi-compass', route: '/explorar', hoverColor: 'red' },
   { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
-  { title: 'Favoritos', icon: 'mdi-star', route: '/favoritos' },
+  { title: 'Favoritos', icon: 'mdi-heart', route: '/favoritos', hoverColor: 'pink'  },
   { title: 'Profesores', icon: 'mdi-account-group', route: '/usuarios' },
-  { title: 'MarIAno', icon: 'mdi-robot-outline', route: '/ia' },
+  { title: 'MarIAno', icon: 'mdi-robot-outline', route: '/ia', hoverColor: 'light-blue' },
   { title: 'Ranking', icon: 'mdi-chart-bar', route: '/ranking' },
-...(idRol.value === 1 ? [
-  { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
-] : [])
-
+  ...(idRol.value === 1 ? [
+    { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
+  ] : [])
 ];
 
 const menuItemsAdmin = [
@@ -103,7 +106,12 @@ const drawer = computed({
         :color="item.color"
         :class="[
           'Sidebar__MenuItem',
-          item.color === 'red' && 'Sidebar__MenuItem--admin'
+          item.color === 'red' && 'Sidebar__MenuItem--admin',
+          item.color === 'primary' && 'Sidebar__MenuItem--crear-curso',
+          item.hoverColor === 'blue' && 'Sidebar__MenuItem--hover-blue',
+          item.hoverColor === 'red' && 'Sidebar__MenuItem--hover-red',
+          item.hoverColor === 'light-blue' && 'Sidebar__MenuItem--hover-light-blue',
+          item.hoverColor === 'light-blue' && 'Sidebar__MenuItem--hover-light-pink'
         ]"
       >
         <!-- Tooltip para modo colapsado -->
@@ -187,6 +195,11 @@ const drawer = computed({
 .Sidebar {
   background-color: white;
   border-right: 1px solid rgba(0, 0, 0, 0.12);
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1000;
 }
 
 .Sidebar__MenuItem--admin {
@@ -198,6 +211,45 @@ const drawer = computed({
 .Sidebar__MenuItem--admin:hover {
   background: rgba(244, 67, 54, 0.1);
 }
+
+.Sidebar__MenuItem--crear-curso {
+  background: rgba(25, 118, 210, 0.05);
+  border-radius: 8px;
+  margin: 2px 8px;
+  font-weight: 500;
+}
+
+.Sidebar__MenuItem--crear-curso:hover {
+  background: rgba(25, 118, 210, 0.1);
+}
+
+.Sidebar__MenuItem--hover-blue:hover {
+  background: rgba(33, 150, 243, 0.1);
+  color: #1976d2;
+}
+
+.Sidebar__MenuItem--hover-blue:hover .v-icon {
+  color: #1976d2 !important;
+}
+
+.Sidebar__MenuItem--hover-red:hover {
+  background: rgba(244, 67, 54, 0.1);
+  color: #d32f2f;
+}
+
+.Sidebar__MenuItem--hover-red:hover .v-icon {
+  color: #d32f2f !important;
+}
+
+.Sidebar__MenuItem--hover-light-blue:hover {
+  background: rgba(3, 169, 244, 0.1);
+  color: #0288d1;
+}
+
+.Sidebar__MenuItem--hover-light-blue:hover .v-icon {
+  color: #0288d1 !important;
+}
+
 
 .Sidebar__MenuItem {
   margin: 1px 4px;

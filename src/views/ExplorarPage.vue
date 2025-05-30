@@ -4,7 +4,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useVideoStore } from '@/stores/Video';
 import { useAsignaturaStore } from '@/stores/Asignaturas';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import Header from '@/components/Layout/Header.vue';
+import HeaderVideos from '@/components/Layout/HeaderVideos.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
 import ExplorarHeader from '@/components/Explorar/ExplorarHeader.vue';
 import FiltrosSection from '@/components/Explorar/FiltrosSection.vue';
@@ -189,7 +189,7 @@ onMounted(() => {
 
 <template>
   <v-app>
-    <Header @toggle-sidebar="toggleSidebar" @update-search="updateSearch" />
+    <HeaderVideos @toggle-sidebar="toggleSidebar" @update-search="updateSearch" />
     
     <v-main>
       <Sidebar v-model="drawer" />

@@ -4,9 +4,9 @@ import { ref, computed, onMounted } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import { useUsuarioCursoStore } from '@/stores/UsuarioCurso';
 import { useCursoStore } from '@/stores/Curso';
-import Header from '@/components/Layout/Header.vue';
+import HeaderCursos from '@/components/Layout/HeaderCursos.vue';
 import Footer from '@/components/Layout/Footer.vue';
-import SideBarCursos from '@/components/Layout/SideBarCursos.vue';
+import SideBar from '@/components/Layout/SideBar.vue';
 import CardCurso from '@/components/CardCurso.vue';
 
 // --------------------------- Breadcrumb ---------------------------
@@ -102,8 +102,8 @@ onMounted(() => {
 <template>
   <v-app>
     <!-- --------------------------- Header --------------------------- -->
-    <Header @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
-    <SideBarCursos v-model="drawer" />
+    <HeaderCursos @toggle-sidebar="drawer = !drawer" @update-search="searchQuery = $event" />
+    <SideBar v-model="drawer" />
 
     <!-- --------------------------- Contenedor principal --------------------------- -->
     <div class="MisCursosPage__Wrapper">
@@ -118,7 +118,7 @@ onMounted(() => {
         <!-- --------------------------- Título de la página --------------------------- -->
         <div class="MisCursosPage__Header">
           <div class="d-flex align-center mb-4">
-            <v-icon color="orange" size="x-large" class="mr-3">mdi-bookmark-multiple</v-icon>
+            <v-icon color="blue" size="x-large" class="mr-3">mdi-bookmark-multiple</v-icon>
             <div>
               <h1 class="MisCursosPage__Titulo">Mis Cursos</h1>
               <p class="MisCursosPage__Subtitulo">Cursos en los que estás inscrito</p>
@@ -130,7 +130,7 @@ onMounted(() => {
         <div class="MisCursosPage__Contenido">
           <!-- Estado de carga -->
           <div v-if="loading" class="text-center py-12">
-            <v-progress-circular indeterminate color="orange" size="64" class="mb-4"></v-progress-circular>
+            <v-progress-circular indeterminate color="blue" size="64" class="mb-4"></v-progress-circular>
             <p class="text-h6">Cargando tus cursos...</p>
           </div>
           
@@ -151,7 +151,7 @@ onMounted(() => {
               </p>
               <div class="d-flex gap-3 justify-center">
                 <v-btn 
-                  color="orange" 
+                  color="blue" 
                   variant="elevated" 
                   prepend-icon="mdi-compass"
                   to="/cursos"
@@ -179,7 +179,7 @@ onMounted(() => {
             <div class="MisCursosPage__Info mb-4">
               <div class="d-flex align-center justify-space-between">
                 <div class="d-flex align-center">
-                  <v-chip color="orange" variant="outlined" class="mr-3">
+                  <v-chip color="indigo" variant="outlined" class="mr-3">
                     {{ cursosFiltrados.length }} curso{{ cursosFiltrados.length !== 1 ? 's' : '' }}
                   </v-chip>
                   <span v-if="searchQuery" class="text-body-2 text-grey">
@@ -189,7 +189,7 @@ onMounted(() => {
                 
                 <v-btn 
                   variant="outlined" 
-                  color="orange" 
+                  color="blue" 
                   prepend-icon="mdi-refresh"
                   @click="cargarMisCursos"
                   :loading="loading"
@@ -260,7 +260,7 @@ onMounted(() => {
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 4px;
-  background: linear-gradient(90deg, #FF9800 0%, #FFB74D 100%);
+  background: linear-gradient(90deg, #0084ff 0%, #4d6eff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -294,10 +294,10 @@ onMounted(() => {
 }
 
 .MisCursosPage__Info {
-  background: rgba(255, 152, 0, 0.05);
+  background: rgba(0, 38, 255, 0.05);
   border-radius: 12px;
   padding: 16px;
-  border-left: 4px solid #FF9800;
+  border-left: 4px solid #0099ff;
 }
 
 .MisCursosPage__ContenedorCursos {

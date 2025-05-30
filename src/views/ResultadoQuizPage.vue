@@ -50,11 +50,11 @@ const porcentaje = computed(() => {
 
 const nivelRendimiento = computed(() => {
   const pct = porcentaje.value;
-  if (pct >= 90) return { nivel: 'Excelente', color: 'success', icon: 'mdi-trophy', emoji: '🏆' };
-  if (pct >= 75) return { nivel: 'Muy Bueno', color: 'info', icon: 'mdi-medal', emoji: '🥈' };
-  if (pct >= 60) return { nivel: 'Bueno', color: 'warning', icon: 'mdi-thumb-up', emoji: '👍' };
-  if (pct >= 40) return { nivel: 'Regular', color: 'orange', icon: 'mdi-school', emoji: '📚' };
-  return { nivel: 'Necesita Mejorar', color: 'error', icon: 'mdi-book-open', emoji: '💪' };
+  if (pct >= 90) return { nivel: 'Excelente', color: 'orange', icon: 'mdi-trophy' };
+  if (pct >= 75) return { nivel: 'Muy Bueno', color: 'orange', icon: 'mdi-medal' };
+  if (pct >= 60) return { nivel: 'Bueno', color: 'orange', icon: 'mdi-thumb-up' };
+  if (pct >= 40) return { nivel: 'Regular', color: 'orange', icon: 'mdi-school' };
+  return { nivel: 'Necesita Mejorar', color: 'orange', icon: 'mdi-book-open' };
 });
 
 const mensajeMotivacional = computed(() => {
@@ -147,7 +147,7 @@ const volverAQuizzes = () => {
   // Limpiar datos del sessionStorage
   const resultadoKey = `quiz_resultado_${quizId.value}`;
   sessionStorage.removeItem(resultadoKey);
-  router.push('/quizz-time!');
+  router.push('/cursos');
 };
 
 const repetirQuiz = () => {
@@ -192,7 +192,7 @@ onMounted(() => {
 
     <!-- App Bar -->
     <v-app-bar app color="white" elevation="2" height="70">
-      <v-btn icon @click="volverAQuizzes" color="orange">
+      <v-btn icon @click="volverAQuizzes" color="purple">
         <v-icon>mdi-close</v-icon>
       </v-btn>
       
@@ -202,7 +202,7 @@ onMounted(() => {
       
       <v-spacer></v-spacer>
       
-      <v-btn icon @click="compartirResultado" color="orange">
+      <v-btn icon @click="compartirResultado" color="purple">
         <v-icon>mdi-share-variant</v-icon>
       </v-btn>
     </v-app-bar>
@@ -214,7 +214,7 @@ onMounted(() => {
         <div class="text-center">
           <v-progress-circular
             indeterminate
-            color="orange"
+            color="purple"
             size="64"
             width="6"
             class="mb-4"
@@ -319,7 +319,7 @@ onMounted(() => {
         <!-- Botones de acción -->
         <v-card class="ResultadoQuizPage__Actions mb-6" elevation="3">
           <v-card-text class="pa-6">
-            <div class="d-flex flex-column flex-md-row gap-4 align-center justify-center">
+        <div class="d-flex flex-column flex-md-row gap-6 align-center justify-center">
               <v-btn
                 @click="toggleRevision"
                 color="info"
@@ -333,7 +333,7 @@ onMounted(() => {
               
               <v-btn
                 @click="repetirQuiz"
-                color="orange"
+                color="purple"
                 size="large"
                 variant="elevated"
                 prepend-icon="mdi-refresh"
@@ -344,7 +344,7 @@ onMounted(() => {
               
               <v-btn
                 @click="compartirResultado"
-                color="success"
+                color="orange"
                 size="large"
                 variant="elevated"
                 prepend-icon="mdi-share-variant"
@@ -355,13 +355,13 @@ onMounted(() => {
               
               <v-btn
                 @click="volverAQuizzes"
-                color="primary"
+                color="indigo"
                 size="large"
                 variant="elevated"
                 prepend-icon="mdi-format-list-bulleted"
                 class="flex-grow-1 flex-md-grow-0"
               >
-                Otros Quizzes
+                volver a cursos
               </v-btn>
             </div>
           </v-card-text>
@@ -464,7 +464,7 @@ onMounted(() => {
 }
 
 .ResultadoQuizPage__HeaderBg {
-  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 50%, #FFB366 100%);
+  background: linear-gradient(135deg, purple 0%, #cf5bec 50%, #b61cb6 100%);
   position: relative;
 }
 
@@ -596,18 +596,6 @@ onMounted(() => {
     opacity: 0;
   }
 }
-
-/* Generar posiciones aleatorias para el confetti */
-.confetti:nth-child(1) { left: 10%; animation-delay: 0s; }
-.confetti:nth-child(2) { left: 20%; animation-delay: 0.2s; }
-.confetti:nth-child(3) { left: 30%; animation-delay: 0.4s; }
-.confetti:nth-child(4) { left: 40%; animation-delay: 0.6s; }
-.confetti:nth-child(5) { left: 50%; animation-delay: 0.8s; }
-.confetti:nth-child(6) { left: 60%; animation-delay: 1s; }
-.confetti:nth-child(7) { left: 70%; animation-delay: 1.2s; }
-.confetti:nth-child(8) { left: 80%; animation-delay: 1.4s; }
-.confetti:nth-child(9) { left: 90%; animation-delay: 1.6s; }
-.confetti:nth-child(10) { left: 15%; animation-delay: 1.8s; }
 
 @media (max-width: 600px) {
   .ResultadoQuizPage__Container {

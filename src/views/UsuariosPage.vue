@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useUsuarioStore } from '@/stores/Usuario';
-import HeaderUsuarios from '@/components/Usuarios/HeaderUsuarios.vue';
+import HeaderUsuarios from '@/components/Layout/HeaderUsuarios.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
 import CardUsuario from '@/components/Usuarios/CardUsuario.vue';
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';

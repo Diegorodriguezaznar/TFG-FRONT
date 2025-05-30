@@ -8,6 +8,7 @@ import Header from '@/components/Layout/Header.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
 import QuizInfoModal from '@/components/Quizz/QuizInfoModal.vue';
 import type { QuizCompletaDTO } from '@/stores/dtos/QuizCompletaDTO';
+import QuizDetalle from './QuizDetalle.vue';
 
 // Stores y router
 const quizStore = useQuizStore();
@@ -226,27 +227,19 @@ onMounted(() => {
               elevation="0"
               border
             >
-              <!-- Header con gradiente -->
-              <div class="quiz-header">
-                <div class="quiz-header-content">        
-                </div>
+            <div class="quiz-header">
+              <div class="quiz-header-content d-flex align-center justify-center" style="height: 100%;">
+                <v-icon size="48" color="white">mdi-book-open-page-variant</v-icon>
               </div>
+            </div>
+
               
               <!-- Contenido -->
               <v-card-text class="pb-2">
                 <div class="d-flex align-center mb-3">
-                  <v-avatar 
-                    size="32" 
-                    color="purple" 
-                    class="mr-3"
-                  >
-                    <span class="text-white font-weight-bold">
-                      {{ quiz.nombre.charAt(0).toUpperCase() }}
-                    </span>
-                  </v-avatar>
+
                   <div>
                     <div class="text-h6 font-weight-bold">{{ quiz.nombre }}</div>
-                    <div class="text-caption text-grey-darken-1">{{ quiz.nombreUsuario  }}</div>
                   </div>
                 </div>
                 

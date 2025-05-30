@@ -1,24 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import UserAvatar from '@/components/UserAvatar.vue';
 
-const searchQuery = ref('');
 const usuarioStore = useUsuarioLogeadoStore();
 
-const emit = defineEmits(['toggle-sidebar', 'update-search']);
+const emit = defineEmits(['toggle-sidebar']);
 
 const toggleSidebar = () => {
   emit('toggle-sidebar');
 };
-
-const updateSearch = () => {
-  emit('update-search', searchQuery.value);
-};
 </script>
 
 <template>
-  <v-app-bar app color="white" elevation="1" class="Header">
+  <v-app-bar app color="white" elevation="1" class="Header" flat>
     <v-btn icon @click="toggleSidebar" class="Header__btn-menu">
       <v-icon>mdi-menu</v-icon>
     </v-btn>
@@ -27,19 +21,6 @@ const updateSearch = () => {
       <v-icon color="orange" size="x-large" class="Header__icono">mdi-play-box</v-icon>
       <span class="Header__texto">AcademIQ Play</span>
     </div>
-    
-    <v-text-field
-      v-model="searchQuery"
-      density="compact"
-      variant="outlined"
-      hide-details
-      placeholder="Buscar videos..."
-      append-inner-icon="mdi-magnify"
-      @click:append-inner="updateSearch"
-      @keyup.enter="updateSearch"
-      class="Header__buscador"
-      bg-color="grey-lighten-4"
-    />
     
     <!-- Spacer para empujar el avatar al extremo derecho -->
     <v-spacer></v-spacer>
@@ -72,6 +53,11 @@ const updateSearch = () => {
   padding: 0 16px;
   display: flex;
   align-items: center;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  margin-bottom: 0 !important;
+  box-shadow: none !important;
 }
 
 .Header__Logo {
@@ -79,12 +65,6 @@ const updateSearch = () => {
   align-items: center;
   min-width: 140px;
   margin-right: 16px;
-}
-
-.Header__Buscador {
-  max-width: 600px;
-  flex-grow: 1;
-  margin: 0 16px;
 }
 
 .Header__UserSection {
@@ -106,10 +86,6 @@ const updateSearch = () => {
 }
 
 @media (max-width: 600px) {
-  .Header__Buscador {
-    margin: 0 8px;
-  }
-  
   .Header__Logo span {
     display: none;
   }

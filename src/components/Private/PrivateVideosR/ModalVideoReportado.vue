@@ -45,7 +45,6 @@ const mostrarListadoReportes = ref(false)
         </div>
 
         <p class="text-subtitle-1 mb-1">Autor: {{ video.autor }}</p>
-        <p class="text-subtitle-2 mb-4">Subido: {{ video.fecha }}</p>
 
         <p class="text-body-1 mb-4">{{ video.descripcion || 'Sin descripción disponible' }}</p>
 

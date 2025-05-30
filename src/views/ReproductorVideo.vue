@@ -185,14 +185,14 @@ watch(() => route.query.id, async (newId, oldId) => {
                   class="ma-1 favorite-btn"
                   :class="{ 'favorite-active': esFavorito }"
                   variant="elevated"
-                  :color="esFavorito ? 'yellow-darken-2' : 'grey-lighten-2'"
+                  :color="esFavorito ? 'pink' : 'grey-lighten-2'"
                   :loading="loadingFavorito"
                   :disabled="!usuarioLogeadoStore.estaAutenticado || loadingFavorito"
                   @click="toggleFavorito"
                   size="large"
                 >
                   <v-icon size="28">
-                    {{ esFavorito ? 'mdi-star' : 'mdi-star-outline' }}
+                    {{ esFavorito ? 'mdi-heart' : 'mdi-heart-outline' }}
                   </v-icon>
                 </v-btn>
 

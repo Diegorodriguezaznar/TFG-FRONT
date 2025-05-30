@@ -97,7 +97,7 @@ onMounted(async () => {
     <div class="d-flex justify-space-between align-center mb-4">
       <div>
         <div class="text-h5 font-weight-bold d-flex align-center">
-          <v-icon size="28" color="yellow-darken-2" class="mr-2">mdi-star</v-icon>
+          <v-icon size="28" color="pink" class="mr-2">mdi-heart</v-icon>
           Mis Videos Favoritos
         </div>
         <div class="text-body-2 text-grey mt-1">
@@ -130,7 +130,7 @@ onMounted(async () => {
               class="ListaVideosFavoritos__FavoritoBtn"
               @click.stop="quitarDeFavoritos(video.idVideo)"
             >
-              <v-icon>mdi-star</v-icon>
+              <v-icon>mdi-heart</v-icon>
             </v-btn>
             
             <template v-slot:placeholder>

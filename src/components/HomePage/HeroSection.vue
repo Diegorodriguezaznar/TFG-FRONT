@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import AcademIQLogo from '@/components/AcademIQ.vue';
+import AcademIQLogo from '@/components/Common/AcademIQ.vue';
 
 // Emits
 defineEmits<{

@@ -5,7 +5,7 @@ import { useUsuarioStore } from '@/stores/Usuario';
 import { useCursoStore } from '@/stores/Curso';
 import { useVideoStore } from '@/stores/Video';
 import { useQuizStore } from '@/stores/Quiz';
-import HeaderUsuarios from '@/components/Usuarios/HeaderUsuarios.vue';
+import HeaderUsuarios from '@/components/Layout/HeaderUsuarios.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
 import CursosUsuario from '@/components/Perfil/CursosUsuario.vue';
 import VideosUsuario from '@/components/Perfil/VideosUsuario.vue';
