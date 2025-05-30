@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import { useDisplay } from 'vuetify';
 import { useRouter } from 'vue-router';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 const props = defineProps({
   modelValue: {
@@ -29,16 +29,15 @@ const esAdmin = computed(() => idRol.value === 3);
 const menuItemsBase = [
   { title: 'Inicio', icon: 'mdi-home', route: '/home', hoverColor: 'orange' },
   { title: 'Cursos', icon: 'mdi-book', route: '/cursos', hoverColor: 'blue' },
-  { title: 'Mis Cursos', icon: 'mdi-bookmark-multiple', route: '/mis-cursos' },
-  ...(esProfesor.value ? [
-    { title: 'Crear Curso', icon: 'mdi-plus-box', route: '/crear-curso' }
-  ] : []),
   { title: 'Explorar', icon: 'mdi-compass', route: '/explorar', hoverColor: 'red' },
-  { title: 'Biblioteca', icon: 'mdi-folder', route: '/biblioteca' },
+  { title: 'Mis Cursos', icon: 'mdi-bookmark-multiple', route: '/mis-cursos', hoverColor: 'blue' },
   { title: 'Favoritos', icon: 'mdi-heart', route: '/favoritos', hoverColor: 'pink'  },
-  { title: 'Profesores', icon: 'mdi-account-group', route: '/usuarios' },
   { title: 'MarIAno', icon: 'mdi-robot-outline', route: '/ia', hoverColor: 'light-blue' },
-  { title: 'Ranking', icon: 'mdi-chart-bar', route: '/ranking' },
+  { title: 'Profesores', icon: 'mdi-account-group', route: '/usuarios', hoverColor: 'orange' },
+  { title: 'Ranking', icon: 'mdi-chart-bar', route: '/ranking', hoverColor: 'gold' },
+    ...(esProfesor.value ? [
+    { title: 'Crear Curso', icon: 'mdi-plus-box', route: '/crear-curso', hoverColor: 'blue' }
+  ] : []),
   ...(idRol.value === 1 ? [
     { title: 'Hazte Profesor', icon: 'mdi-school', route: '/peticion-profesor' }
   ] : [])
@@ -87,11 +86,6 @@ const drawer = computed({
     :width="isExpanded ? 240 : 80"
     class="Sidebar"
   >
-    <div class="Sidebar__cabecera">
-      <v-btn v-if="!isMobile" icon @click="toggleSidebar" size="small">
-        <v-icon>{{ isExpanded ? 'mdi-chevron-left' : 'mdi-chevron-right' }}</v-icon>
-      </v-btn>
-    </div>
     
     <v-divider />
     
@@ -108,10 +102,12 @@ const drawer = computed({
           'Sidebar__MenuItem',
           item.color === 'red' && 'Sidebar__MenuItem--admin',
           item.color === 'primary' && 'Sidebar__MenuItem--crear-curso',
+          item.hoverColor === 'orange' && 'Sidebar__MenuItem--hover-orange',
           item.hoverColor === 'blue' && 'Sidebar__MenuItem--hover-blue',
           item.hoverColor === 'red' && 'Sidebar__MenuItem--hover-red',
           item.hoverColor === 'light-blue' && 'Sidebar__MenuItem--hover-light-blue',
-          item.hoverColor === 'light-blue' && 'Sidebar__MenuItem--hover-light-pink'
+          item.hoverColor === 'pink' && 'Sidebar__MenuItem--hover-pink',
+          item.hoverColor === 'gold' && 'Sidebar__MenuItem--hover-gold'
         ]"
       >
         <!-- Tooltip para modo colapsado -->
@@ -223,6 +219,17 @@ const drawer = computed({
   background: rgba(25, 118, 210, 0.1);
 }
 
+/* Hover para Inicio - Naranja más oscuro */
+.Sidebar__MenuItem--hover-orange:hover {
+  background: rgba(255, 111, 0, 0.1);
+  color: #e65100;
+}
+
+.Sidebar__MenuItem--hover-orange:hover .v-icon {
+  color: #e65100 !important;
+}
+
+/* Hover para Cursos y Mis Cursos - Azul */
 .Sidebar__MenuItem--hover-blue:hover {
   background: rgba(33, 150, 243, 0.1);
   color: #1976d2;
@@ -232,6 +239,7 @@ const drawer = computed({
   color: #1976d2 !important;
 }
 
+/* Hover para Explorar - Rojo */
 .Sidebar__MenuItem--hover-red:hover {
   background: rgba(244, 67, 54, 0.1);
   color: #d32f2f;
@@ -241,6 +249,7 @@ const drawer = computed({
   color: #d32f2f !important;
 }
 
+/* Hover para MarIAno - Azul claro */
 .Sidebar__MenuItem--hover-light-blue:hover {
   background: rgba(3, 169, 244, 0.1);
   color: #0288d1;
@@ -250,6 +259,25 @@ const drawer = computed({
   color: #0288d1 !important;
 }
 
+/* Hover para Favoritos - Rosa */
+.Sidebar__MenuItem--hover-pink:hover {
+  background: rgba(233, 30, 99, 0.1);
+  color: #c2185b;
+}
+
+.Sidebar__MenuItem--hover-pink:hover .v-icon {
+  color: #c2185b !important;
+}
+
+/* Hover para Ranking - Dorado */
+.Sidebar__MenuItem--hover-gold:hover {
+  background: rgba(255, 193, 7, 0.1);
+  color: #f57c00;
+}
+
+.Sidebar__MenuItem--hover-gold:hover .v-icon {
+  color: #f57c00 !important;
+}
 
 .Sidebar__MenuItem {
   margin: 1px 4px;

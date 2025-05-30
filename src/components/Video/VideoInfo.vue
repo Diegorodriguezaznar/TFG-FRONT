@@ -2,7 +2,7 @@
 // --------------------------- Imports ---------------------------
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 // --------------------------- Router ---------------------------
 const router = useRouter();

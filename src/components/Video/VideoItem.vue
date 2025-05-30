@@ -13,7 +13,7 @@ const emit = defineEmits(['ver-video', 'eliminado']);
 // --------------------------- Stores ---------------------------
 import { useVideoStore } from '@/stores/Video';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 const videoStore = useVideoStore();
 const usuarioLogeadoStore = useUsuarioLogeadoStore();

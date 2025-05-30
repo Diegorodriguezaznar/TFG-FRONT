@@ -107,31 +107,6 @@
                       ></v-text-field>
                     </div>
 
-                    <div class="form-options">
-                      <v-checkbox
-                        v-model="rememberMe"
-                        color="primary"
-                        density="compact"
-                        hide-details
-                        :disabled="loading"
-                      >
-                        <template v-slot:label>
-                          <span class="checkbox-label">Recordarme</span>
-                        </template>
-                      </v-checkbox>
-
-                      <v-btn
-                        variant="text"
-                        color="primary"
-                        size="small"
-                        @click="forgotPassword"
-                        :disabled="loading"
-                        class="forgot-password-btn"
-                      >
-                        ¿Olvidaste tu contraseña?
-                      </v-btn>
-                    </div>
-
                     <v-btn
                       type="submit"
                       color="primary"
@@ -796,15 +771,7 @@ export default {
   padding-left: 0.8rem;
 }
 
-/* Opciones del formulario compactas */
-.form-options {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 1rem 0;
-  flex-wrap: wrap;
-  gap: 0.8rem;
-}
+
 
 .checkbox-label {
   font-size: 0.85rem;
@@ -893,11 +860,7 @@ export default {
     font-size: 0.85rem;
   }
   
-  .form-options {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
+
 }
 
 @media (max-width: 480px) {
@@ -1001,9 +964,7 @@ export default {
     margin-bottom: 0.7rem;
   }
   
-  .form-options {
-    margin: 0.7rem 0;
-  }
+
   
   .terms-container {
     margin: 0.7rem 0 0.3rem;

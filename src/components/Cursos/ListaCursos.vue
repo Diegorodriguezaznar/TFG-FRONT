@@ -2,7 +2,7 @@
 // --------------------------- Imports ---------------------------
 import { ref, computed, onMounted } from 'vue';
 import { useCursoStore } from '@/stores/Curso'; 
-import CardCurso from '@/components/CardCurso.vue';
+import CardCurso from '@/components/Cursos/CardCurso.vue';
 
 // --------------------------- Store ---------------------------
 const cursoStore = useCursoStore();

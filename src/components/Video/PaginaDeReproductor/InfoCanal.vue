@@ -2,7 +2,7 @@
 import { defineProps, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import type { VideoDTO } from '@/stores/dtos/VideoDTO';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 const props = defineProps<{
   video: VideoDTO

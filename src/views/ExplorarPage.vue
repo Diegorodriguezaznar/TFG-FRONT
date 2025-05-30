@@ -6,12 +6,12 @@ import { useAsignaturaStore } from '@/stores/Asignaturas';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import HeaderVideos from '@/components/Layout/HeaderVideos.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
-import ExplorarHeader from '@/components/Explorar/ExplorarHeader.vue';
-import FiltrosSection from '@/components/Explorar/FiltrosSection.vue';
-import VideosGrid from '@/components/Explorar/VideosGrid.vue';
-import VideosList from '@/components/Explorar/VideosList.vue';
-import EstadoCarga from '@/components/Explorar/EstadoCarga.vue';
-import EstadoVacio from '@/components/Explorar/EstadoVacio.vue';
+import ExplorarHeader from '@/components/Video/Explorar/ExplorarHeader.vue';
+import FiltrosSection from '@/components/Video/Explorar/FiltrosSection.vue';
+import VideosGrid from '@/components/Video/Explorar/VideosGrid.vue';
+import VideosList from '@/components/Video/Explorar/VideosList.vue';
+import EstadoCarga from '@/components/Video/Explorar/EstadoCarga.vue';
+import EstadoVacio from '@/components/Video/Explorar/EstadoVacio.vue';
 
 // Stores
 const videoStore = useVideoStore();
@@ -243,7 +243,7 @@ onMounted(() => {
 .ExplorarPage {
   background: linear-gradient(135deg, rgba(244, 67, 54, 0.05) 0%, #ffffff 50%, rgba(255, 138, 128, 0.03) 100%);
   min-height: 100vh;
-  padding-top: 24px;
+  padding-top: 0 !important; 
 }
 
 .ExplorarPage__Content {

@@ -3,7 +3,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUsuarioEstadisticasStore } from '@/stores/UsuarioEstadisticas';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 // Props

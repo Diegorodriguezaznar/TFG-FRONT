@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 import type { VideoDTO } from '@/stores/dtos/VideoDTO';
 
 const props = defineProps<{

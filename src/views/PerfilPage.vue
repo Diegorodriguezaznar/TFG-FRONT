@@ -3,11 +3,11 @@ import { ref, computed, onMounted } from 'vue';
 import Header from '@/components/Layout/Header.vue';
 import Footer from '@/components/Layout/Footer.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
-import UserTab from '@/components/Perfil/UserTab.vue';
-import EditarPerfilModal from '@/components/Perfil/EditarPerfilModal.vue';
-import CursosInscritos from '@/components/Perfil/CursosInscritos.vue';
+import UserTab from '@/components/Usuarios/Perfil/UserTab.vue';
+import EditarPerfilModal from '@/components/Usuarios/Perfil/EditarPerfilModal.vue';
+import CursosInscritos from '@/components/Usuarios/Perfil/CursosInscritos.vue';
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
-import AvatarRiendo from '@/components/AvatarEmote.vue';
+import AvatarRiendo from '@/components/Common/AvatarEmote.vue';
 
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
 

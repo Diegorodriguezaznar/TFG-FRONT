@@ -19,13 +19,12 @@ import RealizarQuizPage from "../views/RealizarQuizPage.vue";
 import ResultadoQuizPage from "../views/ResultadoQuizPage.vue";
 import CrearQuizPage from "../views/CrearQuizPage.vue";
 
-// PÁGINAS LEGACY (mantener por compatibilidad)
 import Quizzes from "../views/Quizzes.vue";
 import QuizDetalle from "../views/QuizDetalle.vue";
 
 // ADMIN Y OTRAS PÁGINAS
 import PeticionProfesorPage from '../views/PeticionProfesorPage.vue';
-import CrearAsignaturas from '../views/CrearAsignaturas.vue';
+import CrearAsignaturas from '../components/Cursos/CrearAsignaturas.vue';
 import MisCursosPage from '../views/MisCursosPage.vue';
 
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";

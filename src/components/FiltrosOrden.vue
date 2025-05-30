@@ -1,6 +1,3 @@
-// src/components/FiltrosOrden.vue
-// Componente simple para los filtros de ordenamiento
-
 <script setup>
 import { ref, onMounted, watch } from 'vue';
 

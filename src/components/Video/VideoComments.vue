@@ -6,7 +6,7 @@ import type { ComentarioUI } from '@/stores/dtos/ComentarioDTO';
 import { storeToRefs } from 'pinia';
 import ModalReportarComentario from './Modales/ModalReportarComentario.vue';
 import ModalNotificacion from './Modales/ModalReporteCorrecto.vue';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 const comentarioStore = useComentarioStore();
 const usuarioLogeadoStore = useUsuarioLogeadoStore();

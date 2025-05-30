@@ -1,6 +1,7 @@
 .HomePage {
   background-color: #f9f9f9;
   min-height: 100vh;
+  padding-top: 0 !important; 
 
   &__Container {
     padding: 1rem;
@@ -30,7 +31,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(to bottom, rgba(255, 188, 188, 0.7) 0%, rgba(112, 89, 89, 0.5) 100%);
+    background: linear-gradient(to bottom, rgba(188, 215, 255, 0.7) 0%, rgba(112, 89, 89, 0.5) 100%);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;

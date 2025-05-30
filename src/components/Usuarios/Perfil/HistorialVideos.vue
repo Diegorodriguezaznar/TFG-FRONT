@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // --------------------------- Imports ---------------------------
 import { computed } from 'vue';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 // --------------------------- Props y Emits ---------------------------
 const props = defineProps({

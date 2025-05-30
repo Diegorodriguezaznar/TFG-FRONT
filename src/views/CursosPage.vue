@@ -73,5 +73,6 @@ onMounted(() => {
 <style scoped>
 .CursosPage {
   background: #f5f5f5;
+  padding-top: 0 !important; 
 }
 </style>

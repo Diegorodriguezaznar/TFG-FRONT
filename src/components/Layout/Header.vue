@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 const usuarioStore = useUsuarioLogeadoStore();
 
@@ -56,7 +56,6 @@ const toggleSidebar = () => {
   position: sticky !important;
   top: 0 !important;
   z-index: 1000 !important;
-  margin-bottom: 0 !important;
   box-shadow: none !important;
 }
 

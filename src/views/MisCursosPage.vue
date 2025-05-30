@@ -7,7 +7,7 @@ import { useCursoStore } from '@/stores/Curso';
 import HeaderCursos from '@/components/Layout/HeaderCursos.vue';
 import Footer from '@/components/Layout/Footer.vue';
 import SideBar from '@/components/Layout/SideBar.vue';
-import CardCurso from '@/components/CardCurso.vue';
+import CardCurso from '@/components/Cursos/CardCurso.vue';
 
 // --------------------------- Breadcrumb ---------------------------
 const items = ref([

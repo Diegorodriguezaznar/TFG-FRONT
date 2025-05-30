@@ -7,10 +7,10 @@ import { useVideoStore } from '@/stores/Video';
 import { useQuizStore } from '@/stores/Quiz';
 import HeaderUsuarios from '@/components/Layout/HeaderUsuarios.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
-import CursosUsuario from '@/components/Perfil/CursosUsuario.vue';
-import VideosUsuario from '@/components/Perfil/VideosUsuario.vue';
-import QuizzesUsuario from '@/components/Perfil/QuizzesUsuario.vue';
-import UserAvatar from '@/components/UserAvatar.vue'; // ← AÑADIDO
+import CursosUsuario from '@/components/Usuarios/Perfil/CursosUsuario.vue';
+import VideosUsuario from '@/components/Usuarios/Perfil/VideosUsuario.vue';
+import QuizzesUsuario from '@/components/Usuarios/Perfil/QuizzesUsuario.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue'; // ← AÑADIDO
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 const route = useRoute();

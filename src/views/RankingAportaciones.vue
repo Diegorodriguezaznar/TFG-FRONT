@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import Header from '@/components/Layout/Header.vue'
+import HeaderRanking from '@/components/Layout/HeaderRanking.vue'
 import Sidebar from '@/components/Layout/Sidebar.vue'
-import GraficoUsuariosVideos from '@/components/GraficoUsuariosVideos.vue'
+import GraficoUsuariosVideos from '@/components/Graficos/GraficoUsuariosVideos.vue'
 
 const drawer = ref(false)
 </script>
 
 <template>
   <v-app>
-    <Header @toggle-sidebar="drawer = !drawer" />
+    <HeaderRanking @toggle-sidebar="drawer = !drawer" />
 
     <v-main class="RankingPage">
       <Sidebar v-model="drawer" />

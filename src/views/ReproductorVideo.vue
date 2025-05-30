@@ -11,10 +11,10 @@ import InfoCanal from '@/components/Video/PaginaDeReproductor/InfoCanal.vue';
 import MarcadoresTiempo from '@/components/Video/PaginaDeReproductor/MarcadoresTiempo.vue';
 import ReportarVideo from '@/components/Video/PaginaDeReproductor/ReportarVideo.vue';
 import CargandoVideo from '@/components/Video/PaginaDeReproductor/CargaVideo.vue';
-import Cabecera from '@/components/Layout/Header.vue';
 import BarraLateral from '@/components/Layout/Sidebar.vue';
 import type { VideoDTO } from '@/stores/dtos/VideoDTO';
 import type { MarcadorVideoDTO } from '@/stores/dtos/MarcadorVideoDTO';
+import HeaderVideos from '@/components/Layout/HeaderVideos.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -168,7 +168,7 @@ watch(() => route.query.id, async (newId, oldId) => {
 
 <template>
   <v-app>
-    <Cabecera @toggle-sidebar="toggleSidebar" @update-search="updateSearch" />
+    <HeaderVideos @toggle-sidebar="toggleSidebar" @update-search="updateSearch" />
     <BarraLateral v-model="sidebarOpen" />
     
     <v-main>

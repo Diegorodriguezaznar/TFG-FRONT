@@ -5,28 +5,24 @@
         <v-col cols="6" md="3">
           <div class="EstadisticasSection__Card">
             <v-icon size="50" color="#FF9800" class="EstadisticasSection__Icon">mdi-play-circle</v-icon>
-            <h3 class="EstadisticasSection__Number">1000+</h3>
             <p class="EstadisticasSection__Label">Videos Educativos</p>
           </div>
         </v-col>
         <v-col cols="6" md="3">
           <div class="EstadisticasSection__Card">
             <v-icon size="50" color="#FF9800" class="EstadisticasSection__Icon">mdi-book-education</v-icon>
-            <h3 class="EstadisticasSection__Number">50+</h3>
             <p class="EstadisticasSection__Label">Cursos Disponibles</p>
           </div>
         </v-col>
         <v-col cols="6" md="3">
           <div class="EstadisticasSection__Card">
             <v-icon size="50" color="#FF9800" class="EstadisticasSection__Icon">mdi-brain</v-icon>
-            <h3 class="EstadisticasSection__Number">200+</h3>
             <p class="EstadisticasSection__Label">Quizzes Interactivos</p>
           </div>
         </v-col>
         <v-col cols="6" md="3">
           <div class="EstadisticasSection__Card">
             <v-icon size="50" color="#FF9800" class="EstadisticasSection__Icon">mdi-account-group</v-icon>
-            <h3 class="EstadisticasSection__Number">30+</h3>
             <p class="EstadisticasSection__Label">Profesores Expertos</p>
           </div>
         </v-col>
