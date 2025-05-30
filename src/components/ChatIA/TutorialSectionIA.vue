@@ -163,7 +163,7 @@ const faqs = ref([
   },
   {
     question: '¿Qué hago si MarIAno no puede resolver mi problema?',
-    answer: 'Si MarIAno no puede ayudarte, te recomendará contactar al soporte técnico o proporcionará enlaces a recursos adicionales de ayuda.'
+    answer: 'Deberias probar a a reformular la pregunta , probablemente MarIAno no te haya entendido.'
   },
   {
     question: '¿MarIAno está disponible 24/7?',
