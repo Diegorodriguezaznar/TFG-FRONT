@@ -48,5 +48,6 @@ const scrollToChat = () => {
 <style scoped>
 .ChatIA {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding-top: 0 !important; 
 }
 </style>

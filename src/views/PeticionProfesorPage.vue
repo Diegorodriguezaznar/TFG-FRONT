@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import Header from '@/components/Layout/Header.vue'
 import Sidebar from '@/components/Layout/Sidebar.vue'
-import ModalSolicitudProfesor from '@/components/ModalSolicitudProfesor.vue'
+import ModalSolicitudProfesor from '@/components/Common/ModalSolicitudProfesor.vue'
 
 const drawer = ref(false)
 const currentStep = ref(1)

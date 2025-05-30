@@ -1,6 +1,6 @@
-<!-- src/components/Favoritos/HeaderFavoritos.vue -->
+<!-- src/components/Cursos/HeaderCursos.vue -->
 <script setup lang="ts">
-import { computed } from 'vue';
+import { ref, computed } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import UserAvatar from '@/components/Common/UserAvatar.vue';
 
@@ -20,41 +20,34 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-  <v-app-bar 
-    app 
-    color="white" 
-    elevation="2" 
-    class="HeaderFavoritos"
-    height="70"
-    sticky
-  >
+<v-app-bar app color="white" elevation="2" class="HeaderCursos" height="70" sticky>
     <!-- Botón menú -->
     <v-btn 
       icon 
       @click="toggleSidebar" 
-      class="HeaderFavoritos__MenuBtn"
-      color="pink"
+      class="HeaderCursos__MenuBtn"
+      color="blue"
       variant="text"
     >
       <v-icon>mdi-menu</v-icon>
     </v-btn>
     
     <!-- Logo y título -->
-    <div class="HeaderFavoritos__Logo d-flex align-center">
-      <v-icon color="pink" size="x-large" class="mr-2">mdi-heart</v-icon>
+    <div class="HeaderCursos__Logo d-flex align-center">
+      <v-icon color="blue" size="x-large" class="mr-2">mdi-book-open-page-variant</v-icon>
       <div class="d-flex flex-column d-none d-sm-flex">
-        <span class="text-h6 font-weight-bold text-pink">Favoritos</span>
+        <span class="text-h6 font-weight-bold text-blue">Crear Curso</span>
       </div>
     </div>
     
     <v-spacer></v-spacer>
     
     <!-- Botón de perfil con UserAvatar -->
-    <div class="HeaderFavoritos__ProfileSection">
+    <div class="HeaderCursos__ProfileSection">
       <v-btn 
         variant="text"
         to="/perfil"
-        class="HeaderFavoritos__ProfileBtn"
+        class="HeaderCursos__ProfileBtn"
       >
         <UserAvatar
           v-if="usuarioActual"
@@ -73,72 +66,60 @@ const toggleSidebar = () => {
 </template>
 
 <style scoped>
-.HeaderFavoritos {
-  border-bottom: 2px solid rgba(255, 0, 200, 0.2) !important;
+.HeaderCursos {
+  border-bottom: 2px solid rgba(0, 26, 255, 0.2) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
 }
 
-.HeaderFavoritos__MenuBtn {
+.HeaderCursos__MenuBtn {
   margin-right: 16px;
 }
 
-.HeaderFavoritos__Logo {
+.HeaderCursos__Logo {
   min-width: 200px;
   margin-right: 25px;
 }
 
-.HeaderFavoritos__FilterMenu {
-  background: white;
-  border: 1px solid rgba(255, 0, 200, 0.2);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.15);
-}
-
-.HeaderFavoritos__Filters .v-btn {
-  border-color: rgba(255, 0, 221, 0.5);
-}
-
-.HeaderFavoritos__Filters .v-btn:hover {
-  background-color: rgba(255, 152, 0, 0.1);
-}
-
 /* Responsive mejorado */
 @media (max-width: 768px) {
-  .HeaderFavoritos__Logo {
+  .HeaderCursos__Logo {
     min-width: 160px;
     margin-right: 15px;
   }
   
-  .HeaderFavoritos__ProfileSection {
+  .HeaderCursos__ProfileSection {
     padding-right: 15px;
   }
 }
 
 @media (max-width: 600px) {
-  .HeaderFavoritos__Logo {
-    min-width: 60px;
+  .HeaderCursos__Logo {
+    min-width: 60px; /* Solo ícono en móvil */
     margin-right: 10px;
   }
   
-  .HeaderFavoritos__ProfileSection {
+  .HeaderCursos__ProfileSection {
     padding-right: 10px;
   }
 }
 
 /* Animaciones */
-.HeaderFavoritos__MenuBtn {
+.HeaderCursos__MenuBtn {
   transition: transform 0.2s ease;
 }
 
-.HeaderFavoritos__MenuBtn:hover {
+.HeaderCursos__MenuBtn:hover {
   transform: scale(1.1);
 }
 
 /* AVATAR DE PERFIL - 25px de la derecha */
-.HeaderFavoritos__ProfileSection {
-  padding-right: 25px;
+.HeaderCursos__ProfileSection {
+  padding-right: 25px; 
 }
 
-.HeaderFavoritos__ProfileBtn {
+.HeaderCursos__ProfileBtn {
   border-radius: 50%;
   min-width: 40px;
   width: 40px;
@@ -147,8 +128,8 @@ const toggleSidebar = () => {
   transition: all 0.2s ease;
 }
 
-.HeaderFavoritos__ProfileBtn:hover {
-  background: rgba(233, 30, 99, 0.1);
+.HeaderCursos__ProfileBtn:hover {
+  background: rgba(255, 152, 0, 0.1);
   transform: scale(1.05);
 }
 </style>

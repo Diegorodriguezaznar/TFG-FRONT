@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 // Variables
 const searchQuery = ref('');
@@ -49,7 +49,6 @@ const clearSearch = () => {
       <v-icon color="red" size="x-large" class="mr-2">mdi-play-box-multiple</v-icon>
       <div class="d-flex flex-column d-none d-sm-flex">
         <span class="text-h6 font-weight-bold text-red">Videos</span>
-        <span class="text-caption text-grey-darken-1">Comunidad AcademIQ</span>
       </div>
     </div>
     

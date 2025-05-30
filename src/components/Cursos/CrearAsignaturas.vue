@@ -4,7 +4,7 @@ import { useRoute } from "vue-router";
 import { useAsignaturaStore } from "@/stores/Asignaturas";
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 import type { AsignaturaCrearDTO } from "@/stores/dtos/AsignaturaCrearDTO";
-import Header from "@/components/Layout/Header.vue";
+import HeaderCrearCursos from "@/components/Layout/HeaderCreacionCurso.vue";
 import Sidebar from "@/components/Layout/Sidebar.vue";
 
 const route = useRoute();
@@ -47,7 +47,7 @@ onMounted(() => {
 
 <template>
   <v-app>
-    <Header @toggle-sidebar="drawer = !drawer" />
+    <HeaderCrearCursos @toggle-sidebar="drawer = !drawer" />
     <v-main>
       <Sidebar v-model="drawer" />
 

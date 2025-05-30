@@ -4,11 +4,11 @@ import { useRoute } from 'vue-router';
 import { useCursoStore } from '@/stores/Curso';
 import { useVideoStore } from '@/stores/Video';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado'; 
-import Header from '@/components/Layout/Header.vue';
+import HeaderCursos from '@/components/Layout/HeaderCursos.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
-import Filtros from '@/components/Home/Filtros.vue';
-import ListaVideos from '@/components/Home/ListaVideos.vue';
-import BotonQuizes from '@/components/Home/BotonQuizes.vue';
+import Filtros from '@/components/Video/Home/Filtros.vue';
+import ListaVideos from '@/components/Video/Home/ListaVideos.vue';
+import BotonQuizes from '@/components/Video/Home/BotonQuizes.vue';
 
 const route = useRoute();
 const cursoStore = useCursoStore();
@@ -152,10 +152,7 @@ onMounted(() => {
 
 <template>
   <v-app>
-    <Header 
-      @toggle-sidebar="drawer = !drawer" 
-      @update-search="actualizarBusqueda"
-    />
+    <HeaderCursos @toggle-sidebar="drawer = !drawer" @update-search="actualizarBusqueda"/>
     
     <v-main class="HomePage">
       <Sidebar v-model="drawer" />
@@ -182,15 +179,6 @@ onMounted(() => {
               </p>
               
               <div class="HomePage__Actions">
-                <v-chip 
-                  color="red" 
-                  variant="elevated" 
-                  class="HomePage__VideoCount"
-                  size="large"
-                >
-                  <v-icon start icon="mdi-play-circle"></v-icon>
-                  {{ videosData?.totalCount || 0 }} videos
-                </v-chip>
                 
                 <v-btn 
                   v-if="puedeSubirVideo" 

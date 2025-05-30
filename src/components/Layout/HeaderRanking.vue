@@ -33,7 +33,7 @@ const toggleSidebar = () => {
       icon 
       @click="toggleSidebar" 
       class="HeaderFavoritos__MenuBtn"
-      color="pink"
+      color="amber-darken-2"
       variant="text"
     >
       <v-icon>mdi-menu</v-icon>
@@ -41,9 +41,9 @@ const toggleSidebar = () => {
     
     <!-- Logo y título -->
     <div class="HeaderFavoritos__Logo d-flex align-center">
-      <v-icon color="pink" size="x-large" class="mr-2">mdi-heart</v-icon>
+      <v-icon color="amber-darken-2" size="x-large" class="mr-2">mdi-trophy</v-icon>
       <div class="d-flex flex-column d-none d-sm-flex">
-        <span class="text-h6 font-weight-bold text-pink">Favoritos</span>
+        <span class="text-h6 font-weight-bold text-amber-darken-2">Ranking</span>
       </div>
     </div>
     
@@ -74,7 +74,7 @@ const toggleSidebar = () => {
 
 <style scoped>
 .HeaderFavoritos {
-  border-bottom: 2px solid rgba(255, 0, 200, 0.2) !important;
+  border-bottom: 2px solid rgba(229, 255, 0, 0.2) !important;
 }
 
 .HeaderFavoritos__MenuBtn {
@@ -88,13 +88,13 @@ const toggleSidebar = () => {
 
 .HeaderFavoritos__FilterMenu {
   background: white;
-  border: 1px solid rgba(255, 0, 200, 0.2);
+  border: 1px solid rgba(238, 255, 0, 0.2);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(255, 251, 0, 0.15);
 }
 
 .HeaderFavoritos__Filters .v-btn {
-  border-color: rgba(255, 0, 221, 0.5);
+  border-color: rgba(255, 208, 0, 0.5);
 }
 
 .HeaderFavoritos__Filters .v-btn:hover {
@@ -124,7 +124,6 @@ const toggleSidebar = () => {
   }
 }
 
-/* Animaciones */
 .HeaderFavoritos__MenuBtn {
   transition: transform 0.2s ease;
 }
@@ -133,7 +132,6 @@ const toggleSidebar = () => {
   transform: scale(1.1);
 }
 
-/* AVATAR DE PERFIL - 25px de la derecha */
 .HeaderFavoritos__ProfileSection {
   padding-right: 25px;
 }
@@ -148,7 +146,7 @@ const toggleSidebar = () => {
 }
 
 .HeaderFavoritos__ProfileBtn:hover {
-  background: rgba(233, 30, 99, 0.1);
+  background: rgba(220, 233, 30, 0.1);
   transform: scale(1.05);
 }
 </style>

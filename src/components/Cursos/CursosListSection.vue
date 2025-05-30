@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CardCurso from '@/components/CardCurso.vue';
+import CardCurso from '@/components/Cursos/CardCurso.vue';
 
 // Props
 const props = defineProps<{

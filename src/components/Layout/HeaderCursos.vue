@@ -2,7 +2,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
-import UserAvatar from '@/components/UserAvatar.vue';
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 
 // Variables
 const searchQuery = ref('');

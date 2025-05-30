@@ -9,10 +9,10 @@ import { useAsignaturaStore } from '@/stores/Asignaturas';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 
 // Componentes
-import QuizStepper from '@/components/CrearQuiz/QuizStepper.vue';
-import QuizInfo from '@/components/CrearQuiz/QuizInfo.vue';
-import PreguntasQuiz from '@/components/CrearQuiz/PreguntasQuiz.vue';
-import VistaPrevia from '@/components/CrearQuiz/VistaPrevia.vue';
+import QuizStepper from '@/components/Quizz/CrearQuiz/QuizStepper.vue';
+import QuizInfo from '@/components/Quizz/CrearQuiz/QuizInfo.vue';
+import PreguntasQuiz from '@/components/Quizz/CrearQuiz/PreguntasQuiz.vue';
+import VistaPrevia from '@/components/Quizz/CrearQuiz/VistaPrevia.vue';
 
 // Stores y router
 const router = useRouter();

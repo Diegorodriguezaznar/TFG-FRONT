@@ -2,7 +2,7 @@
 // --------------------------- Imports ---------------------------
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import VideoUpload from '@/components/SubirVideo/VideoUpload.vue';
+import VideoUpload from '@/components/Video/SubirVideo/VideoUpload.vue';
 import Header from '@/components/Layout/Header.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
 

@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import HeaderFavoritos from '@/components/Layout/HeaderFavoritos.vue';
 import BarraLateral from '@/components/Layout/Sidebar.vue';
-import ListaVideosFavoritos from '@/components/ListaVideosFavoritos.vue';
+import ListaVideosFavoritos from '@/components/Video/ListaVideosFavoritos.vue';
 
 const usuarioLogeadoStore = useUsuarioLogeadoStore();
 const sidebarOpen = ref(true);
