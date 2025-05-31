@@ -1,0 +1,127 @@
+.filtros-section {
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 16px rgba(244, 67, 54, 0.08);
+  border: 1px solid rgba(244, 67, 54, 0.1);
+  overflow: hidden;
+}
+
+.filtros-section__header {
+  background: linear-gradient(135deg, #F44336 0%, #FF5722 100%);
+  padding: 20px;
+  color: white;
+}
+
+.filtros-section__header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.filtros-section__header-info {
+  display: flex;
+  align-items: center;
+}
+
+.filtros-section__header-icon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.filtros-section__title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  color: white;
+}
+
+.filtros-section__subtitle {
+  font-size: 0.8rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.filtros-section__counter {
+  margin-left: 12px;
+}
+
+.filtros-section__content {
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(244, 67, 54, 0.02) 0%, #ffffff 100%);
+}
+
+.filtros-section__filter-group {
+  height: 100%;
+}
+
+.filtros-section__label {
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  gap: 6px;
+}
+
+/* Focus states */
+:deep(.v-field--focused .v-field__outline) {
+  border-color: #F44336 !important;
+  border-width: 2px !important;
+  box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1) !important;
+}
+
+:deep(.v-field--focused .v-field__prepend-inner .v-icon) {
+  color: #F44336 !important;
+}
+
+:deep(.v-select .v-field) {
+  transition: all 0.3s ease;
+}
+
+:deep(.v-select .v-field:hover) {
+  box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .filtros-section__header {
+    padding: 16px;
+  }
+  
+  .filtros-section__content {
+    padding: 16px;
+  }
+  
+  .filtros-section__header-content {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .filtros-section__title {
+    font-size: 1rem;
+  }
+  
+  .filtros-section__subtitle {
+    font-size: 0.75rem;
+  }
+  
+  .filtros-section__header-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+  }
+  
+  .filtros-section__counter {
+    margin-left: 8px;
+  }
+}

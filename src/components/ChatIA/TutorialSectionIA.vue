@@ -3,9 +3,6 @@
     <v-container>
       <div class="TutorialIA__Header">
         <h2 class="TutorialIA__Title">¿Cómo puede ayudarte MarIAno?</h2>
-        <p class="TutorialIA__Subtitle">
-          MarIAno es tu asistente personal especializado en AcademIQ. Aquí tienes todo lo que necesitas saber:
-        </p>
       </div>
 
       <v-row class="TutorialIA__Features">
@@ -57,28 +54,6 @@
             </v-row>
           </v-card-text>
         </v-card>
-      </div>
-
-      <!-- Preguntas frecuentes -->
-      <div class="TutorialIA__FAQ">
-        <h3 class="TutorialIA__FAQTitle">Preguntas Frecuentes</h3>
-        <v-expansion-panels variant="accordion" class="TutorialIA__FAQPanels">
-          <v-expansion-panel
-            v-for="(faq, index) in faqs"
-            :key="index"
-            class="TutorialIA__FAQPanel"
-          >
-            <v-expansion-panel-title class="TutorialIA__FAQQuestion">
-              <div class="d-flex align-center">
-                <v-icon color="cyan" class="mr-3">mdi-help-circle</v-icon>
-                {{ faq.question }}
-              </div>
-            </v-expansion-panel-title>
-            <v-expansion-panel-text class="TutorialIA__FAQAnswer">
-              {{ faq.answer }}
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
       </div>
     </v-container>
   </section>

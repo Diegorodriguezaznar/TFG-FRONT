@@ -89,7 +89,6 @@ const getColorForAsignatura = (asignatura) => {
           <v-card-subtitle class="px-0 py-1">
             <div class="text-body-2">{{ video.autor }}</div>
             <div class="d-flex text-caption text-grey">
-              <span>{{ video.vistas }} visualizaciones</span>
               <v-icon size="small" class="mx-1">mdi-circle-small</v-icon>
               <span>{{ video.fecha }}</span>
             </div>

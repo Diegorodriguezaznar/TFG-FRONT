@@ -274,7 +274,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   if (to.path !== from.path) {
     console.clear();
-    console.log(`%c 🚀 Navegando a: ${to.path}`, 'color: #F44336; font-weight: bold; font-size: 14px;');
+    console.log(`%c Navegando a: ${to.path}`, 'color:rgb(57, 252, 40); font-weight: bold; font-size: 14px;');
   }
   next();
 });
@@ -285,38 +285,38 @@ router.beforeEach((to, from, next) => {
   const usuario = usuarioLogeadoStore.usuarioActual;
   const idRol = usuario?.idRol || usuario?.rol?.idRol || usuario?.rol?.id;
 
-  // 🟢 Ruta pública - permitir acceso
+  // Ruta pública - permitir acceso
   if (!to.meta.requiresAuth) {
     next();
     return;
   }
 
-  // 🔴 No autenticado - redirigir al login  
+  // No autenticado - redirigir al login  
   if (!usuarioLogeadoStore.estaAutenticado || !usuario) {
-    console.log('❌ Usuario no autenticado, redirigiendo a login');
+    console.log(' Usuario no autenticado, redirigiendo a login');
     next("/login");
     return;
   }
 
-  // 🔴 Requiere admin (rol 3)
+  // Requiere admin (rol 3)
   if (to.meta.requiresAdmin && idRol !== 3) {
-    console.log('❌ Acceso denegado: requiere permisos de administrador');
-    alert("❌ No tienes permisos de administrador");
+    console.log(' Acceso denegado: requiere permisos de administrador');
+    alert(" No tienes permisos de administrador");
     next("/home");
     return;
   }
 
-  // 🔴 Requiere creador de quizzes (roles 2 y 3)
+  //  Requiere creador de quizzes (roles 2 y 3)
   if (to.meta.requiresQuizCreator && !(idRol === 2 || idRol === 3)) {
-    console.log('❌ Acceso denegado: requiere permisos para crear quizzes');
-    alert("❌ No tienes permisos para crear quizzes. Solo profesores y administradores pueden crear quizzes.");
+    console.log('Acceso denegado: requiere permisos para crear quizzes');
+    alert(" No tienes permisos para crear quizzes. Solo profesores y administradores pueden crear quizzes.");
     next("/quizz-time!");
     return;
   }
 
-  // 🔴 Permisos por rol específico
+  // Permisos por rol específico
   if (to.meta.allowRoles && !to.meta.allowRoles.includes(idRol)) {
-    console.log('❌ Acceso denegado: rol no permitido para esta ruta');
+    console.log(' Acceso denegado: rol no permitido para esta ruta');
     next("/peticion-profesor");
     return;
   }
@@ -326,7 +326,7 @@ router.beforeEach((to, from, next) => {
 });
 
 router.onError((error) => {
-  console.error('❌ Error de navegación:', error);
+  console.error(' Error de navegación:', error);
 });
 
 export default router;

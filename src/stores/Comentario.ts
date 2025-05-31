@@ -8,7 +8,7 @@ export const useComentarioStore = defineStore("comentario", () => {
   const loading = ref(false);
   const usuarioLogeadoStore = useUsuarioLogeadoStore();
 
-  // GET - Obtener comentarios por ID de video
+  // Método GET obtener comentarios por ID de video
   async function fetchComentariosByVideoId(idVideo: number): Promise<ComentarioUI[]> {
     loading.value = true;
     errorMessage.value = "";
@@ -55,7 +55,33 @@ export const useComentarioStore = defineStore("comentario", () => {
     }
   }
 
-  // POST - Crear comentario
+  // Método GET obtener comentarios reportados
+  async function fetchComentariosReportados(): Promise<ComentarioUI[]> {
+    loading.value = true;
+    errorMessage.value = "";
+
+    try {
+      const response = await fetch(`http://localhost:5190/api/ComentarioVideo/reportados`, {
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error al obtener comentarios reportados: ${response.statusText}`);
+      }
+
+      const comentarios = await response.json();
+      return comentarios.map((c: any) => transformarComentario(c));
+    } catch (error: any) {
+      errorMessage.value = error.message || "Error al cargar comentarios reportados";
+      return [];
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  // Método POST crear comentario
   async function createComentario(nuevoComentario: {
     contenido: string;
     idUsuario: number;
@@ -113,7 +139,7 @@ export const useComentarioStore = defineStore("comentario", () => {
     }
   }
 
-  // PUT - Reportar comentario
+  // Método PUT reportar comentario
   async function reportarComentario(idComentario: number): Promise<boolean> {
     loading.value = true;
     errorMessage.value = "";
@@ -139,33 +165,33 @@ export const useComentarioStore = defineStore("comentario", () => {
     }
   }
 
-  // GET - Obtener comentarios reportados
-  async function fetchComentariosReportados(): Promise<ComentarioUI[]> {
+  // Método PUT quitar reportes de comentario
+  async function quitarReporteComentario(idComentario: number): Promise<boolean> {
     loading.value = true;
     errorMessage.value = "";
 
     try {
-      const response = await fetch(`http://localhost:5190/api/ComentarioVideo/reportados`, {
+      const response = await fetch(`http://localhost:5190/api/ComentarioVideo/quitar-reportes/${idComentario}`, {
+        method: "PUT",
         headers: {
           "Accept": "application/json"
         }
       });
 
       if (!response.ok) {
-        throw new Error(`Error al obtener comentarios reportados: ${response.statusText}`);
+        throw new Error("Error al quitar los reportes del comentario.");
       }
 
-      const comentarios = await response.json();
-      return comentarios.map((c: any) => transformarComentario(c));
+      return true;
     } catch (error: any) {
-      errorMessage.value = error.message || "Error al cargar comentarios reportados";
-      return [];
+      errorMessage.value = error.message || "Error quitando reporte";
+      return false;
     } finally {
       loading.value = false;
     }
   }
 
-  // DELETE - Eliminar comentario (admin)
+  // Método DELETE eliminar comentario
   async function eliminarComentario(idComentario: number): Promise<void> {
     loading.value = true;
     errorMessage.value = "";
@@ -187,7 +213,7 @@ export const useComentarioStore = defineStore("comentario", () => {
     }
   }
 
-  //  DELETE - Eliminar comentario propio
+  // Método DELETE eliminar comentario propio
   async function eliminarComentarioPropio(idComentario: number): Promise<boolean> {
     loading.value = true;
     errorMessage.value = "";
@@ -217,33 +243,7 @@ export const useComentarioStore = defineStore("comentario", () => {
     }
   }
 
-  //  PUT - Quitar reportes de comentario
-  async function quitarReporteComentario(idComentario: number): Promise<boolean> {
-    loading.value = true;
-    errorMessage.value = "";
-
-    try {
-      const response = await fetch(`http://localhost:5190/api/ComentarioVideo/quitar-reportes/${idComentario}`, {
-        method: "PUT",
-        headers: {
-          "Accept": "application/json"
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al quitar los reportes del comentario.");
-      }
-
-      return true;
-    } catch (error: any) {
-      errorMessage.value = error.message || "Error quitando reporte";
-      return false;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  // Transformar comentario del API a formato UI
+  // Método utilitario transformar comentario del API a formato UI
   function transformarComentario(c: any): ComentarioUI {
     const fecha = new Date(c.fecha);
     const ahora = new Date();

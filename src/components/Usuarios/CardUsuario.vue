@@ -119,6 +119,7 @@ onMounted(() => {
         <div class="text-caption text-grey mt-2">Cargando estadísticas...</div>
       </div>
       
+      
       <div v-else-if="estadisticas" class="CardUsuario__StatsGrid">
         <!-- Cursos -->
         <div class="CardUsuario__Stat">
@@ -130,7 +131,6 @@ onMounted(() => {
             <div class="CardUsuario__StatLabel">Cursos</div>
           </div>
         </div>
-        
         <!-- Videos -->
         <div class="CardUsuario__Stat">
           <div class="CardUsuario__StatIcon">

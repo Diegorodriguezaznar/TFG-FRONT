@@ -90,7 +90,7 @@ const verPerfilCanal = () => {
     <!-- Estadísticas y acciones -->
     <div class="VideoInfo__Stats d-flex align-center flex-wrap">
       <div class="VideoInfo__Views d-flex align-center">
-        <span>{{ video.vistas || video.views || '0' }} visualizaciones • {{ video.fecha || video.publishedDate || 'Sin fecha' }}</span>
+        <span>{{ video.fecha || video.publishedDate || 'Sin fecha' }}</span>
       </div>
       
       <v-spacer></v-spacer>

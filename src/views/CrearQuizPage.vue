@@ -347,18 +347,6 @@ onMounted(async () => {
     <!-- Contenido principal -->
     <v-main class="CrearQuizPage">
       <v-container class="CrearQuizPage__Container">
-        <!-- Indicador de curso -->
-        <v-alert
-          v-if="cursoActual"
-          type="info"
-          variant="tonal"
-          class="mb-6"
-        >
-          <v-icon start>mdi-book-open</v-icon>
-          <strong>Creando quiz para el Curso {{ cursoActual }}</strong>
-          <br>
-          <small>Solo se mostrarán las asignaturas de este curso</small>
-        </v-alert>
 
         <!-- Stepper -->
         <QuizStepper

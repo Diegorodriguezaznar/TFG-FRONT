@@ -32,7 +32,7 @@ function formatearFecha(fecha: string): string {
           <v-chip color="error" class="me-2" :text="`${comentario.numeroReportes} reportes`" />
         </div>
 
-        <p class="text-subtitle-2 mb-4">Fecha: {{ formatearFecha(comentario.time) }}</p>
+        <p class="text-subtitle-2 mb-4">Fecha: {{ formatearFecha(comentario.fechaCreacion) }}</p>
 
         <p class="text-body-1 mb-4">{{ comentario.content }}</p>
 

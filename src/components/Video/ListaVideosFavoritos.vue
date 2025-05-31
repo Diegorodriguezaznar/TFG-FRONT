@@ -62,24 +62,6 @@ const recargarFavoritos = async () => {
   }
 };
 
-// --------------------------- Colores para asignaturas ---------------------------
-function getColorForAsignatura(asignatura: string): string {
-  const colores: Record<string, string> = {
-    'Mates': 'blue',
-    'Lengua': 'deep-purple',
-    'Historia': 'brown',
-    'Física': 'indigo',
-    'Química': 'green',
-    'Biología': 'teal',
-    'Inglés': 'red',
-    'Arte': 'pink',
-    'Informática': 'orange',
-    'Música': 'cyan'
-  };
-  
-  return colores[asignatura] || 'grey';
-}
-
 // --------------------------- Onmounted ---------------------------
 onMounted(async () => {
   if (!usuarioLogeadoStore.estaAutenticado) {
@@ -117,116 +99,67 @@ onMounted(async () => {
     </div>
     
     <!-- Lista de videos -->
-    <v-row v-if="favoritos.length > 0">
-      <v-col v-for="video in favoritos" :key="video.idVideo" cols="12" sm="6" md="4" lg="3">
-        <v-card class="ListaVideosFavoritos__Card" elevation="1" rounded="lg" @click="verVideo(video)">
-          <v-img :src="video.miniatura || `https://picsum.photos/seed/${video.idVideo}/400/225`" height="180" cover>
-            
-            <!-- Botón de favorito -->
-            <v-btn
-              icon
-              size="small"
-              color="yellow-darken-2"
-              class="ListaVideosFavoritos__FavoritoBtn"
-              @click.stop="quitarDeFavoritos(video.idVideo)"
-            >
-              <v-icon>mdi-heart</v-icon>
-            </v-btn>
-            
-            <template v-slot:placeholder>
-              <v-row class="fill-height ma-0" align="center" justify="center">
-                <v-progress-circular indeterminate color="grey-lighten-4"></v-progress-circular>
-              </v-row>
-            </template>
-          </v-img>
-          
-          <v-card-item>
-            <v-row no-gutters>
-              <v-col cols="auto" class="mr-3">
-                <v-avatar size="36" :color="getColorForAsignatura(video.asignatura)">
-                  {{ video.autor ? video.autor.charAt(0).toUpperCase() : 'U' }}
-                </v-avatar>
-              </v-col>
-
-              <v-col>
-                <v-card-title class="text-subtitle-1 font-weight-bold px-0 py-0" @click="verVideo(video)">
-                  {{ video.titulo }}
-                </v-card-title>
-
-                <v-card-subtitle class="px-0 py-1">
-                  <div class="text-body-2">{{ video.autor }}</div>
-                  <div class="text-caption text-grey">
-                    {{ formatearFecha(video.fechaSubida) }}
-                  </div>
-                </v-card-subtitle>
-              </v-col>
-            </v-row>
-          </v-card-item>
-        </v-card>
-      </v-col>
-    </v-row>
+    <div v-if="favoritos.length > 0" class="lista-videos-favoritos__grid">
+      <div v-for="video in favoritos" :key="video.idVideo" class="lista-videos-favoritos__item">
+        <div class="video-card" @click="verVideo(video)">
+          <div class="video-card__imagen">
+            <v-img :src="video.miniatura || `https://picsum.photos/seed/${video.idVideo}/400/225`" height="200" cover>
+              
+              <!-- Título en chip rojo -->
+              <v-chip
+                variant="elevated"
+                size="small"
+                class="video-card__titulo"
+                color="pink"
+              >
+                {{ video.titulo }}
+              </v-chip>
+              
+              <!-- Botón de favorito -->
+              <v-btn
+                icon
+                size="small"
+                color="white-darken-2"
+                class="video-card__favorito"
+                @click.stop="quitarDeFavoritos(video.idVideo)"
+              >
+                <v-icon color="pink">mdi-heart</v-icon>
+              </v-btn>
+              
+              <template v-slot:placeholder>
+                <div class="video-card__placeholder">
+                  <v-progress-circular indeterminate color="grey-lighten-4"></v-progress-circular>
+                </div>
+              </template>
+            </v-img>
+          </div>
+        </div>
+      </div>
+    </div>
     
     <!-- Estado de carga -->
-    <v-row v-else-if="cargando">
-      <v-col cols="12" class="text-center py-8">
-        <v-progress-circular indeterminate color="primary" class="mb-4"></v-progress-circular>
-        <div class="text-body-2 text-grey">Cargando videos favoritos...</div>
-      </v-col>
-    </v-row>
+    <div v-else-if="cargando" class="lista-videos-favoritos__estado">
+      <v-progress-circular indeterminate color="primary" class="lista-videos-favoritos__spinner"></v-progress-circular>
+      <div class="lista-videos-favoritos__mensaje">Cargando videos favoritos...</div>
+    </div>
     
     <!-- Estado vacío -->
-    <v-row v-else>
-      <v-col cols="12" class="text-center py-8">
-        <v-icon size="80" color="grey-lighten-2" class="mb-4">mdi-star-outline</v-icon>
-        <div class="text-h6 text-grey">No tienes videos favoritos</div>
-        <div class="text-body-2 text-grey mb-4">Explora videos y marca tus favoritos con ⭐</div>
-        <v-btn 
-          @click="router.push('/videos')" 
-          color="primary" 
-          prepend-icon="mdi-compass"
-        >
-          Explorar Videos
-        </v-btn>
-      </v-col>
-    </v-row>
+    <div v-else class="lista-videos-favoritos__estado">
+      <v-icon size="80" color="grey-lighten-2" class="lista-videos-favoritos__icono">mdi-star-outline</v-icon>
+      <div class="lista-videos-favoritos__titulo-vacio">No tienes videos favoritos</div>
+      <div class="lista-videos-favoritos__mensaje">Explora videos y marca tus favoritos </div>
+      <v-btn 
+        @click="router.push('/videos')" 
+        color="primary" 
+        prepend-icon="mdi-compass"
+        class="lista-videos-favoritos__boton"
+      >
+        Explorar Videos
+      </v-btn>
+    </div>
   </div>
 </template>
 
-<style scoped>
-.ListaVideosFavoritos__Card {
-  position: relative;
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: pointer;
-  margin-bottom: 16px;
-}
-
-.ListaVideosFavoritos__Card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.ListaVideosFavoritos__Etiqueta {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-}
-
-.ListaVideosFavoritos__Duracion {
-  position: absolute;
-  bottom: 8px;
-  right: 8px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  padding: 2px 4px;
-  border-radius: 2px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.ListaVideosFavoritos__FavoritoBtn {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(255, 255, 255, 0.9) !important;
-}
+<style lang="scss" scoped>
+@import "@/assets/sass/components/Video/VideosFavoritos.scss";
 </style>

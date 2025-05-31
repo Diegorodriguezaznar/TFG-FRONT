@@ -1,0 +1,61 @@
+.header-mariano {
+    border-bottom: 2px solid rgba(25, 118, 210, 0.2) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+}
+
+.header-mariano__menu-btn {
+  margin-right: 16px;
+  transition: transform 0.2s ease;
+}
+
+.header-mariano__menu-btn:hover {
+  transform: scale(1.1);
+}
+
+.header-mariano__logo {
+  min-width: 200px;
+  margin-right: 25px;
+}
+
+.header-mariano__profile-section {
+  padding-right: 25px;
+}
+
+.header-mariano__profile-btn {
+  border-radius: 50%;
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.header-mariano__profile-btn:hover {
+  background: rgba(25, 118, 210, 0.1);
+  transform: scale(1.05);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-mariano__logo {
+    min-width: 160px;
+    margin-right: 15px;
+  }
+  
+  .header-mariano__profile-section {
+    padding-right: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-mariano__logo {
+    min-width: 60px;
+    margin-right: 10px;
+  }
+  
+  .header-mariano__profile-section {
+    padding-right: 10px;
+  }
+}
