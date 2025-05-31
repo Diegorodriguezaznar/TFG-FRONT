@@ -1,59 +1,53 @@
 <template>
-  <div class="auth-wrapper">
-    <!-- Fondo animado -->
-    <div class="background-animation">
-      <div class="floating-shape shape-1"></div>
-      <div class="floating-shape shape-2"></div>
-      <div class="floating-shape shape-3"></div>
-      <div class="floating-shape shape-4"></div>
-      <div class="floating-shape shape-5"></div>
+  <div class="LoginRegister">
+    <div class="LoginRegister__BackgroundAnimation">
+      <div class="LoginRegister__FloatingShape LoginRegister__FloatingShape--1"></div>
+      <div class="LoginRegister__FloatingShape LoginRegister__FloatingShape--2"></div>
+      <div class="LoginRegister__FloatingShape LoginRegister__FloatingShape--3"></div>
+      <div class="LoginRegister__FloatingShape LoginRegister__FloatingShape--4"></div>
+      <div class="LoginRegister__FloatingShape LoginRegister__FloatingShape--5"></div>
     </div>
 
-    <!-- Contenedor principal -->
-    <v-container fluid class="auth-container">
+    <v-container fluid class="LoginRegister__Container">
       <v-row no-gutters class="fill-height align-center justify-center">
         <v-col cols="12" sm="10" md="8" lg="5" xl="4">
-          <!-- Logo y branding compacto -->
           <div class="text-center mb-4">
-            <div class="logo-container">
-              <v-avatar size="60" class="logo-avatar">
+            <div class="LoginRegister__LogoContainer">
+              <v-avatar size="60" class="LoginRegister__LogoAvatar">
                 <v-icon size="35" color="white">mdi-school</v-icon>
               </v-avatar>
             </div>
-            <h1 class="logo-text">AcademIQ</h1>
-            <p class="logo-subtitle">Tu plataforma de aprendizaje</p>
+            <h1 class="LoginRegister__LogoText">AcademIQ</h1>
+            <p class="LoginRegister__LogoSubtitle">Tu plataforma de aprendizaje</p>
           </div>
 
-          <!-- Card principal compacto -->
-          <v-card class="auth-card" elevation="16">
-            <!-- Pestañas compactas -->
-            <div class="tabs-container">
-              <div class="tabs-wrapper">
+          <v-card class="LoginRegister__Card" elevation="16">
+            <div class="LoginRegister__TabsContainer">
+              <div class="LoginRegister__TabsWrapper">
                 <button 
-                  :class="['tab-button', { active: tab === 'login' }]"
+                  :class="['LoginRegister__TabButton', { 'LoginRegister__TabButton--active': tab === 'login' }]"
                   @click="tab = 'login'"
                 >
-                  <v-icon class="tab-icon">mdi-login</v-icon>
+                  <v-icon class="LoginRegister__TabIcon">mdi-login</v-icon>
                   Iniciar Sesión
                 </button>
                 <button 
-                  :class="['tab-button', { active: tab === 'register' }]"
+                  :class="['LoginRegister__TabButton', { 'LoginRegister__TabButton--active': tab === 'register' }]"
                   @click="tab = 'register'"
                 >
-                  <v-icon class="tab-icon">mdi-account-plus</v-icon>
+                  <v-icon class="LoginRegister__TabIcon">mdi-account-plus</v-icon>
                   Registrarse
                 </button>
               </div>
-              <div class="tab-indicator" :class="{ 'indicator-right': tab === 'register' }"></div>
+              <div :class="['LoginRegister__TabIndicator', { 'LoginRegister__TabIndicator--right': tab === 'register' }]"></div>
             </div>
 
-            <v-card-text class="auth-content">
-              <!-- Alertas compactas -->
+            <v-card-text class="LoginRegister__Content">
               <v-alert
                 v-if="alert.show"
                 :type="alert.type"
                 variant="tonal"
-                class="custom-alert mb-3"
+                class="LoginRegister__Alert mb-3"
                 border="start"
                 closable
                 @click:close="alert.show = false"
@@ -65,15 +59,13 @@
                 {{ alert.message }}
               </v-alert>
 
-              <!-- Contenido de las pestañas -->
-              <div class="tab-content">
-                <!-- Login Form -->
-                <div v-if="tab === 'login'" class="form-container">
-                  <h2 class="form-title">¡Bienvenido!</h2>
-                  <p class="form-subtitle">Ingresa tus credenciales</p>
+              <div class="LoginRegister__TabContent">
+                <div v-if="tab === 'login'" class="LoginRegister__FormContainer">
+                  <h2 class="LoginRegister__FormTitle">¡Bienvenido!</h2>
+                  <p class="LoginRegister__FormSubtitle">Ingresa tus credenciales</p>
 
                   <v-form ref="loginForm" v-model="loginValid" @submit.prevent="handleLogin" class="mt-4">
-                    <div class="input-group">
+                    <div class="LoginRegister__InputGroup">
                       <v-text-field
                         v-model="loginEmail"
                         :rules="emailRules"
@@ -81,7 +73,7 @@
                         type="email"
                         variant="outlined"
                         color="primary"
-                        class="custom-input"
+                        class="LoginRegister__Input"
                         prepend-inner-icon="mdi-email-outline"
                         :disabled="loading"
                         autocomplete="email"
@@ -89,7 +81,7 @@
                       ></v-text-field>
                     </div>
 
-                    <div class="input-group">
+                    <div class="LoginRegister__InputGroup">
                       <v-text-field
                         v-model="loginPassword"
                         :rules="passwordRules"
@@ -97,7 +89,7 @@
                         label="Contraseña"
                         variant="outlined"
                         color="primary"
-                        class="custom-input"
+                        class="LoginRegister__Input"
                         prepend-inner-icon="mdi-lock-outline"
                         :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                         @click:append-inner="showPassword = !showPassword"
@@ -113,7 +105,7 @@
                       size="large"
                       block
                       :loading="loading"
-                      class="submit-btn mt-4"
+                      class="LoginRegister__SubmitBtn mt-4"
                       variant="elevated"
                     >
                       <v-icon start>mdi-login</v-icon>
@@ -122,22 +114,21 @@
                   </v-form>
                 </div>
 
-                <!-- Register Form -->
-                <div v-else class="form-container">
-                  <h2 class="form-title">¡Únete a nosotros!</h2>
-                  <p class="form-subtitle">Crea tu cuenta de estudiante</p>
+                <div v-else class="LoginRegister__FormContainer">
+                  <h2 class="LoginRegister__FormTitle">¡Únete a nosotros!</h2>
+                  <p class="LoginRegister__FormSubtitle">Crea tu cuenta de estudiante</p>
 
                   <v-form ref="registerForm" v-model="registerValid" @submit.prevent="handleRegister" class="mt-4">
                     <v-row dense>
                       <v-col cols="12" sm="6">
-                        <div class="input-group">
+                        <div class="LoginRegister__InputGroup">
                           <v-text-field
                             v-model="registerNombre"
                             :rules="nameRules"
                             label="Nombre *"
                             variant="outlined"
                             color="primary"
-                            class="custom-input"
+                            class="LoginRegister__Input"
                             prepend-inner-icon="mdi-account-outline"
                             :disabled="loading"
                             autocomplete="given-name"
@@ -147,14 +138,14 @@
                         </div>
                       </v-col>
                       <v-col cols="12" sm="6">
-                        <div class="input-group">
+                        <div class="LoginRegister__InputGroup">
                           <v-text-field
                             v-model="registerApellido"
                             :rules="nameRules"
                             label="Apellido *"
                             variant="outlined"
                             color="primary"
-                            class="custom-input"
+                            class="LoginRegister__Input"
                             prepend-inner-icon="mdi-account-outline"
                             :disabled="loading"
                             autocomplete="family-name"
@@ -165,7 +156,7 @@
                       </v-col>
                     </v-row>
 
-                    <div class="input-group">
+                    <div class="LoginRegister__InputGroup">
                       <v-text-field
                         v-model="registerEmail"
                         :rules="emailRules"
@@ -173,7 +164,7 @@
                         type="email"
                         variant="outlined"
                         color="primary"
-                        class="custom-input"
+                        class="LoginRegister__Input"
                         prepend-inner-icon="mdi-email-outline"
                         :disabled="loading"
                         autocomplete="email"
@@ -182,7 +173,7 @@
                       ></v-text-field>
                     </div>
 
-                    <div class="input-group">
+                    <div class="LoginRegister__InputGroup">
                       <v-text-field
                         v-model="registerTelefono"
                         :rules="phoneRules"
@@ -190,7 +181,7 @@
                         type="tel"
                         variant="outlined"
                         color="primary"
-                        class="custom-input"
+                        class="LoginRegister__Input"
                         prepend-inner-icon="mdi-phone-outline"
                         :disabled="loading"
                         autocomplete="tel"
@@ -202,7 +193,7 @@
 
                     <v-row dense>
                       <v-col cols="12" sm="6">
-                        <div class="input-group">
+                        <div class="LoginRegister__InputGroup">
                           <v-text-field
                             v-model="registerPassword"
                             :rules="passwordRules"
@@ -210,7 +201,7 @@
                             label="Contraseña *"
                             variant="outlined"
                             color="primary"
-                            class="custom-input"
+                            class="LoginRegister__Input"
                             prepend-inner-icon="mdi-lock-outline"
                             :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
                             @click:append-inner="showPassword = !showPassword"
@@ -222,7 +213,7 @@
                         </div>
                       </v-col>
                       <v-col cols="12" sm="6">
-                        <div class="input-group">
+                        <div class="LoginRegister__InputGroup">
                           <v-text-field
                             v-model="registerConfirmPassword"
                             :rules="[...passwordRules, passwordConfirmationRule]"
@@ -230,7 +221,7 @@
                             label="Confirmar Contraseña *"
                             variant="outlined"
                             color="primary"
-                            class="custom-input"
+                            class="LoginRegister__Input"
                             prepend-inner-icon="mdi-lock-check-outline"
                             :disabled="loading"
                             autocomplete="new-password"
@@ -241,7 +232,7 @@
                       </v-col>
                     </v-row>
 
-                    <div class="terms-container">
+                    <div class="LoginRegister__TermsContainer">
                       <v-checkbox
                         v-model="termsAccepted"
                         :rules="[v => !!v || 'Debes aceptar los términos y condiciones']"
@@ -251,15 +242,14 @@
                         hide-details="auto"
                       >
                         <template v-slot:label>
-                          <span class="terms-label">
+                          <span class="LoginRegister__TermsLabel">
                             Acepto los 
-                            <a href="#" class="terms-link" @click.prevent>términos y condiciones</a>
+                            <a href="#" class="LoginRegister__TermsLink" @click.prevent>términos y condiciones</a>
                           </span>
                         </template>
                       </v-checkbox>
                     </div>
 
-                    <!-- Información compacta sobre el tipo de cuenta -->
                     <v-alert
                       type="info"
                       variant="tonal"
@@ -279,7 +269,7 @@
                       size="large"
                       block
                       :loading="loading"
-                      class="submit-btn mt-3"
+                      class="LoginRegister__SubmitBtn mt-3"
                       variant="elevated"
                     >
                       <v-icon start>mdi-account-plus</v-icon>
@@ -291,8 +281,7 @@
             </v-card-text>
           </v-card>
 
-          <!-- Footer compacto -->
-          <div class="auth-footer">
+          <div class="LoginRegister__Footer">
             <p>&copy; 2025 AcademIQ. Todos los derechos reservados.</p>
           </div>
         </v-col>
@@ -313,13 +302,11 @@ export default {
       showPassword: false,
       loading: false,
       
-      // Login form
       loginValid: false,
       loginEmail: '',
       loginPassword: '',
       rememberMe: false,
       
-      // Register form
       registerValid: false,
       registerNombre: '',
       registerApellido: '',
@@ -329,14 +316,12 @@ export default {
       registerConfirmPassword: '',
       termsAccepted: false,
       
-      // Alerta
       alert: {
         show: false,
         type: 'info',
         message: ''
       },
       
-      // Validation rules
       nameRules: [
         v => !!v || 'Este campo es requerido',
         v => (v && v.trim().length >= 2) || 'Debe tener al menos 2 caracteres',
@@ -514,478 +499,6 @@ export default {
 }
 </script>
 
-<style scoped>
-/* Variables CSS */
-:root {
-  --primary-color: #FF9800;
-  --primary-dark: #F57700;
-  --primary-light: #FFB74D;
-  --secondary-color: #2196F3;
-  --text-primary: #212121;
-  --text-secondary: #757575;
-  --background-light: #FAFAFA;
-  --shadow-main: 0 6px 24px rgba(0, 0, 0, 0.08);
-  --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --border-radius: 12px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Wrapper principal */
-.auth-wrapper {
-  min-height: 100vh;
-  position: relative;
-  background: linear-gradient(135deg, #FF6B35 0%, #F7931E 25%, #FFB74D 50%, #FF8A65 75%, #FF7043 100%);
-  overflow: hidden;
-}
-
-/* Animación de fondo */
-.background-animation {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  z-index: 0;
-}
-
-.floating-shape {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  animation: float 6s ease-in-out infinite;
-  backdrop-filter: blur(2px);
-}
-
-.shape-1 {
-  width: 60px;
-  height: 60px;
-  top: 15%;
-  left: 10%;
-  animation-delay: 0s;
-  background: rgba(255, 152, 0, 0.15);
-}
-
-.shape-2 {
-  width: 80px;
-  height: 80px;
-  top: 70%;
-  left: 80%;
-  animation-delay: 1s;
-  background: rgba(255, 193, 7, 0.2);
-}
-
-.shape-3 {
-  width: 40px;
-  height: 40px;
-  top: 25%;
-  right: 15%;
-  animation-delay: 2s;
-  background: rgba(255, 183, 77, 0.25);
-}
-
-.shape-4 {
-  width: 70px;
-  height: 70px;
-  bottom: 25%;
-  left: 15%;
-  animation-delay: 3s;
-  background: rgba(255, 112, 67, 0.15);
-}
-
-.shape-5 {
-  width: 30px;
-  height: 30px;
-  top: 50%;
-  left: 50%;
-  animation-delay: 4s;
-  background: rgba(255, 138, 101, 0.2);
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg) scale(1);
-  }
-  33% {
-    transform: translateY(-20px) rotate(120deg) scale(1.05);
-  }
-  66% {
-    transform: translateY(10px) rotate(240deg) scale(0.95);
-  }
-}
-
-/* Contenedor principal */
-.auth-container {
-  position: relative;
-  z-index: 1;
-  padding: 1.5rem;
-}
-
-/* Logo y branding compacto */
-.logo-container {
-  margin-bottom: 1rem;
-}
-
-.logo-avatar {
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  box-shadow: var(--shadow-main);
-  margin: 0 auto;
-}
-
-.logo-text {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: white;
-  margin: 0.8rem 0 0.3rem;
-  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-  letter-spacing: -0.5px;
-}
-
-.logo-subtitle {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.95rem;
-  margin: 0;
-  font-weight: 300;
-}
-
-/* Card principal compacto */
-.auth-card {
-  border-radius: 20px;
-  backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  overflow: hidden;
-  transition: var(--transition);
-  max-width: 100%;
-}
-
-.auth-card:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-1px);
-}
-
-/* Pestañas compactas */
-.tabs-container {
-  position: relative;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-  padding: 0;
-}
-
-.tabs-wrapper {
-  display: flex;
-  position: relative;
-}
-
-.tab-button {
-  flex: 1;
-  padding: 1rem 1.5rem;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  position: relative;
-  z-index: 2;
-}
-
-.tab-button.active {
-  color: var(--primary-color);
-}
-
-.tab-icon {
-  font-size: 1.1rem;
-}
-
-.tab-indicator {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 50%;
-  height: 3px;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-  transition: var(--transition);
-  border-radius: 2px 2px 0 0;
-}
-
-.tab-indicator.indicator-right {
-  left: 50%;
-}
-
-/* Contenido compacto */
-.auth-content {
-  padding: 2rem 1.5rem 1.5rem;
-}
-
-.tab-content {
-  min-height: auto;
-}
-
-.form-container {
-  max-width: 100%;
-}
-
-.form-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.3rem;
-  text-align: center;
-}
-
-.form-subtitle {
-  color: var(--text-secondary);
-  text-align: center;
-  margin-bottom: 0;
-  font-size: 0.9rem;
-}
-
-/* Grupos de inputs compactos */
-.input-group {
-  margin-bottom: 1rem;
-}
-
-/* Inputs personalizados compactos */
-:deep(.custom-input .v-field) {
-  border-radius: 10px;
-  background: rgba(248, 250, 252, 0.8);
-  backdrop-filter: blur(10px);
-}
-
-:deep(.custom-input .v-field--focused) {
-  box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
-}
-
-:deep(.custom-input.v-text-field--density-compact .v-field__input) {
-  padding: 0.5rem 0.8rem 0.5rem 2.5rem;
-  font-size: 0.95rem;
-  min-height: 40px;
-}
-
-:deep(.custom-input .v-field__prepend-inner) {
-  padding-left: 0.8rem;
-}
-
-
-
-.checkbox-label {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-.forgot-password-btn {
-  font-size: 0.85rem;
-  text-decoration: none;
-  padding: 0.2rem;
-}
-
-.forgot-password-btn:hover {
-  text-decoration: underline;
-}
-
-/* Términos compactos */
-.terms-container {
-  margin: 1rem 0 0.5rem;
-}
-
-.terms-label {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-.terms-link {
-  color: var(--primary-color);
-  text-decoration: none;
-  font-weight: 600;
-}
-
-.terms-link:hover {
-  text-decoration: underline;
-}
-
-/* Botón de envío compacto */
-.submit-btn {
-  border-radius: 10px;
-  font-size: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  text-transform: none;
-  box-shadow: var(--shadow-main);
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
-  height: 48px;
-}
-
-.submit-btn:hover {
-  box-shadow: var(--shadow-hover);
-  transform: translateY(-1px);
-}
-
-/* Alertas personalizadas compactas */
-.custom-alert {
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-  border-left-width: 3px;
-  font-size: 0.9rem;
-}
-
-/* Footer compacto */
-.auth-footer {
-  text-align: center;
-  margin-top: 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.85rem;
-}
-
-/* Responsive mejorado */
-@media (max-width: 768px) {
-  .auth-content {
-    padding: 1.5rem 1rem;
-  }
-  
-  .logo-text {
-    font-size: 2rem;
-  }
-  
-  .form-title {
-    font-size: 1.4rem;
-  }
-  
-  .tab-button {
-    padding: 0.8rem 0.8rem;
-    font-size: 0.85rem;
-  }
-  
-
-}
-
-@media (max-width: 480px) {
-  .auth-container {
-    padding: 1rem 0.5rem;
-  }
-  
-  .auth-content {
-    padding: 1.2rem 0.8rem;
-  }
-  
-  .logo-text {
-    font-size: 1.8rem;
-  }
-  
-  .input-group {
-    margin-bottom: 0.8rem;
-  }
-}
-
-/* Animaciones sutiles */
-.form-container {
-  animation: fadeInUp 0.3s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Estados de carga */
-.submit-btn:disabled {
-  opacity: 0.7;
-}
-
-/* Mejoras de accesibilidad */
-.tab-button:focus {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
-
-:deep(.v-field--focused .v-field__outline) {
-  border-color: var(--primary-color);
-  border-width: 2px;
-}
-
-/* Ajustes específicos para densidad compacta */
-:deep(.v-checkbox--density-compact .v-selection-control__wrapper) {
-  height: 24px;
-}
-
-:deep(.v-alert--density-compact) {
-  padding: 8px 16px;
-}
-
-:deep(.v-alert--density-compact .v-alert__content) {
-  padding: 4px 0;
-}
-
-/* Optimización de espaciado vertical */
-.v-row.dense {
-  margin: -4px;
-}
-
-.v-row.dense .v-col {
-  padding: 4px;
-}
-
-/* Ajustes finales para eliminar scroll */
-.auth-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@media (max-height: 700px) {
-  .auth-container {
-    padding: 0.5rem;
-  }
-  
-  .logo-container {
-    margin-bottom: 0.5rem;
-  }
-  
-  .logo-text {
-    font-size: 1.8rem;
-    margin: 0.5rem 0 0.2rem;
-  }
-  
-  .auth-content {
-    padding: 1rem;
-  }
-  
-  .input-group {
-    margin-bottom: 0.7rem;
-  }
-  
-
-  
-  .terms-container {
-    margin: 0.7rem 0 0.3rem;
-  }
-}
-
-@media (max-height: 600px) {
-  .logo-avatar {
-    display: none;
-  }
-  
-  .logo-text {
-    font-size: 1.6rem;
-  }
-  
-  .form-title {
-    font-size: 1.3rem;
-  }
-  
-  .form-subtitle {
-    font-size: 0.8rem;
-  }
-}
+<style scoped lang="scss">
+@import "@/assets/sass/pages/LoginRegister";
 </style>

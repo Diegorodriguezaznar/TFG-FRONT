@@ -1,0 +1,415 @@
+:root {
+  --primary-color: #ff9800;
+  --primary-dark: #f57700;
+  --primary-light: #ffb74d;
+  --secondary-color: #2196f3;
+  --text-primary: #212121;
+  --text-secondary: #757575;
+  --background-light: #fafafa;
+  --shadow-main: 0 6px 24px rgba(0, 0, 0, 0.08);
+  --shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --border-radius: 12px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.LoginRegister {
+  min-height: 100vh;
+  position: relative;
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 25%, #ffb74d 50%, #ff8a65 75%, #ff7043 100%);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__BackgroundAnimation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  &__FloatingShape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: float 6s ease-in-out infinite;
+    backdrop-filter: blur(2px);
+
+    &--1 {
+      width: 60px;
+      height: 60px;
+      top: 15%;
+      left: 10%;
+      animation-delay: 0s;
+      background: rgba(255, 152, 0, 0.15);
+    }
+
+    &--2 {
+      width: 80px;
+      height: 80px;
+      top: 70%;
+      left: 80%;
+      animation-delay: 1s;
+      background: rgba(255, 193, 7, 0.2);
+    }
+
+    &--3 {
+      width: 40px;
+      height: 40px;
+      top: 25%;
+      right: 15%;
+      animation-delay: 2s;
+      background: rgba(255, 183, 77, 0.25);
+    }
+
+    &--4 {
+      width: 70px;
+      height: 70px;
+      bottom: 25%;
+      left: 15%;
+      animation-delay: 3s;
+      background: rgba(255, 112, 67, 0.15);
+    }
+
+    &--5 {
+      width: 30px;
+      height: 30px;
+      top: 50%;
+      left: 50%;
+      animation-delay: 4s;
+      background: rgba(255, 138, 101, 0.2);
+    }
+  }
+
+  &__Container {
+    position: relative;
+    z-index: 1;
+    padding: 1rem 0.5rem;
+
+    @media (min-width: 768px) {
+      padding: 1.5rem;
+    }
+  }
+
+  &__LogoContainer {
+    margin-bottom: 1rem;
+  }
+
+  &__LogoAvatar {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    box-shadow: var(--shadow-main);
+    margin: 0 auto;
+  }
+
+  &__LogoText {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+    margin: 0.8rem 0 0.3rem;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.5px;
+
+    @media (min-width: 768px) {
+      font-size: 2.2rem;
+    }
+  }
+
+  &__LogoSubtitle {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    margin: 0;
+    font-weight: 300;
+  }
+
+  &__Card {
+    border-radius: 20px;
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden;
+    transition: var(--transition);
+    max-width: 100%;
+
+    &:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+  }
+
+  &__TabsContainer {
+    position: relative;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+    padding: 0;
+  }
+
+  &__TabsWrapper {
+    display: flex;
+    position: relative;
+  }
+
+  &__TabButton {
+    flex: 1;
+    padding: 0.8rem 0.8rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    position: relative;
+    z-index: 2;
+
+    @media (min-width: 768px) {
+      padding: 1rem 1.5rem;
+      font-size: 0.9rem;
+    }
+
+    &--active {
+      color: var(--primary-color);
+    }
+  }
+
+  &__TabIcon {
+    font-size: 1.1rem;
+  }
+
+  &__TabIndicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    transition: var(--transition);
+    border-radius: 2px 2px 0 0;
+
+    &--right {
+      left: 50%;
+    }
+  }
+
+  &__Content {
+    padding: 1.2rem 0.8rem;
+
+    @media (min-width: 768px) {
+      padding: 2rem 1.5rem 1.5rem;
+    }
+  }
+
+  &__TabContent {
+    min-height: auto;
+  }
+
+  &__FormContainer {
+    max-width: 100%;
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  &__FormTitle {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.3rem;
+    text-align: center;
+
+    @media (min-width: 768px) {
+      font-size: 1.6rem;
+    }
+  }
+
+  &__FormSubtitle {
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 0;
+    font-size: 0.9rem;
+  }
+
+  &__InputGroup {
+    margin-bottom: 0.8rem;
+
+    @media (min-width: 768px) {
+      margin-bottom: 1rem;
+    }
+  }
+
+  &__Input {
+    :deep(.v-field) {
+      border-radius: 10px;
+      background: rgba(248, 250, 252, 0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    :deep(.v-field--focused) {
+      box-shadow: 0 0 0 2px rgba(255, 152, 0, 0.2);
+    }
+
+    :deep(.v-text-field--density-compact .v-field__input) {
+      padding: 0.5rem 0.8rem 0.5rem 2.5rem;
+      font-size: 0.95rem;
+      min-height: 40px;
+    }
+
+    :deep(.v-field__prepend-inner) {
+      padding-left: 0.8rem;
+    }
+  }
+
+  &__TermsContainer {
+    margin: 0.7rem 0 0.3rem;
+
+    @media (min-width: 768px) {
+      margin: 1rem 0 0.5rem;
+    }
+  }
+
+  &__TermsLabel {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+
+  &__TermsLink {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__SubmitBtn {
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    box-shadow: var(--shadow-main);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    height: 48px;
+
+    &:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-1px);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+    }
+  }
+
+  &__Alert {
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border-left-width: 3px;
+    font-size: 0.9rem;
+  }
+
+  &__Footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+  }
+
+  .v-row.dense {
+    margin: -4px;
+
+    .v-col {
+      padding: 4px;
+    }
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+  }
+  33% {
+    transform: translateY(-20px) rotate(120deg) scale(1.05);
+  }
+  66% {
+    transform: translateY(10px) rotate(240deg) scale(0.95);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:deep(.v-field--focused .v-field__outline) {
+  border-color: var(--primary-color);
+  border-width: 2px;
+}
+
+:deep(.v-checkbox--density-compact .v-selection-control__wrapper) {
+  height: 24px;
+}
+
+:deep(.v-alert--density-compact) {
+  padding: 8px 16px;
+
+  .v-alert__content {
+    padding: 4px 0;
+  }
+}
+
+@media (max-height: 700px) {
+  .LoginRegister__Container {
+    padding: 0.5rem;
+  }
+  
+  .LoginRegister__LogoContainer {
+    margin-bottom: 0.5rem;
+  }
+  
+  .LoginRegister__LogoText {
+    font-size: 1.8rem;
+    margin: 0.5rem 0 0.2rem;
+  }
+  
+  .LoginRegister__Content {
+    padding: 1rem;
+  }
+  
+  .LoginRegister__InputGroup {
+    margin-bottom: 0.7rem;
+  }
+  
+  .LoginRegister__TermsContainer {
+    margin: 0.7rem 0 0.3rem;
+  }
+}
+
+@media (max-height: 600px) {
+  .LoginRegister__LogoAvatar {
+    display: none;
+  }
+  
+  .LoginRegister__LogoText {
+    font-size: 1.6rem;
+  }
+  
+  .LoginRegister__FormTitle {
+    font-size: 1.3rem;
+  }
+  
+  .LoginRegister__FormSubtitle {
+    font-size: 0.8rem;
+  }
+}
+  

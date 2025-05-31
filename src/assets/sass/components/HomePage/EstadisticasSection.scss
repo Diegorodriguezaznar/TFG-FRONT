@@ -1,0 +1,49 @@
+.EstadisticasSection {
+  padding: 60px 0;
+  background: #333;
+  color: white;
+
+  @media (min-width: 768px) {
+    padding: 80px 0;
+  }
+
+  &__Card {
+    padding: 1rem;
+    transition: transform 0.3s ease;
+
+    @media (min-width: 768px) {
+      padding: 2rem 1rem;
+    }
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &__Icon {
+    margin-bottom: 1rem;
+  }
+
+  &__Number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #FF9800;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+
+    @media (min-width: 768px) {
+      font-size: 3rem;
+    }
+  }
+
+  &__Label {
+    font-size: 1rem;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 500;
+
+    @media (min-width: 768px) {
+      font-size: 1.1rem;
+    }
+  }
+}

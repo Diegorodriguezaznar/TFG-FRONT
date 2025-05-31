@@ -1,0 +1,71 @@
+.FuncionalidadesAdicionales {
+  padding: 60px 0;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+
+  @media (min-width: 768px) {
+    padding: 80px 0;
+  }
+
+  &__Header {
+    text-align: center;
+    margin-bottom: 40px;
+
+    @media (min-width: 768px) {
+      margin-bottom: 60px;
+    }
+  }
+
+  &__Title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      font-size: 2.5rem;
+    }
+  }
+
+  &__Subtitle {
+    font-size: 1rem;
+    color: #666;
+    max-width: 100%;
+    margin: 0 auto;
+    line-height: 1.6;
+    padding: 0 1rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.2rem;
+      max-width: 700px;
+      padding: 0;
+    }
+  }
+
+  &__Grid {
+    margin: 0 -8px;
+
+    @media (min-width: 960px) {
+      display: flex;
+      flex-wrap: nowrap;
+      margin: 0 -12px;
+      
+      .v-col {
+        flex: 1;
+        min-width: 0;
+        max-width: none;
+      }
+    }
+  }
+
+  &__CardWrapper {
+    padding: 8px 0;
+
+    @media (min-width: 600px) {
+      padding: 8px;
+    }
+
+    @media (min-width: 960px) {
+      padding: 12px;
+    }
+  }
+}

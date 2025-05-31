@@ -1,0 +1,113 @@
+.FeatureCard {
+  height: 100%;
+  border-radius: 20px;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+  animation: fadeInUp 0.6s ease-out;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15) !important;
+  }
+
+  &--blue:hover {
+    border-color: #2196f3;
+  }
+
+  &--red:hover {
+    border-color: #f44336;
+  }
+
+  &--purple:hover {
+    border-color: #9c27b0;
+  }
+
+  &--green:hover {
+    border-color: #4caf50;
+  }
+
+  &--orange:hover {
+    border-color: #ff9800;
+  }
+
+  &__Icon {
+    text-align: center;
+    padding: 1rem 0;
+    background: rgba(0, 0, 0, 0.02);
+
+    @media (min-width: 768px) {
+      padding: 2rem 0 1rem;
+    }
+  }
+
+  &__Title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-align: center;
+    color: #333;
+    padding: 0.5rem 1rem 0;
+
+    @media (min-width: 768px) {
+      font-size: 1.8rem;
+      padding: 1rem 2rem 0;
+    }
+  }
+
+  &__Description {
+    padding: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #555;
+
+    @media (min-width: 768px) {
+      padding: 1.5rem 2rem;
+      font-size: 1rem;
+    }
+  }
+
+  &__List {
+    margin-top: 1rem;
+    padding-left: 0;
+    list-style: none;
+
+    @media (min-width: 768px) {
+      margin-top: 1.5rem;
+    }
+
+    li {
+      padding: 0.5rem 0;
+      position: relative;
+      padding-left: 1.5rem;
+
+      &::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: #4caf50;
+        font-weight: bold;
+      }
+    }
+  }
+
+  &__Actions {
+    padding: 0 1rem 1rem;
+
+    @media (min-width: 768px) {
+      padding: 0 2rem 2rem;
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

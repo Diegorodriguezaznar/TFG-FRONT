@@ -32,56 +32,9 @@
 </template>
 
 <script setup lang="ts">
-// Este componente es solo de presentación, no necesita lógica
+// Necesito estar iniciado
 </script>
 
-<style scoped>
-.EstadisticasSection {
-  padding: 80px 0;
-  background: #333;
-  color: white;
-}
-
-.EstadisticasSection__Card {
-  padding: 2rem 1rem;
-  transition: transform 0.3s ease;
-}
-
-.EstadisticasSection__Card:hover {
-  transform: scale(1.05);
-}
-
-.EstadisticasSection__Icon {
-  margin-bottom: 1rem;
-}
-
-.EstadisticasSection__Number {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #FF9800;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
-}
-
-.EstadisticasSection__Label {
-  font-size: 1.1rem;
-  opacity: 0.9;
-  margin: 0;
-  font-weight: 500;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .EstadisticasSection {
-    padding: 60px 0;
-  }
-  
-  .EstadisticasSection__Number {
-    font-size: 2.5rem;
-  }
-  
-  .EstadisticasSection__Label {
-    font-size: 1rem;
-  }
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/HomePage/EstadisticasSection";
 </style>
