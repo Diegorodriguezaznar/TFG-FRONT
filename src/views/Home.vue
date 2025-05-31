@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useCursoStore } from '@/stores/Curso';
 import { useVideoStore } from '@/stores/Video';
+import { useQuizStore } from '@/stores/Quiz'; // 🆕 Añadir store de quizzes
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado'; 
 import HeaderCursos from '@/components/Layout/HeaderCursos.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
 import Filtros from '@/components/Video/Home/Filtros.vue';
 import ListaVideos from '@/components/Video/Home/ListaVideos.vue';
 import BotonQuizes from '@/components/Video/Home/BotonQuizes.vue';
+// 🆕 Importar el componente de quizzes
+import QuizzesCurso from '@/components/Cursos/DetalleCurso/QuizzesCurso.vue';
+// 🆕 Importar el modal de información del quiz
+import QuizInfoModal from '@/components/Quizz/QuizInfoModal.vue';
 
 const route = useRoute();
+const router = useRouter();
 const cursoStore = useCursoStore();
 const videoStore = useVideoStore();
+const quizStore = useQuizStore(); // 🆕 Añadir store de quizzes
 const usuarioLogeadoStore = useUsuarioLogeadoStore(); 
 
 const drawer = ref(false);
@@ -22,6 +29,14 @@ const paginaActual = ref(1);
 const loading = computed(() => videoStore.loading || cursoStore.loading);
 const curso = computed(() => cursoStore.curso);
 const mostrarModalAsignatura = ref(false);
+
+// 🆕 Variables para quizzes del curso
+const quizzesCurso = ref([]);
+const loadingQuizzes = ref(false);
+
+// 🆕 Variables para el modal de quiz
+const showQuizModal = ref(false);
+const selectedQuizId = ref(null);
 
 const cursoId = computed(() => {
   if (route.path.startsWith('/curso/')) {
@@ -100,6 +115,25 @@ const cargarVideos = async () => {
   }
 };
 
+// 🆕 Cargar quizzes específicos del curso
+const cargarQuizzesCurso = async () => {
+  if (!cursoId.value) return;
+  
+  loadingQuizzes.value = true;
+  try {
+    // Obtener todos los quizzes del curso
+    await quizStore.fetchQuizzesByCurso(cursoId.value);
+    quizzesCurso.value = quizStore.quizzes.sort((a, b) => 
+      new Date(b.fechaCreacion || new Date()).getTime() - new Date(a.fechaCreacion || new Date()).getTime()
+    );
+  } catch (error) {
+    console.error('Error al cargar quizzes del curso:', error);
+    quizzesCurso.value = [];
+  } finally {
+    loadingQuizzes.value = false;
+  }
+};
+
 const cambiarPagina = async (nuevaPagina: number) => {
   if (nuevaPagina < 1 || nuevaPagina > totalPaginas.value) return;
   
@@ -136,10 +170,27 @@ const actualizarFiltro = (filtro: string | number) => {
   filtroSeleccionado.value = filtro;
 };
 
+// 🆕 Función para crear quiz con la misma lógica
+const crearQuiz = () => {
+  if (cursoId.value) {
+    router.push(`/admin/crear-quiz?curso=${cursoId.value}`);
+  } else {
+    router.push('/admin/crear-quiz');
+  }
+};
+
+// 🆕 Función para mostrar el modal de información del quiz
+const mostrarInfoQuiz = (quizId: number) => {
+  selectedQuizId.value = quizId;
+  showQuizModal.value = true;
+};
+
 watch(() => route.params.id, () => {
   filtroSeleccionado.value = 'Todos';
   paginaActual.value = 1;
   cargarVideos();
+  // 🆕 Recargar quizzes del curso cuando cambie el ID
+  cargarQuizzesCurso();
 });
 
 onMounted(() => {
@@ -147,6 +198,8 @@ onMounted(() => {
     usuarioLogeadoStore.cargarUsuarioDesdeStorage();
   }
   cargarVideos();
+  // 🆕 Cargar quizzes del curso al montar
+  cargarQuizzesCurso();
 });
 </script>
 
@@ -190,6 +243,18 @@ onMounted(() => {
                 >
                   <v-icon start icon="mdi-upload"></v-icon>
                   Subir Video
+                </v-btn>
+                
+                <v-btn 
+                  v-if="puedeSubirVideo" 
+                  color="purple" 
+                  variant="elevated" 
+                  size="small" 
+                  class="HomePage__CreateQuizButton" 
+                  @click="crearQuiz"
+                >
+                  <v-icon start icon="mdi-help-circle"></v-icon>
+                  Crear Quiz
                 </v-btn>
                 
                 <v-btn 
@@ -253,6 +318,16 @@ onMounted(() => {
                 size="small"
               ></v-btn>
             </div>
+
+            <!-- 🆕 Sección de Quizzes del Curso (debajo de los videos) -->
+            <QuizzesCurso 
+              v-if="cursoId && curso && !loadingQuizzes"
+              :quizzes="quizzesCurso"
+              :curso-nombre="curso.nombre"
+              :curso-id="cursoId"
+              class="HomePage__QuizzesSection"
+              @mostrar-info-quiz="mostrarInfoQuiz"
+            />
           </template>
         </v-container>
       </div>
@@ -265,7 +340,13 @@ onMounted(() => {
       @asignatura-creada="asignaturaCreada"
     />
 
-    <BotonQuizes :curso-id="cursoId" />
+    <!-- 🆕 Modal de información del quiz -->
+    <QuizInfoModal
+      v-model="showQuizModal"
+      :quiz-id="selectedQuizId"
+      @quiz-deleted="cargarQuizzesCurso"
+      @quiz-updated="cargarQuizzesCurso"
+    />
   </v-app>
 </template>
 
@@ -287,5 +368,10 @@ onMounted(() => {
   color: rgba(var(--v-theme-on-surface), 0.87);
   min-width: 60px;
   text-align: center;
+}
+
+// 🆕 Estilos para la sección de quizzes
+.HomePage__QuizzesSection {
+  margin-top: 40px;
 }
 </style>

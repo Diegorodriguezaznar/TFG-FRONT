@@ -251,9 +251,9 @@ async function guardarQuiz() {
     resetForm();
     
     if (cursoActual.value) {
-      router.push(`/quizz-time!?curso=${cursoActual.value}`);
+      router.push(`/curso/${cursoActual.value}`);
     } else {
-      router.push('/quizz-time!');
+      router.push('/cursos');
     }
 
   } catch (error: any) {
@@ -282,9 +282,9 @@ function resetForm() {
 function cancelarCreacion() {
   if (confirm('¿Estás seguro de que quieres cancelar? Se perderán todos los cambios.')) {
     if (cursoActual.value) {
-      router.push(`/quizz-time!?curso=${cursoActual.value}`);
+      router.push(`/curso/${cursoActual.value}`);
     } else {
-      router.push('/quizz-time!');
+      router.push('/cursos');
     }
   }
 }
@@ -294,7 +294,7 @@ onMounted(async () => {
   // Verificar permisos
   if (!puedeCrearQuiz.value) {
     alert('No tienes permisos para crear quizzes');
-    router.push('/quizz-time!');
+    router.push('/cursos');
     return;
   }
 

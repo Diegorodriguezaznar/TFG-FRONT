@@ -21,9 +21,9 @@ const router = useRouter();
 
 const navegarAQuizzes = () => {
   if (props.cursoId) {
-    router.push(`/quizz-time!?curso=${props.cursoId}`);
+    router.push(`/curso/${props.cursoId}`);
   } else {
-    router.push('/quizz-time!');
+    router.push('/cursos');
   }
   
   emit('click');
