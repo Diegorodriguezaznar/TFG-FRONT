@@ -4,10 +4,6 @@
       <v-row align="center" class="fill-height">
         <v-col cols="12" md="6" class="HeroIA__Content">
           <div class="HeroIA__Badge">
-            <v-chip color="cyan" variant="elevated" size="large" class="HeroIA__BetaChip">
-              <v-icon start>mdi-robot-excited</v-icon>
-              MarIAno IA - Beta
-            </v-chip>
           </div>
           
           <h1 class="HeroIA__Title">
@@ -18,23 +14,6 @@
             con todas tus dudas sobre la plataforma, desde navegar por los cursos hasta 
             resolver problemas técnicos.
           </p>
-          
-          <div class="HeroIA__Stats">
-            <div class="HeroIA__Stat">
-              <v-icon color="cyan" size="large">mdi-lightning-bolt</v-icon>
-              <div class="HeroIA__StatContent">
-                <h3>Respuestas Instantáneas</h3>
-                <p>Obtén ayuda al momento</p>
-              </div>
-            </div>
-            <div class="HeroIA__Stat">
-              <v-icon color="cyan" size="large">mdi-brain</v-icon>
-              <div class="HeroIA__StatContent">
-                <h3>Conocimiento Especializado</h3>
-                <p>Experto en AcademIQ</p>
-              </div>
-            </div>
-          </div>
           
           <v-btn 
             color="cyan" 
@@ -85,7 +64,7 @@ defineEmits<{
 <style scoped>
 .HeroIA {
   background: linear-gradient(135deg, #00BCD4 0%, #00ACC1 50%, #0097A7 100%);
-  min-height: 70vh;
+  min-height: 10vh;
   display: flex;
   align-items: center;
   position: relative;

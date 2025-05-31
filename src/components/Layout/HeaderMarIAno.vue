@@ -1,4 +1,4 @@
-<!-- src/components/Favoritos/HeaderFavoritos.vue -->
+<!-- src/components/MarIAno/HeaderMarIAno.vue -->
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
@@ -24,7 +24,7 @@ const toggleSidebar = () => {
     app 
     color="white" 
     elevation="2" 
-    class="HeaderFavoritos"
+    class="header-mariano"
     height="70"
     sticky
   >
@@ -32,29 +32,29 @@ const toggleSidebar = () => {
     <v-btn 
       icon 
       @click="toggleSidebar" 
-      class="HeaderFavoritos__MenuBtn"
-      color="amber-darken-2"
+      class="header-mariano__menu-btn"
+      color="cyan"
       variant="text"
     >
       <v-icon>mdi-menu</v-icon>
     </v-btn>
     
     <!-- Logo y título -->
-    <div class="HeaderFavoritos__Logo d-flex align-center">
-      <v-icon color="amber-darken-2" size="x-large" class="mr-2">mdi-trophy</v-icon>
+    <div class="header-mariano__logo d-flex align-center">
+      <v-icon color="cyan" size="x-large" class="mr-2">mdi-robot-happy</v-icon>
       <div class="d-flex flex-column d-none d-sm-flex">
-        <span class="text-h6 font-weight-bold text-amber-darken-2">Ranking</span>
+        <span class="text-h6 font-weight-bold text-cyan">MarIAno</span>
       </div>
     </div>
     
     <v-spacer></v-spacer>
     
     <!-- Botón de perfil con UserAvatar -->
-    <div class="HeaderFavoritos__ProfileSection">
+    <div class="header-mariano__profile-section">
       <v-btn 
         variant="text"
         to="/perfil"
-        class="HeaderFavoritos__ProfileBtn"
+        class="header-mariano__profile-btn"
       >
         <UserAvatar
           v-if="usuarioActual"
@@ -73,5 +73,5 @@ const toggleSidebar = () => {
 </template>
 
 <style lang="scss" scoped>
-@import "@/assets/sass/layout/HeaderRanking";
+@import "@/assets/sass/layout/HeaderMarIAno";
 </style>

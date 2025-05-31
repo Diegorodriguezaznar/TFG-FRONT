@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import type { QuizDTO } from '@/stores/dtos/QuizDTO';
+import type { QuizCompletaDTO } from '@/stores/dtos/QuizCompletaDTO';
 
 // Props
 const props = defineProps<{
-  quizzes: QuizDTO[];
+  quizzes: QuizCompletaDTO[];
   cursoNombre: string;
   cursoId: number;
 }>();
@@ -37,11 +37,11 @@ const toggleMostrarTodos = () => {
   mostrarTodos.value = !mostrarTodos.value;
 };
 
-const verQuiz = (quiz: QuizDTO) => {
+const verQuiz = (quiz: QuizCompletaDTO) => {
   router.push(`/quiz/${quiz.idQuiz}`);
 };
 
-const verDetalleQuiz = (quiz: QuizDTO) => {
+const verDetalleQuiz = (quiz: QuizCompletaDTO) => {
   emit('mostrar-info-quiz', quiz.idQuiz);
 };
 </script>
@@ -119,12 +119,7 @@ const verDetalleQuiz = (quiz: QuizDTO) => {
                 <div class="QuizzesCurso__QuizMeta">
                   <div class="d-flex align-center text-caption text-grey">
                     <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
-                    <span>Creado hace {{ Math.floor(Math.random() * 30) + 1 }} días</span>
-                  </div>
-                  
-                  <div class="d-flex align-center text-caption text-grey mt-1">
-                    <v-icon size="small" class="mr-1">mdi-account-multiple</v-icon>
-                    <span>{{ Math.floor(Math.random() * 100) + 10 }} participantes</span>
+                    <span>Creado el {{ quiz.fechaCreacion }}</span>
                   </div>
                 </div>
               </v-card-item>

@@ -13,9 +13,6 @@ const cambiarVista = (nuevaVista: 'grid' | 'list') => {
   emit('cambiar-vista', nuevaVista);
 };
 
-const limpiarFiltros = () => {
-  emit('limpiar-filtros');
-};
 </script>
 
 <template>
@@ -61,14 +58,6 @@ const limpiarFiltros = () => {
           </v-btn>
         </v-btn-toggle>
         
-        <v-btn 
-          @click="limpiarFiltros"
-          variant="outlined"
-          color="red"
-          prepend-icon="mdi-filter-off"
-        >
-          Limpiar Filtros
-        </v-btn>
       </div>
     </div>
   </div>

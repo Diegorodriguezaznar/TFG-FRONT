@@ -370,7 +370,6 @@ onMounted(() => {
   text-align: center;
 }
 
-// 🆕 Estilos para la sección de quizzes
 .HomePage__QuizzesSection {
   margin-top: 40px;
 }

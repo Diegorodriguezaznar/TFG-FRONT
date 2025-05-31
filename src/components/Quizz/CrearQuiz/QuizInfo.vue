@@ -81,7 +81,7 @@ const updateQuizData = (field: keyof QuizData, value: any) => {
           :label="cursoActual ? `Asignatura del Curso ${cursoActual} *` : 'Asignatura *'"
           variant="outlined"
           :error-messages="errores.asignatura"
-          :hint="cursoActual ? `Solo asignaturas del curso ${cursoActual}` : 'Selecciona la materia correspondiente'"
+          :hint="cursoActual ? `Asignaturas` : 'Selecciona la materia correspondiente'"
           persistent-hint
           :no-data-text="cursoActual ? `No hay asignaturas en el curso ${cursoActual}` : 'No hay asignaturas disponibles'"
         ></v-select>

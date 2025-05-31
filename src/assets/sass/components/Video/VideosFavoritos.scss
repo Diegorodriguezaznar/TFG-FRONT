@@ -1,0 +1,116 @@
+.lista-videos-favoritos__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.lista-videos-favoritos__item {
+  width: 100%;
+}
+
+.video-card {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.video-card:hover {
+  transform: translateY(-2px);
+}
+
+.video-card__imagen {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.video-card__titulo {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 2;
+  max-width: calc(100% - 60px);
+  font-size: 0.75rem;
+}
+
+.video-card__favorito {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+}
+
+.video-card__placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+/* Estados vacío y carga */
+.lista-videos-favoritos__estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.lista-videos-favoritos__spinner {
+  margin-bottom: 1rem;
+}
+
+.lista-videos-favoritos__icono {
+  margin-bottom: 1rem;
+}
+
+.lista-videos-favoritos__titulo-vacio {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.lista-videos-favoritos__mensaje {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.lista-videos-favoritos__boton {
+  margin-top: 0.5rem;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .lista-videos-favoritos__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+  
+  .video-card__titulo {
+    font-size: 0.875rem;
+  }
+  
+  .lista-videos-favoritos__estado {
+    padding: 3rem 2rem;
+  }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .lista-videos-favoritos__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Desktop large */
+@media (min-width: 1200px) {
+  .lista-videos-favoritos__grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+  }
+  
+  .video-card__titulo {
+    font-size: 1rem;
+  }
+}

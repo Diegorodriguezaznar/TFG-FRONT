@@ -1,4 +1,4 @@
-// src/stores/UsuarioEstadisticas.ts - Versión optimizada
+// src/stores/UsuarioEstadisticas.ts - Versión corregida
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -29,10 +29,10 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
         const stats = await response.json();
         const estadisticasFormateadas: EstadisticasUsuario = {
           idUsuario: stats.idUsuario,
-          totalCursos: stats.totalCursos,
-          totalVideos: stats.totalVideos,
-          totalQuizzes: stats.totalQuizzes,
-          fechaUltimaActividad: stats.fechaUltimaActividad
+          totalCursos: stats.totalCursos || 0,
+          totalVideos: stats.totalVideos || 0,
+          totalQuizzes: stats.totalQuizzes || 0,
+          fechaUltimaActividad: stats.fechaUltimaActividad || new Date().toISOString()
         };
         
         estadisticas.value.set(idUsuario, estadisticasFormateadas);
@@ -53,7 +53,7 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
   // Método fallback usando endpoints individuales
   async function fetchEstadisticasIndividuales(idUsuario: number): Promise<EstadisticasUsuario | null> {
     try {
-      const [cursosResponse, videosResponse, quizzesResponse] = await Promise.all([
+      const [totalCursos, totalVideos, totalQuizzes] = await Promise.all([
         fetchCursosPorUsuario(idUsuario),
         fetchVideosPorUsuario(idUsuario),
         fetchQuizzesPorUsuario(idUsuario)
@@ -61,9 +61,9 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
 
       const stats: EstadisticasUsuario = {
         idUsuario,
-        totalCursos: cursosResponse,
-        totalVideos: videosResponse,
-        totalQuizzes: quizzesResponse,
+        totalCursos,
+        totalVideos,
+        totalQuizzes,
         fechaUltimaActividad: new Date().toISOString()
       };
 
@@ -72,7 +72,18 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
     } catch (error: any) {
       errorMessage.value = error.message;
       console.error("Error al obtener estadísticas del usuario:", error);
-      return null;
+      
+      // Si falla todo, devolver estadísticas en 0
+      const statsVacias: EstadisticasUsuario = {
+        idUsuario,
+        totalCursos: 0,
+        totalVideos: 0,
+        totalQuizzes: 0,
+        fechaUltimaActividad: new Date().toISOString()
+      };
+      
+      estadisticas.value.set(idUsuario, statsVacias);
+      return statsVacias;
     }
   }
 
@@ -115,15 +126,15 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
       const response = await fetch(`http://localhost:5190/api/Curso/usuario/${idUsuario}`);
       
       if (!response.ok) {
-        throw new Error(`Error al obtener cursos: ${response.status}`);
+        console.warn(`API Curso no disponible (${response.status}), devolviendo 0`);
+        return 0;
       }
       
       const cursos = await response.json();
       return Array.isArray(cursos) ? cursos.length : 0;
     } catch (error) {
-      console.error("Error al obtener cursos del usuario:", error);
-      // Fallback: devolver datos simulados si falla la API
-      return Math.floor(Math.random() * 5) + 1;
+      console.warn("Error al obtener cursos del usuario, devolviendo 0:", error);
+      return 0;
     }
   }
 
@@ -132,15 +143,15 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
       const response = await fetch(`http://localhost:5190/api/Video/usuario/${idUsuario}`);
       
       if (!response.ok) {
-        throw new Error(`Error al obtener videos: ${response.status}`);
+        console.warn(`API Video no disponible (${response.status}), devolviendo 0`);
+        return 0;
       }
       
       const videos = await response.json();
       return Array.isArray(videos) ? videos.length : 0;
     } catch (error) {
-      console.error("Error al obtener videos del usuario:", error);
-      // Fallback: devolver datos simulados si falla la API
-      return Math.floor(Math.random() * 15) + 2;
+      console.warn("Error al obtener videos del usuario, devolviendo 0:", error);
+      return 0;
     }
   }
 
@@ -149,15 +160,15 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
       const response = await fetch(`http://localhost:5190/api/Quiz/usuario/${idUsuario}`);
       
       if (!response.ok) {
-        throw new Error(`Error al obtener quizzes: ${response.status}`);
+        console.warn(`API Quiz no disponible (${response.status}), devolviendo 0`);
+        return 0;
       }
       
       const quizzes = await response.json();
       return Array.isArray(quizzes) ? quizzes.length : 0;
     } catch (error) {
-      console.error("Error al obtener quizzes del usuario:", error);
-      // Fallback: devolver datos simulados si falla la API
-      return Math.floor(Math.random() * 8) + 1;
+      console.warn("Error al obtener quizzes del usuario, devolviendo 0:", error);
+      return 0;
     }
   }
 

@@ -1,0 +1,149 @@
+.header-cursos {
+  border-bottom: 2px solid rgba(0, 26, 255, 0.2) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+}
+
+.header-cursos__menu-btn {
+  margin-right: 16px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.header-cursos__menu-btn:hover {
+  transform: scale(1.1);
+}
+
+.header-cursos__logo {
+  min-width: 200px;
+  margin-right: 25px;
+  flex-shrink: 0;
+}
+
+.header-cursos__search {
+  flex: 1;
+  max-width: 600px;
+  margin-right: 16px;
+}
+
+.header-cursos__search-field {
+  width: 100% !important;
+  transition: all 0.3s ease;
+}
+
+.header-cursos__search-field:focus-within {
+  transform: scale(1.02);
+}
+
+.header-cursos__profile-section {
+  padding-right: 25px;
+  flex-shrink: 0;
+}
+
+.header-cursos__profile-btn {
+  border-radius: 50%;
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.header-cursos__profile-btn:hover {
+  background: rgba(0, 26, 255, 0.1);
+  transform: scale(1.05);
+}
+
+/* Focus states */
+:deep(.v-field--focused .v-field__outline) {
+  border-color: #174e8d !important;
+  border-width: 2px !important;
+}
+
+:deep(.v-field--focused .v-field__prepend-inner .v-icon) {
+  color: #183aa8 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-cursos__logo {
+    min-width: 120px;
+    margin-right: 12px;
+  }
+  
+  .header-cursos__search {
+    max-width: 250px;
+    margin-right: 8px;
+  }
+  
+  .header-cursos__profile-section {
+    padding-right: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header-cursos__menu-btn {
+    margin-right: 8px;
+  }
+  
+  .header-cursos__logo {
+    min-width: 50px;
+    margin-right: 8px;
+  }
+  
+  .header-cursos__search {
+    flex: 1;
+    max-width: none;
+    margin-right: 8px;
+    min-width: 0;
+  }
+  
+  .header-cursos__search-field {
+    font-size: 14px;
+  }
+  
+  .header-cursos__search-field :deep(.v-field__input) {
+    min-height: 36px !important;
+  }
+  
+  .header-cursos__search-field :deep(.v-field__input input::placeholder) {
+    font-size: 13px;
+  }
+  
+  .header-cursos__profile-section {
+    padding-right: 8px;
+  }
+  
+  .header-cursos__profile-btn {
+    min-width: 36px;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-cursos {
+    height: 64px;
+  }
+  
+  .header-cursos__menu-btn {
+    margin-right: 4px;
+  }
+  
+  .header-cursos__logo {
+    margin-right: 4px;
+  }
+  
+  .header-cursos__search {
+    margin-right: 4px;
+  }
+  
+  .header-cursos__profile-section {
+    padding-right: 4px;
+  }
+  
+  .header-cursos__search-field :deep(.v-field__input input::placeholder) {
+    content: "Buscar...";
+  }
+}

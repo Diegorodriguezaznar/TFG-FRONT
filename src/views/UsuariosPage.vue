@@ -109,7 +109,7 @@ onMounted(() => {
           <p class="text-body-1 text-grey">
             {{ searchQuery ? 'Prueba con otro término de búsqueda' : 'No hay profesores disponibles' }}
           </p>
-        </div>
+      </div>
         
         <!-- Grid de usuarios -->
         <div v-else-if="!loading" class="UsuariosPage__Grid">
@@ -131,56 +131,6 @@ onMounted(() => {
   </v-app>
 </template>
 
-<style scoped>
-.UsuariosPage {
-  background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
-  min-height: 100vh;
-}
-
-.UsuariosPage__Container {
-  padding-top: 24px;
-  max-width: 1400px;
-}
-
-.UsuariosPage__Header {
-  background: white;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(255, 152, 0, 0.1);
-  border: 1px solid rgba(255, 152, 0, 0.2);
-}
-
-.UsuariosPage__Stats {
-  text-align: right;
-}
-
-.UsuariosPage__Grid {
-  animation: fadeIn 0.6s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { 
-    opacity: 0; 
-    transform: translateY(20px); 
-  }
-  to { 
-    opacity: 1; 
-    transform: translateY(0); 
-  }
-}
-
-@media (max-width: 600px) {
-  .UsuariosPage__Container {
-    padding: 16px;
-  }
-  
-  .UsuariosPage__Header {
-    padding: 16px;
-  }
-  
-  .UsuariosPage__Stats {
-    text-align: left;
-    margin-top: 16px;
-  }
-}
+<style lang="scss" scoped>
+@import "@/assets/sass/pages/UsuariosPage";
 </style>

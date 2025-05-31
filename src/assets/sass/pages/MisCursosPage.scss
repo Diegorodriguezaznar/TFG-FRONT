@@ -1,0 +1,110 @@
+.MisCursosPage__Wrapper {
+  min-height: calc(100vh - 64px - 64px); // Altura total - header - footer
+  background: linear-gradient(135deg, #fff5f0 0%, #ffffff 50%, #fff8f5 100%);
+  padding-bottom: 24px;
+}
+
+.MisCursosPage__Breadcrumb {
+  background-color: transparent;
+  padding: 16px 24px 0;
+}
+
+.MisCursosPage__Contenedor {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.MisCursosPage__Header {
+  padding: 24px 0 16px;
+}
+
+.MisCursosPage__Titulo {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  background: linear-gradient(90deg, #0084ff 0%, #4d6eff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.MisCursosPage__Subtitulo {
+  font-size: 1.25rem;
+  color: #607d8b;
+  margin: 0;
+}
+
+.MisCursosPage__Contenido {
+  padding-top: 16px;
+}
+
+.MisCursosPage__EstadoVacio {
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.MisCursosPage__IconoVacio {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.MisCursosPage__Info {
+  background: rgba(0, 38, 255, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  border-left: 4px solid #0099ff;
+}
+
+.MisCursosPage__ContenedorCursos {
+  width: 100%;
+}
+
+/* Animación de entrada para las cards */
+.curso-col {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideInUp 0.5s ease forwards;
+}
+
+@keyframes slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Media queries para mejor responsividad */
+@media (max-width: 960px) {
+  .MisCursosPage__Titulo {
+    font-size: 2rem;
+  }
+  
+  .MisCursosPage__Subtitulo {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .MisCursosPage__Header {
+    padding: 16px 0 12px;
+  }
+  
+  .MisCursosPage__Titulo {
+    font-size: 1.75rem;
+  }
+  
+  .MisCursosPage__Subtitulo {
+    font-size: 1rem;
+  }
+  
+  .MisCursosPage__Info {
+    padding: 12px;
+  }
+}

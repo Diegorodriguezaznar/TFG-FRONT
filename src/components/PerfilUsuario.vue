@@ -114,7 +114,6 @@ const formatearFecha = (fecha: string | Date) => {
                   
                   <div class="d-flex align-center text-caption text-grey mt-1">
                     <v-icon size="small" class="mr-1">mdi-account-multiple</v-icon>
-                    <span>{{ Math.floor(Math.random() * 500) + 50 }} participantes</span>
                   </div>
                 </div>
               </v-card-item>

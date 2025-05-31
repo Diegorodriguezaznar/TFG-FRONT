@@ -10,7 +10,7 @@ import Sidebar from '@/components/Layout/Sidebar.vue';
 import CursosUsuario from '@/components/Usuarios/Perfil/CursosUsuario.vue';
 import VideosUsuario from '@/components/Usuarios/Perfil/VideosUsuario.vue';
 import QuizzesUsuario from '@/components/Usuarios/Perfil/QuizzesUsuario.vue';
-import UserAvatar from '@/components/Common/UserAvatar.vue'; // ← AÑADIDO
+import UserAvatar from '@/components/Common/UserAvatar.vue';
 import type { UsuarioDTO } from '@/stores/dtos/UsuarioDTO';
 
 const route = useRoute();
@@ -73,7 +73,7 @@ const cargarDatosUsuario = async () => {
       cargarQuizzesUsuario()
     ]);
   } catch (error) {
-    // Error manejado por los stores
+    console.error('Error cargando datos del usuario:', error);
   } finally {
     loading.value = false;
   }
@@ -86,6 +86,7 @@ const cargarCursosUsuario = async () => {
       curso.idUsuario === usuarioId.value
     ).sort((a, b) => new Date(b.fechaCreacion).getTime() - new Date(a.fechaCreacion).getTime());
   } catch (error) {
+    console.error('Error cargando cursos del usuario:', error);
     cursosUsuario.value = [];
   }
 };
@@ -97,17 +98,26 @@ const cargarVideosUsuario = async () => {
       video.idUsuario === usuarioId.value
     ).sort((a, b) => new Date(b.fechaSubida).getTime() - new Date(a.fechaSubida).getTime());
   } catch (error) {
+    console.error('Error cargando videos del usuario:', error);
     videosUsuario.value = [];
   }
 };
 
 const cargarQuizzesUsuario = async () => {
+  if (!usuarioId.value) return;
+  
   try {
-    await quizStore.fetchAllQuizzes();
-    quizzesUsuario.value = quizStore.quizzes.filter(quiz => 
-      quiz.idUsuario === usuarioId.value
-    ).sort((a, b) => new Date(b.fechaCreacion || new Date()).getTime() - new Date(a.fechaCreacion || new Date()).getTime());
+    // Usar el método específico para obtener quizzes por usuario
+    const quizzes = await quizStore.fetchQuizzesByUsuario(usuarioId.value);
+    quizzesUsuario.value = quizzes.sort((a, b) => {
+      const fechaA = new Date(a.fechaCreacion || new Date()).getTime();
+      const fechaB = new Date(b.fechaCreacion || new Date()).getTime();
+      return fechaB - fechaA;
+    });
+    
+    console.log(`Quizzes cargados para usuario ${usuarioId.value}:`, quizzesUsuario.value);
   } catch (error) {
+    console.error('Error cargando quizzes del usuario:', error);
     quizzesUsuario.value = [];
   }
 };
@@ -147,7 +157,6 @@ onMounted(() => {
               <div class="PerfilUsuario__HeaderContent">
                 <!-- Avatar y información básica -->
                 <div class="d-flex align-center">
-                  <!-- CAMBIO AQUÍ: Reemplazado v-avatar + v-img por UserAvatar -->
                   <UserAvatar
                     :nombre="nombreCompleto"
                     :id-rol="usuario.idRol"
@@ -243,6 +252,34 @@ onMounted(() => {
   max-width: 1400px;
 }
 
+.PerfilUsuario__Loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+}
+
+.PerfilUsuario__NotFound {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.PerfilUsuario__NotFoundIcon {
+  margin-bottom: 16px;
+}
+
+.PerfilUsuario__NotFoundTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.PerfilUsuario__NotFoundText {
+  color: #999;
+  margin-bottom: 24px;
+}
+
 .PerfilUsuario__Header {
   border-radius: 16px;
   overflow: hidden;
@@ -276,6 +313,37 @@ onMounted(() => {
 .PerfilUsuario__Avatar {
   border: 4px solid white;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  margin-right: 24px;
+}
+
+.PerfilUsuario__UserDetails {
+  flex: 1;
+}
+
+.PerfilUsuario__UserName {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 16px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.PerfilUsuario__UserBadges {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.PerfilUsuario__Phone {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
+}
+
+.PerfilUsuario__PhoneIcon {
+  margin-right: 8px;
 }
 
 .PerfilUsuario__Stats {
@@ -306,10 +374,9 @@ onMounted(() => {
 }
 
 .PerfilUsuario__Content {
-  margin-top: 20px; /* Separación entre el header naranja y los apartados */
+  margin-top: 20px;
 }
 
-/* Separación entre apartados */
 .PerfilUsuario__CursosSection {
   margin-bottom: 15px;
 }
@@ -329,12 +396,25 @@ onMounted(() => {
     gap: 24px;
   }
   
+  .PerfilUsuario__Avatar {
+    margin-right: 0;
+    margin-bottom: 16px;
+  }
+  
+  .PerfilUsuario__UserName {
+    font-size: 2rem;
+  }
+  
   .PerfilUsuario__Stats {
     justify-content: center;
   }
   
   .PerfilUsuario__Container {
     padding: 16px;
+  }
+  
+  .PerfilUsuario__UserBadges {
+    justify-content: center;
   }
 }
 </style>

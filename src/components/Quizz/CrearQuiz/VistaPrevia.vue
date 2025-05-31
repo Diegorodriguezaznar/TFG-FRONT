@@ -43,10 +43,6 @@ defineProps<Props>();
             <v-chip color="purple" size="large">
               {{ preguntasValidas.length }} preguntas
             </v-chip>
-            <v-chip v-if="cursoActual" color="blue" size="large">
-              <v-icon start size="small">mdi-book-open</v-icon>
-              Curso {{ cursoActual }}
-            </v-chip>
           </div>
         </div>
       </v-card-text>

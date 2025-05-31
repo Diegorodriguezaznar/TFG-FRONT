@@ -10,13 +10,13 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
   const isLoading = ref<boolean>(false);
   const successMessage = ref<string>("");
 
-  // Limpiar mensajes de error y éxito
+  // Método para limpiar mensajes
   function clearMessages() {
     errorMessage.value = "";
     successMessage.value = "";
   }
 
-  // todo GET - Obtener todas las asignaturas
+  // Método GET obtener todas las asignaturas
   async function fetchAllAsignaturas() {
     isLoading.value = true;
     clearMessages();
@@ -32,7 +32,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     }
   }
 
-  // GET - Obtener asignaturas por curso
+  // Método GET obtener asignaturas por curso
   async function fetchAsignaturasByCurso(idCurso: number) {
     isLoading.value = true;
     clearMessages();
@@ -48,7 +48,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     }
   }
 
-  // GET - Obtener asignatura por ID
+  // Método GET obtener asignatura por ID
   async function fetchAsignaturaById(idAsignatura: number): Promise<AsignaturaDTO | null> {
     isLoading.value = true;
     clearMessages();
@@ -65,7 +65,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     }
   }
 
-  // POST - Crear asignatura
+  // Método POST crear asignatura
   async function createAsignatura(nuevaAsignatura: AsignaturaCrearDTO): Promise<boolean> {
     isLoading.value = true;
     clearMessages();
@@ -103,7 +103,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     }
   }
 
-  // PUT - Actualizar asignatura
+  // Método PUT actualizar asignatura
   async function updateAsignatura(asignatura: AsignaturaDTO): Promise<boolean> {
     isLoading.value = true;
     clearMessages();
@@ -134,7 +134,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     }
   }
 
-  // DELETE - Eliminar asignatura
+  // Método DELETE eliminar asignatura
   async function deleteAsignatura(idAsignatura: number): Promise<boolean> {
     isLoading.value = true;
     clearMessages();
@@ -157,7 +157,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     }
   }
 
-  // Computed - Filtrar asignaturas por búsqueda
+  // Computed filtrar asignaturas por búsqueda
   const asignaturasFiltradas = computed(() => (searchQuery: string) => {
     if (!searchQuery) return asignaturas.value;
     return asignaturas.value.filter(asignatura =>

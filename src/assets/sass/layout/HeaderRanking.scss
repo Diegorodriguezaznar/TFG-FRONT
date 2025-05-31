@@ -1,0 +1,79 @@
+.HeaderFavoritos {
+  border-bottom: 2px solid rgba(229, 255, 0, 0.2) !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+}
+
+.HeaderFavoritos__MenuBtn {
+  margin-right: 16px;
+}
+
+.HeaderFavoritos__Logo {
+  min-width: 200px;
+  margin-right: 25px;
+}
+
+.HeaderFavoritos__FilterMenu {
+  background: white;
+  border: 1px solid rgba(238, 255, 0, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(255, 251, 0, 0.15);
+}
+
+.HeaderFavoritos__Filters .v-btn {
+  border-color: rgba(255, 208, 0, 0.5);
+}
+
+.HeaderFavoritos__Filters .v-btn:hover {
+  background-color: rgba(255, 152, 0, 0.1);
+}
+
+/* Responsive mejorado */
+@media (max-width: 768px) {
+  .HeaderFavoritos__Logo {
+    min-width: 160px;
+    margin-right: 15px;
+  }
+  
+  .HeaderFavoritos__ProfileSection {
+    padding-right: 15px;
+  }
+}
+
+@media (max-width: 600px) {
+  .HeaderFavoritos__Logo {
+    min-width: 60px;
+    margin-right: 10px;
+  }
+  
+  .HeaderFavoritos__ProfileSection {
+    padding-right: 10px;
+  }
+}
+
+.HeaderFavoritos__MenuBtn {
+  transition: transform 0.2s ease;
+}
+
+.HeaderFavoritos__MenuBtn:hover {
+  transform: scale(1.1);
+}
+
+.HeaderFavoritos__ProfileSection {
+  padding-right: 25px;
+}
+
+.HeaderFavoritos__ProfileBtn {
+  border-radius: 50%;
+  min-width: 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  transition: all 0.2s ease;
+}
+
+.HeaderFavoritos__ProfileBtn:hover {
+  background: rgba(220, 233, 30, 0.1);
+  transform: scale(1.05);
+}
