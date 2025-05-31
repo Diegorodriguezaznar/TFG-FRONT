@@ -137,7 +137,7 @@ const cargarDatos = async () => {
   } catch (error) {
     console.error('❌ Error al cargar datos:', error);
     alert('Error al cargar el resultado del quiz: ' + error.message);
-    router.push('/quizz-time!');
+    router.push('/cursos');
   } finally {
     loading.value = false;
   }

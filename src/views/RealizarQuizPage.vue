@@ -118,7 +118,7 @@ const cargarQuiz = async () => {
     }
     
     alert(mensaje);
-    router.push('/quizz-time!');
+    router.push('/cursos');
   } finally {
     loading.value = false;
   }
@@ -254,10 +254,10 @@ const confirmarFinalizacion = async () => {
 const salirQuiz = () => {
   if (totalRespuestas.value > 0) {
     if (confirm('¿Estás seguro de que quieres salir? Se perderá tu progreso.')) {
-      router.push('/quizz-time!');
+      router.push('/cursos');
     }
   } else {
-    router.push('/quizz-time!');
+    router.push('/cursos');
   }
 };
 
@@ -514,9 +514,9 @@ onUnmounted(() => {
           <p class="text-body-1 mb-4">
             No se pudo cargar el quiz solicitado. Puede que no exista o no tenga preguntas configuradas.
           </p>
-          <v-btn color="purple" variant="elevated" @click="router.push('/quizz-time!')">
+          <v-btn color="purple" variant="elevated" @click="router.push('/cursos')">
             <v-icon start>mdi-arrow-left</v-icon>
-            Volver a Quizzes
+            Volver a Cursos
           </v-btn>
         </v-card>
       </div>

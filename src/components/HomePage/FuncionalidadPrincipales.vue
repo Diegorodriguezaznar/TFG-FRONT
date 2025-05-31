@@ -69,7 +69,7 @@
               ]"
               texto-boton="Hacer Quiz"
               icono-boton="mdi-lightning-bolt"
-              ruta="/quizz-time!"
+              ruta="/cursos"
               @navegar="$emit('navegar', $event)"
             />
           </div>
