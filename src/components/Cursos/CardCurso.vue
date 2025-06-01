@@ -1,253 +1,49 @@
-<script setup lang="ts">
-// Imports
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
-import { useUsuarioCursoStore } from "@/stores/UsuarioCurso";
-
-// Stores
-const usuarioLogeadoStore = useUsuarioLogeadoStore();
-const usuarioCursoStore = useUsuarioCursoStore();
-
-// Router
-const router = useRouter();
-
-// Estado para las alertas
-const mostrarAlerta = ref(false);
-const mensajeAlerta = ref('');
-const tipoAlerta = ref('success');
-
-// Función para mostrar alertas
-const mostrarMensaje = (mensaje, tipo = 'success') => {
-  mensajeAlerta.value = mensaje;
-  tipoAlerta.value = tipo;
-  mostrarAlerta.value = true;
-  
-  setTimeout(() => {
-    mostrarAlerta.value = false;
-  }, 3000);
-};
-
-// Propiedades del curso
-const props = defineProps({
-  id: {
-    type: Number,
-    required: true
-  },
-  titulo: String,
-  subtitulo: String,
-  descripcion: String,
-  imagen: String
-});
-
-// Emits
-const emit = defineEmits(['guardado', 'eliminado']);
-
-// Evento para ir a la página de videos del curso
-const seleccionarCurso = () => {
-  if (props.id) {
-    router.push(`/curso/${props.id}`);
-  }
-};
-
-// ID del usuario actual
-const usuarioId = computed(() => {
-  const usuario = usuarioLogeadoStore.usuarioActual;
-  return usuario?.id || usuario?.idUsuario || null;
-});
-
-// Estado de inscripción
-const estaInscrito = ref(false);
-const animacionGuardar = ref(false);
-
-// Verificar si el usuario está inscrito en este curso al cargar el componente
-onMounted(async () => {
-  if (usuarioId.value && props.id) {
-    await verificarInscripcion();
-  }
-});
-
-// Verificar si el usuario está inscrito en este curso
-async function verificarInscripcion() {
-  try {
-    if (usuarioId.value) {
-      const inscripciones = await usuarioCursoStore.fetchInscripcionesByUsuarioId(usuarioId.value);
-      estaInscrito.value = inscripciones.some(i => i.idCurso === props.id);
-    }
-  } catch (error) {
-    console.error("Error al verificar inscripción:", error);
-  }
-}
-
-// Método para guardar un curso
-const guardarCurso = async (event) => {
-  // Prevenir la navegación
-  event.stopPropagation();
-  
-  // Verificar login
-  if (!usuarioId.value) {
-    mostrarMensaje('Debes iniciar sesión para guardar curso', 'error');
-    router.push('/login');
-    return;
-  }
-
-  try {
-    // Añadir animación
-    animacionGuardar.value = true;
-    
-    // CREAR inscripción usando el store
-    const nuevaInscripcion = {
-      IdUsuario: usuarioId.value,
-      IdCurso: props.id
-    };
-    
-    const resultado = await usuarioCursoStore.createInscripcion(nuevaInscripcion);
-    
-    if (resultado) {
-      estaInscrito.value = true;
-      mostrarMensaje('Curso guardado correctamente', 'success');
-      emit('guardado', props.id);
-    } else {
-      console.error("Error al crear inscripción:", usuarioCursoStore.errorMessage);
-      mostrarMensaje('Error al guardar curso', 'error');
-    }
-
-    // Quitar animación después de un tiempo
-    setTimeout(() => {
-      animacionGuardar.value = false;
-    }, 500);
-    
-  } catch (error) {
-    console.error("Error al guardar curso:", error);
-    mostrarMensaje('Error en la operación', 'error');
-    animacionGuardar.value = false;
-  }
-};
-
-// Método para borrar un curso guardado - CORREGIDO
-const borrarGuardado = async (event) => {
-  // Prevenir la navegación
-  event.stopPropagation();
-  
-  // Verificar que esté inscrito
-  if (!estaInscrito.value) {
-    console.warn("No se puede borrar un curso que no está guardado");
-    return;
-  }
-  
-  try {
-    // Añadir animación
-    animacionGuardar.value = true;
-    
-    // Verificar que tenemos los datos necesarios
-    if (!usuarioId.value || !props.id) {
-      console.error("Error: Faltan datos para eliminar inscripción", { 
-        usuarioId: usuarioId.value, 
-        cursoId: props.id 
-      });
-      mostrarMensaje('Error al quitar curso guardado: Datos incompletos', 'error');
-      animacionGuardar.value = false;
-      return;
-    }
-    
-    console.log("Eliminando inscripción usando el store...");
-    
-    // USAR EL MÉTODO DEL STORE en lugar de hacer peticiones directas
-    const resultado = await usuarioCursoStore.deleteInscripcion(usuarioId.value, props.id);
-    
-    if (resultado) {
-      estaInscrito.value = false;
-      mostrarMensaje('Curso quitado de guardados', 'success');
-      emit('eliminado', props.id);
-    } else {
-      console.error("Error al eliminar inscripción:", usuarioCursoStore.errorMessage);
-      mostrarMensaje(`Error al quitar curso guardado: ${usuarioCursoStore.errorMessage}`, 'error');
-    }
-
-    // Quitar animación después de un tiempo
-    setTimeout(() => {
-      animacionGuardar.value = false;
-    }, 500);
-    
-  } catch (error) {
-    console.error("Error al borrar guardado:", error);
-    mostrarMensaje(`Error en la operación: ${error.message}`, 'error');
-    animacionGuardar.value = false;
-  }
-};
-
-// Método que decide si guardar o borrar en función del estado
-const toggleInscripcion = async (event) => {
-  // Prevenir la navegación
-  event.stopPropagation();
-  
-  // Verificar login
-  if (!usuarioId.value) {
-    mostrarMensaje('Debes iniciar sesión para guardar curso', 'error');
-    router.push('/login');
-    return;
-  }
-  
-  if (estaInscrito.value) {
-    await borrarGuardado(event);
-  } else {
-    await guardarCurso(event);
-  }
-};
-</script>
-
 <template>
-  <div class="curso-card-wrapper">
+  <div class="card-curso">
     <v-hover v-slot="{ isHovering }">
       <v-card 
-        class="curso-card" 
+        class="card-curso__item" 
         @click="seleccionarCurso"
         :elevation="isHovering ? 8 : 2"
       >
-        <!-- Contenedor de imagen -->
-        <div class="curso-card-imagen-container">
+        <div class="card-curso__imagen-container">
           <v-img 
             :src="imagen || 'https://picsum.photos/300/200'" 
             height="220px" 
             cover
-            class="curso-card-imagen"
-            :class="{ 'imagen-hover': isHovering }"
+            class="card-curso__imagen"
+            :class="{ 'card-curso__imagen--hover': isHovering }"
           ></v-img>
         </div>
         
-        <!-- Título del curso -->
-        <v-card-title class="curso-card-titulo">
+        <v-card-title class="card-curso__titulo">
           {{ titulo }}
         </v-card-title>
         
-        <!-- Descripción del curso -->
-        <v-card-text v-if="descripcion" class="curso-card-descripcion">
+        <v-card-text v-if="descripcion" class="card-curso__descripcion">
           {{ descripcion }}
         </v-card-text>
         
-        <!-- Botones de acción -->
-        <v-card-actions class="curso-card-acciones">
-          <!-- Botón Guardar (solo se muestra si no está guardado) -->
+        <v-card-actions class="card-curso__acciones">
           <v-btn 
             v-if="!estaInscrito"
             variant="flat" 
             color="blue" 
             @click.stop="guardarCurso($event)"
-            class="curso-card-boton-guardar"
-            :class="{ 'btn-hover': isHovering, 'animar': animacionGuardar }"
+            class="card-curso__boton card-curso__boton--guardar"
+            :class="{ 'card-curso__boton--hover': isHovering, 'card-curso__boton--animar': animacionGuardar }"
           >
             <v-icon left class="mr-1">mdi-bookmark-outline</v-icon>
             Guardar
           </v-btn>
           
-          <!-- Botón Borrar (solo se muestra si está guardado) -->
           <v-btn 
             v-if="estaInscrito"
             variant="flat" 
             color="red" 
             @click.stop="borrarGuardado($event)"
-            class="curso-card-boton-guardar guardado-activo"
-            :class="{ 'btn-hover': isHovering, 'animar': animacionGuardar }"
+            class="card-curso__boton card-curso__boton--quitar"
+            :class="{ 'card-curso__boton--hover': isHovering, 'card-curso__boton--animar': animacionGuardar }"
           >
             <v-icon left class="mr-1">mdi-bookmark-check</v-icon>
             Quitar
@@ -258,7 +54,6 @@ const toggleInscripcion = async (event) => {
       </v-card>
     </v-hover>
     
-    <!-- Snackbar para alertas -->
     <v-snackbar
       v-model="mostrarAlerta"
       :color="tipoAlerta"
@@ -279,97 +74,159 @@ const toggleInscripcion = async (event) => {
   </div>
 </template>
 
-<style scoped>
-.curso-card-wrapper {
-  width: 100%;
-  height: 100%;
-}
+<script setup lang="ts">
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
+import { useUsuarioCursoStore } from "@/stores/UsuarioCurso";
 
-.curso-card {
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  border-radius: 12px;
-  overflow: hidden;
-}
+const usuarioLogeadoStore = useUsuarioLogeadoStore();
+const usuarioCursoStore = useUsuarioCursoStore();
+const router = useRouter();
 
-.curso-card:hover {
-  transform: translateY(-8px);
-}
+const mostrarAlerta = ref(false);
+const mensajeAlerta = ref('');
+const tipoAlerta = ref('success');
 
-.curso-card-imagen-container {
-  position: relative;
-  overflow: hidden;
-}
+const mostrarMensaje = (mensaje, tipo = 'success') => {
+  mensajeAlerta.value = mensaje;
+  tipoAlerta.value = tipo;
+  mostrarAlerta.value = true;
+  
+  setTimeout(() => {
+    mostrarAlerta.value = false;
+  }, 3000);
+};
 
-.curso-card-imagen {
-  transition: transform 0.5s ease;
-}
+const props = defineProps({
+  id: {
+    type: Number,
+    required: true
+  },
+  titulo: String,
+  subtitulo: String,
+  descripcion: String,
+  imagen: String
+});
 
-.imagen-hover {
-  transform: scale(1.05);
-}
+const emit = defineEmits(['guardado', 'eliminado']);
 
-.curso-card-titulo {
-  font-size: 1.25rem !important;
-  font-weight: 700 !important;
-  line-height: 1.3 !important;
-  padding-bottom: 0;
-  margin-bottom: 0;
-  color: rgba(0, 0, 0, 0.87);
-}
-
-.curso-card-descripcion {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  color: rgba(0, 0, 0, 0.6);
-  flex-grow: 1;
-  font-size: 0.875rem;
-}
-
-.curso-card-acciones {
-  padding: 8px 16px 16px 16px;
-}
-
-.curso-card-boton, .curso-card-boton-guardar {
-  transition: all 0.3s ease;
-  border-radius: 20px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  padding: 0 16px;
-}
-
-.curso-card-boton-guardar {
-  background-color: #FF9800 !important;
-  color: white !important;
-}
-
-.guardado-activo {
-  background-color: #FB8C00 !important;
-}
-
-.animar {
-  animation: pulse 0.4s ease-in-out;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
+const seleccionarCurso = () => {
+  if (props.id) {
+    router.push(`/curso/${props.id}`);
   }
-  50% {
-    transform: scale(1.1);
+};
+
+const usuarioId = computed(() => {
+  const usuario = usuarioLogeadoStore.usuarioActual;
+  return usuario?.id || usuario?.idUsuario || null;
+});
+
+const estaInscrito = ref(false);
+const animacionGuardar = ref(false);
+
+onMounted(async () => {
+  if (usuarioId.value && props.id) {
+    await verificarInscripcion();
   }
-  100% {
-    transform: scale(1);
+});
+
+async function verificarInscripcion() {
+  try {
+    if (usuarioId.value) {
+      const inscripciones = await usuarioCursoStore.fetchInscripcionesByUsuarioId(usuarioId.value);
+      estaInscrito.value = inscripciones.some(i => i.idCurso === props.id);
+    }
+  } catch (error) {
+    console.error("Error al verificar inscripción:", error);
   }
 }
 
-.btn-hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+const guardarCurso = async (event) => {
+  event.stopPropagation();
+  
+  if (!usuarioId.value) {
+    mostrarMensaje('Debes iniciar sesión para guardar curso', 'error');
+    router.push('/login');
+    return;
+  }
+
+  try {
+    animacionGuardar.value = true;
+    
+    const nuevaInscripcion = {
+      IdUsuario: usuarioId.value,
+      IdCurso: props.id
+    };
+    
+    const resultado = await usuarioCursoStore.createInscripcion(nuevaInscripcion);
+    
+    if (resultado) {
+      estaInscrito.value = true;
+      mostrarMensaje('Curso guardado correctamente', 'success');
+      emit('guardado', props.id);
+    } else {
+      console.error("Error al crear inscripción:", usuarioCursoStore.errorMessage);
+      mostrarMensaje('Error al guardar curso', 'error');
+    }
+
+    setTimeout(() => {
+      animacionGuardar.value = false;
+    }, 500);
+    
+  } catch (error) {
+    console.error("Error al guardar curso:", error);
+    mostrarMensaje('Error en la operación', 'error');
+    animacionGuardar.value = false;
+  }
+};
+
+const borrarGuardado = async (event) => {
+  event.stopPropagation();
+  
+  if (!estaInscrito.value) {
+    console.warn("No se puede borrar un curso que no está guardado");
+    return;
+  }
+  
+  try {
+    animacionGuardar.value = true;
+    
+    if (!usuarioId.value || !props.id) {
+      console.error("Error: Faltan datos para eliminar inscripción", { 
+        usuarioId: usuarioId.value, 
+        cursoId: props.id 
+      });
+      mostrarMensaje('Error al quitar curso guardado: Datos incompletos', 'error');
+      animacionGuardar.value = false;
+      return;
+    }
+    
+    console.log("Eliminando inscripción usando el store...");
+    
+    const resultado = await usuarioCursoStore.deleteInscripcion(usuarioId.value, props.id);
+    
+    if (resultado) {
+      estaInscrito.value = false;
+      mostrarMensaje('Curso quitado de guardados', 'success');
+      emit('eliminado', props.id);
+    } else {
+      console.error("Error al eliminar inscripción:", usuarioCursoStore.errorMessage);
+      mostrarMensaje(`Error al quitar curso guardado: ${usuarioCursoStore.errorMessage}`, 'error');
+    }
+
+    setTimeout(() => {
+      animacionGuardar.value = false;
+    }, 500);
+    
+  } catch (error) {
+    console.error("Error al borrar guardado:", error);
+    mostrarMensaje(`Error en la operación: ${error.message}`, 'error');
+    animacionGuardar.value = false;
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+@import "@/assets/sass/components/Cursos/CardCurso";
 </style>
