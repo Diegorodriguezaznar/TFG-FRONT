@@ -1,0 +1,206 @@
+.CardUsuario {
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid rgba(255, 152, 0, 0.1);
+  background: linear-gradient(135deg, #ffffff 0%, #fff8f5 100%);
+  cursor: pointer;
+  animation: fadeIn 0.5s ease-out;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(255, 152, 0, 0.2) !important;
+    border-color: rgba(255, 152, 0, 0.3);
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+
+  &__Header {
+    background: linear-gradient(135deg, #ff9800 0%, #ffb74d 100%);
+    padding: 16px;
+    position: relative;
+
+    @media (min-width: 768px) {
+      padding: 20px;
+    }
+  }
+
+  &__AvatarSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  &__Avatar {
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &__Chips {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__RolChip {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  &__Info {
+    padding: 16px 20px 8px 20px;
+    text-align: center;
+  }
+
+  &__Nombre {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.3;
+    padding: 0;
+  }
+
+  &__Email {
+    color: #666;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0 0 0;
+  }
+
+  &__Telefono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__Stats {
+    padding: 12px 20px;
+  }
+
+  &__StatsGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  &__Stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 152, 0, 0.1);
+    transition: all 0.2s ease;
+    position: relative;
+
+    &:hover {
+      background: rgba(255, 152, 0, 0.05);
+      transform: scale(1.02);
+    }
+  }
+
+  &__StatIcon {
+    margin-bottom: 4px;
+  }
+
+  &__StatContent {
+    text-align: center;
+  }
+
+  &__StatNumber {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ff9800;
+    line-height: 1;
+  }
+
+  &__StatLabel {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  &__Actions {
+    padding: 12px 20px 20px 20px;
+    gap: 8px;
+
+    .v-btn {
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      border-radius: 8px;
+      text-transform: none;
+      transition: all 0.2s ease;
+
+      &:hover {
+        transform: scale(1.02);
+      }
+
+      &:active {
+        transform: scale(0.98);
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .CardUsuario {
+    &__Header {
+      padding: 16px;
+    }
+    
+    &__Avatar {
+      width: 56px;
+      height: 56px;
+    }
+    
+    &__StatsGrid {
+      gap: 8px;
+    }
+    
+    &__Stat {
+      padding: 8px 4px;
+    }
+    
+    &__StatNumber {
+      font-size: 1.1rem;
+    }
+    
+    &__StatLabel {
+      font-size: 0.7rem;
+    }
+
+    &__Actions {
+      flex-direction: column;
+
+      .v-btn {
+        width: 100%;
+        margin: 2px 0;
+      }
+    }
+  }
+}

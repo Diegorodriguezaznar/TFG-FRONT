@@ -1,0 +1,128 @@
+.CursosUsuario {
+  border-radius: 16px;
+  border: 1px solid rgba(255, 152, 0, 0.2);
+
+  &__Header {
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, rgba(255, 183, 77, 0.05) 100%);
+    border-bottom: 1px solid rgba(255, 152, 0, 0.1);
+    padding: 16px;
+
+    @media (min-width: 768px) {
+      padding: 20px;
+    }
+  }
+
+  &__Content {
+    padding: 16px;
+
+    @media (min-width: 768px) {
+      padding: 20px;
+    }
+  }
+
+  &__CursosGrid {
+    margin-top: 15px;
+  }
+
+  &__Empty {
+    text-align: center;
+    padding: 32px 16px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+    border: 2px dashed rgba(0, 0, 0, 0.1);
+
+    @media (min-width: 768px) {
+      padding: 40px 20px;
+    }
+  }
+
+  &__CursoCol {
+    animation: fadeInUp 0.5s ease-out;
+    margin-bottom: 5px;
+  }
+
+  &__Curso {
+    height: 100%;
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    border: 1px solid rgba(255, 152, 0, 0.1);
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(255, 152, 0, 0.2);
+      border-color: rgba(255, 152, 0, 0.3);
+    }
+  }
+
+  &__CursoImagen {
+    border-radius: 12px 12px 0 0;
+  }
+
+  &__CursoInfo {
+    padding: 16px;
+  }
+
+  &__CursoTitulo {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #333;
+    padding: 0;
+  }
+
+  &__CursoFecha {
+    color: #666;
+    font-size: 0.875rem;
+    padding: 4px 0 0 0;
+  }
+
+  &__CursoDescripcion {
+    color: #555;
+    font-size: 0.875rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    padding: 8px 0 0 0;
+  }
+
+  &__CursoAcciones {
+    padding: 16px;
+    padding-top: 0;
+  }
+
+  &__ToggleContainer {
+    margin-top: 24px;
+    text-align: center;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .CursosUsuario {
+    &__Header {
+      padding: 16px;
+    }
+    
+    &__Content {
+      padding: 16px;
+    }
+    
+    &__Empty {
+      padding: 32px 16px;
+    }
+  }
+}

@@ -396,60 +396,6 @@ watch(() => props.usuario, () => {
   </v-dialog>
 </template>
 
-<style lang="scss" scoped>
-.EditarPerfil {
-  border-radius: 16px;
-  overflow: hidden;
-  
-  &__Header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 1.5rem;
-    
-    .EditarPerfil__Title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0;
-    }
-    
-    .EditarPerfil__Subtitle {
-      font-size: 0.875rem;
-      opacity: 0.9;
-      margin: 0;
-    }
-  }
-  
-  &__Content {
-    padding: 2rem;
-    max-height: 70vh;
-    overflow-y: auto;
-  }
-  
-  &__Actions {
-    background: #f8f9fa;
-  }
-}
-
-// Responsive adjustments
-@media (max-width: 600px) {
-  .EditarPerfil {
-    &__Content {
-      padding: 1rem;
-    }
-    
-    &__Header {
-      padding: 1rem;
-    }
-  }
-}
-
-// Focus states
-:deep(.v-field--focused .v-field__outline) {
-  border-color: #667eea !important;
-  border-width: 2px !important;
-}
-
-:deep(.v-field--focused .v-field__prepend-inner .v-icon) {
-  color: #667eea !important;
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/Usuarios/Perfil/EditarPerfilModal.scss";
 </style>
