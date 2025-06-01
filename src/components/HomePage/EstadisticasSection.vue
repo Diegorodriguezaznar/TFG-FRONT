@@ -1,29 +1,43 @@
 <template>
   <section class="EstadisticasSection">
     <v-container>
-      <v-row class="text-center">
-        <v-col cols="6" md="3">
-          <div class="EstadisticasSection__Card">
-            <v-icon size="50" color="#FF9800" class="EstadisticasSection__Icon">mdi-play-circle</v-icon>
-            <p class="EstadisticasSection__Label">Videos Educativos</p>
+      <v-row class="align-center justify-center">
+        <!-- Imagen circular izquierda -->
+        <v-col cols="10" md="2" class="text-center">
+          <div class="EstadisticasSection__ProfileCard">
+            <div class="EstadisticasSection__Avatar">
+              <v-img
+                src="../../images/Fran.PNG"
+                alt="Francisco Rebollo"
+                class="EstadisticasSection__ProfileImage"
+              ></v-img>
+            </div>
+            <p class="EstadisticasSection__ProfileName">Francisco Rebollo</p>
           </div>
         </v-col>
-        <v-col cols="6" md="3">
-          <div class="EstadisticasSection__Card">
-            <v-icon size="50" color="#FF9800" class="EstadisticasSection__Icon">mdi-book-education</v-icon>
-            <p class="EstadisticasSection__Label">Cursos Disponibles</p>
+
+        <!-- Imagen rectangular central -->
+        <v-col cols="12" md="6" class="text-center">
+          <div class="EstadisticasSection__CentralImage">
+            <v-img
+              src="@/assets/images/imagen-central.jpg"
+              alt="Imagen Central"
+              class="EstadisticasSection__MainImage"
+            ></v-img>
           </div>
         </v-col>
-        <v-col cols="6" md="3">
-          <div class="EstadisticasSection__Card">
-            <v-icon size="50" color="#FF9800" class="EstadisticasSection__Icon">mdi-brain</v-icon>
-            <p class="EstadisticasSection__Label">Quizzes Interactivos</p>
-          </div>
-        </v-col>
-        <v-col cols="6" md="3">
-          <div class="EstadisticasSection__Card">
-            <v-icon size="50" color="#FF9800" class="EstadisticasSection__Icon">mdi-account-group</v-icon>
-            <p class="EstadisticasSection__Label">Profesores Expertos</p>
+
+        <!-- Imagen circular derecha -->
+        <v-col cols="10" md="2" class="text-center">
+          <div class="EstadisticasSection__ProfileCard">
+            <div class="EstadisticasSection__Avatar">
+              <v-img
+                src="../../images/Diego.PNG"
+                alt="Diego Rodríguez"
+                class="EstadisticasSection__ProfileImage"
+              ></v-img>
+            </div>
+            <p class="EstadisticasSection__ProfileName">Diego Rodríguez</p>
           </div>
         </v-col>
       </v-row>
@@ -31,57 +45,6 @@
   </section>
 </template>
 
-<script setup lang="ts">
-// Este componente es solo de presentación, no necesita lógica
-</script>
-
-<style scoped>
-.EstadisticasSection {
-  padding: 80px 0;
-  background: #333;
-  color: white;
-}
-
-.EstadisticasSection__Card {
-  padding: 2rem 1rem;
-  transition: transform 0.3s ease;
-}
-
-.EstadisticasSection__Card:hover {
-  transform: scale(1.05);
-}
-
-.EstadisticasSection__Icon {
-  margin-bottom: 1rem;
-}
-
-.EstadisticasSection__Number {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #FF9800;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
-}
-
-.EstadisticasSection__Label {
-  font-size: 1.1rem;
-  opacity: 0.9;
-  margin: 0;
-  font-weight: 500;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .EstadisticasSection {
-    padding: 60px 0;
-  }
-  
-  .EstadisticasSection__Number {
-    font-size: 2.5rem;
-  }
-  
-  .EstadisticasSection__Label {
-    font-size: 1rem;
-  }
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/HomePage/EstadisticasSection";
 </style>

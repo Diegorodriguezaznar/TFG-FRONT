@@ -1,0 +1,68 @@
+
+.FuncionalidadesPrincipales {
+  padding: 60px 0;
+  background: white;
+
+  @media (min-width: 768px) {
+    padding: 100px 0;
+  }
+
+  &__Header {
+    text-align: center;
+    margin-bottom: 50px;
+
+    @media (min-width: 768px) {
+      margin-bottom: 80px;
+    }
+  }
+
+  &__Title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+      font-size: 3rem;
+    }
+  }
+
+  &__Subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    max-width: 100%;
+    margin: 0 auto;
+    line-height: 1.6;
+    padding: 0 1rem;
+
+    @media (min-width: 768px) {
+      font-size: 1.3rem;
+      max-width: 800px;
+      padding: 0;
+    }
+  }
+
+  &__Cards {
+    margin: 0;
+
+    @media (min-width: 768px) {
+      margin: 0 -20px;
+      display: flex;
+      flex-wrap: nowrap;
+
+      .v-col {
+        flex: 1;
+        min-width: 0;
+        max-width: none;
+      }
+    }
+  }
+
+  &__CardWrapper {
+    padding: 16px 0;
+
+    @media (min-width: 768px) {
+      padding: 20px;
+    }
+  }
+}

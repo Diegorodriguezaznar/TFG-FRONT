@@ -1,0 +1,357 @@
+.quizzes-curso {
+  border-radius: 16px;
+  border: 1px solid rgba(156, 39, 176, 0.2);
+  margin-bottom: 24px;
+
+  @media (max-width: 768px) {
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 480px) {
+    border-radius: 8px;
+    margin-bottom: 16px;
+  }
+
+  &__header {
+    background: linear-gradient(135deg, rgba(156, 39, 176, 0.1) 0%, rgba(186, 104, 200, 0.05) 100%);
+    border-bottom: 1px solid rgba(156, 39, 176, 0.1);
+    padding: 20px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+    }
+  }
+
+  &__title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0;
+
+    @media (max-width: 768px) {
+      font-size: 1.1rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1rem;
+    }
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: #666;
+    margin: 0;
+
+    @media (max-width: 480px) {
+      font-size: 0.8rem;
+    }
+  }
+
+  &__content {
+    padding: 20px;
+
+    @media (max-width: 768px) {
+      padding: 16px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+    }
+  }
+
+  &__grid {
+    margin-top: 15px;
+
+    @media (max-width: 768px) {
+      margin-top: 12px;
+    }
+
+    @media (max-width: 480px) {
+      margin-top: 8px;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    padding: 40px 20px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 12px;
+    border: 2px dashed rgba(0, 0, 0, 0.1);
+
+    @media (max-width: 768px) {
+      padding: 32px 16px;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 24px 12px;
+      border-radius: 8px;
+    }
+  }
+
+  &__empty-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.9rem;
+    }
+  }
+
+  &__empty-text {
+    font-size: 0.875rem;
+    color: #666;
+
+    @media (max-width: 480px) {
+      font-size: 0.8rem;
+    }
+  }
+
+  &__col {
+    animation: fadeInUp 0.7s ease-out;
+    margin-bottom: 15px;
+
+    @media (max-width: 768px) {
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 480px) {
+      margin-bottom: 16px;
+    }
+  }
+
+  &__quiz {
+    height: 100%;
+    border-radius: 16px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    border: 1px solid rgba(156, 39, 176, 0.1);
+    position: relative;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+      border-radius: 12px;
+    }
+
+    @media (max-width: 480px) {
+      border-radius: 8px;
+    }
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(156, 39, 176, 0.2);
+      border-color: rgba(156, 39, 176, 0.3);
+
+      @media (max-width: 768px) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(156, 39, 176, 0.15);
+      }
+
+      @media (max-width: 480px) {
+        transform: none;
+        box-shadow: 0 4px 15px rgba(156, 39, 176, 0.1);
+      }
+
+      .quizzes-curso__play-icon {
+        opacity: 1;
+      }
+    }
+  }
+
+  &__quiz-header {
+    height: 100px;
+    background: linear-gradient(135deg, #9C27B0 0%, #BA68C8 50%, #E1BEE7 100%);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: 16px 16px 0 0;
+
+    @media (max-width: 768px) {
+      height: 90px;
+      padding: 10px 14px;
+      border-radius: 12px 12px 0 0;
+    }
+
+    @media (max-width: 480px) {
+      height: 80px;
+      padding: 8px 12px;
+      border-radius: 8px 8px 0 0;
+    }
+  }
+
+  &__play-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    @media (max-width: 480px) {
+      opacity: 1;
+
+      .v-icon {
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  &__basic-info {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+
+    @media (max-width: 480px) {
+      top: 6px;
+      right: 6px;
+    }
+  }
+
+  &__difficulty-chip {
+    font-weight: 600;
+    backdrop-filter: blur(10px);
+
+    @media (max-width: 480px) {
+      font-size: 0.7rem;
+      height: auto;
+      padding: 2px 6px;
+    }
+  }
+
+  &__info {
+    padding: 16px;
+
+    @media (max-width: 768px) {
+      padding: 14px;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+    }
+  }
+
+  &__quiz-titulo {
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #333;
+    padding: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    @media (max-width: 768px) {
+      font-size: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.9rem;
+      -webkit-line-clamp: 1;
+    }
+  }
+
+  &__quiz-descripcion {
+    color: #555;
+    font-size: 0.875rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.4;
+    padding: 8px 0;
+
+    @media (max-width: 768px) {
+      font-size: 0.8rem;
+      -webkit-line-clamp: 1;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.75rem;
+      padding: 6px 0;
+    }
+  }
+
+  &__meta {
+    padding-top: 8px;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+    @media (max-width: 480px) {
+      padding-top: 6px;
+
+      .text-caption {
+        font-size: 0.7rem;
+      }
+    }
+  }
+
+  &__acciones {
+    padding: 16px;
+    padding-top: 0;
+
+    @media (max-width: 768px) {
+      padding: 14px;
+      padding-top: 0;
+    }
+
+    @media (max-width: 480px) {
+      padding: 12px;
+      padding-top: 0;
+      flex-direction: column;
+      gap: 8px;
+
+      .v-btn {
+        width: 100%;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  &__toggle {
+    margin-top: 24px;
+    text-align: center;
+
+    @media (max-width: 768px) {
+      margin-top: 20px;
+    }
+
+    @media (max-width: 480px) {
+      margin-top: 16px;
+    }
+
+    .v-btn {
+      @media (max-width: 768px) {
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 480px) {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+      }
+    }
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

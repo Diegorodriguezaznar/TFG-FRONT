@@ -231,44 +231,44 @@ onMounted(() => {
                 {{ curso.descripcion }}
               </p>
               
-              <div class="HomePage__Actions">
-                
-                <v-btn 
-                  v-if="puedeSubirVideo" 
-                  color="warning" 
-                  variant="elevated" 
-                  size="small" 
-                  class="HomePage__UploadButton" 
-                  :to="`/subir-video/${cursoId}`"
-                >
-                  <v-icon start icon="mdi-upload"></v-icon>
-                  Subir Video
-                </v-btn>
-                
-                <v-btn 
-                  v-if="puedeSubirVideo" 
-                  color="purple" 
-                  variant="elevated" 
-                  size="small" 
-                  class="HomePage__CreateQuizButton" 
-                  @click="crearQuiz"
-                >
-                  <v-icon start icon="mdi-help-circle"></v-icon>
-                  Crear Quiz
-                </v-btn>
-                
-                <v-btn 
-                  v-if="esCreadorCurso" 
-                  color="primary" 
-                  variant="elevated" 
-                  size="small" 
-                  class="HomePage__AddSubjectButton" 
-                  :to="`/curso/${cursoId}/asignaturas`"
-                >
-                  <v-icon start icon="mdi-book-plus"></v-icon>
-                  Añadir asignatura
-                </v-btn>
-              </div>
+<div class="HomePage__Actions">
+  
+  <v-btn 
+    v-if="esCreadorCurso" 
+    color="warning" 
+    variant="elevated" 
+    size="small" 
+    class="HomePage__UploadButton" 
+    :to="`/subir-video/${cursoId}`"
+  >
+    <v-icon start icon="mdi-upload"></v-icon>
+    Subir Video
+  </v-btn>
+  
+  <v-btn 
+    v-if="esCreadorCurso" 
+    color="purple" 
+    variant="elevated" 
+    size="small" 
+    class="HomePage__CreateQuizButton" 
+    @click="crearQuiz"
+  >
+    <v-icon start icon="mdi-help-circle"></v-icon>
+    Crear Quiz
+  </v-btn>
+  
+  <v-btn 
+    v-if="esCreadorCurso" 
+    color="primary" 
+    variant="elevated" 
+    size="small" 
+    class="HomePage__AddSubjectButton" 
+    :to="`/curso/${cursoId}/asignaturas`"
+  >
+    <v-icon start icon="mdi-book-plus"></v-icon>
+    Añadir asignatura
+  </v-btn>
+</div>
             </v-container>
           </div>
         </div>

@@ -1,0 +1,78 @@
+.EstadisticasSection {
+  padding: 60px 0;
+  background: #333;
+  color: white;
+
+  @media (min-width: 768px) {
+    padding: 80px 0;
+  }
+
+  &__ProfileCard {
+    padding: 1rem;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  &__Avatar {
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__ProfileImage {
+    width: 120px;
+    height: 120px;
+    border-radius: 100%;
+    border: 3px solid #FF9800;
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+    transition: box-shadow 0.3s ease;
+
+    @media (min-width: 768px) {
+      width: 150px;
+      height: 150px;
+    }
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(255, 152, 0, 0.5);
+    }
+  }
+
+  &__ProfileName {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #FF9800;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(255, 152, 0, 0.3);
+
+    @media (min-width: 768px) {
+      font-size: 1.2rem;
+    }
+  }
+
+  &__CentralImage {
+    padding: 1rem;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.02);
+    }
+  }
+
+  &__MainImage {
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.3s ease;
+
+    @media (min-width: 768px) {
+      max-width: 100%;
+      height: auto;
+    }
+
+    &:hover {
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    }
+  }
+}

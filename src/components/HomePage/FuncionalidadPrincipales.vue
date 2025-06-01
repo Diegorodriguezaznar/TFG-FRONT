@@ -31,7 +31,7 @@
           </div>
         </v-col>
 
-        <!-- Videos - ARREGLADO: Ahora redirige a /explorar -->
+        <!-- Videos -->
         <v-col cols="12" md="4" lg="4" xl="4">
           <div class="FuncionalidadesPrincipales__CardWrapper">
             <FeatureCard
@@ -88,79 +88,6 @@ defineEmits<{
 }>();
 </script>
 
-<style scoped>
-.FuncionalidadesPrincipales {
-  padding: 100px 0;
-  background: white;
-}
-
-.FuncionalidadesPrincipales__Header {
-  text-align: center;
-  margin-bottom: 80px;
-}
-
-.FuncionalidadesPrincipales__Title {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.FuncionalidadesPrincipales__Subtitle {
-  font-size: 1.3rem;
-  color: #666;
-  max-width: 800px;
-  margin: 0 auto;
-  line-height: 1.6;
-}
-
-.FuncionalidadesPrincipales__Cards {
-  margin: 0 -16px;
-}
-
-.FuncionalidadesPrincipales__CardWrapper {
-  padding: 16px;
-}
-
-/* Forzar 3 cards en línea desde MD breakpoint (768px) */
-@media (min-width: 768px) {
-  .FuncionalidadesPrincipales__Cards {
-    display: flex;
-    flex-wrap: nowrap;
-    margin: 0 -20px;
-  }
-  
-  .FuncionalidadesPrincipales__Cards .v-col {
-    flex: 1;
-    min-width: 0;
-    max-width: none;
-  }
-  
-  .FuncionalidadesPrincipales__CardWrapper {
-    padding: 20px;
-  }
-}
-
-/* Responsive para pantallas menores */
-@media (max-width: 767px) {
-  .FuncionalidadesPrincipales {
-    padding: 60px 0;
-  }
-  
-  .FuncionalidadesPrincipales__Title {
-    font-size: 2.2rem;
-  }
-  
-  .FuncionalidadesPrincipales__Header {
-    margin-bottom: 50px;
-  }
-  
-  .FuncionalidadesPrincipales__Cards {
-    margin: 0;
-  }
-  
-  .FuncionalidadesPrincipales__CardWrapper {
-    padding: 16px 0;
-  }
-}
+<style scoped lang="scss">
+@import "@/assets/sass/components/HomePage/FuncionalidadesPrincipales";
 </style>
