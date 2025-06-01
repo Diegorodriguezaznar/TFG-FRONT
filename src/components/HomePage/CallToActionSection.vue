@@ -31,7 +31,7 @@
             color="purple" 
             size="x-large" 
             variant="elevated"
-            @click="$emit('navegar', '/quizz-time!')"
+            @click="$emit('navegar', '/cursos')"
             class="CallToActionSection__Button"
           >
             <v-icon start>mdi-brain</v-icon>

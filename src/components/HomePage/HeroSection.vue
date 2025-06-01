@@ -27,16 +27,6 @@
                 <v-icon start>mdi-book-education</v-icon>
                 Explorar Cursos
               </v-btn>
-              <v-btn 
-                color="white" 
-                variant="outlined" 
-                size="large"
-                @click="$emit('navegar', '/quizz-time!')"
-                class="HeroSection__QuickBtn"
-              >
-                <v-icon start>mdi-brain</v-icon>
-                Hacer Quiz
-              </v-btn>
             </div>
           </div>
         </v-col>
