@@ -3,7 +3,7 @@
   overflow: hidden;
   
   &__Header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #eaac66 0%, #f59312 100%);
     color: white;
     padding: 1rem;
 
@@ -40,12 +40,12 @@
 }
 
 :deep(.v-field--focused .v-field__outline) {
-  border-color: #667eea !important;
+  border-color: #eab166 !important;
   border-width: 2px !important;
 }
 
 :deep(.v-field--focused .v-field__prepend-inner .v-icon) {
-  color: #667eea !important;
+  color: #e08318 !important;
 }
 
 @media (max-width: 600px) {

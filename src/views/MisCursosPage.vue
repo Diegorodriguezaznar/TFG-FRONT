@@ -108,11 +108,7 @@ onMounted(() => {
     <!-- --------------------------- Contenedor principal --------------------------- -->
     <div class="MisCursosPage__Wrapper">
       <!-- --------------------------- Breadcrumb --------------------------- -->
-      <v-breadcrumbs class="MisCursosPage__Breadcrumb" :items="items">
-        <template v-slot:prepend>
-          <v-icon icon="mdi-bookmark-multiple" size="small"></v-icon>
-        </template>
-      </v-breadcrumbs>
+
 
       <v-container class="MisCursosPage__Contenedor">
         <!-- --------------------------- Título de la página --------------------------- -->

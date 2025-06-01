@@ -3,7 +3,6 @@ import { ref, computed, onMounted } from 'vue';
 import Header from '@/components/Layout/Header.vue';
 import Footer from '@/components/Layout/Footer.vue';
 import Sidebar from '@/components/Layout/Sidebar.vue';
-import UserTab from '@/components/Usuarios/Perfil/UserTab.vue';
 import EditarPerfilModal from '@/components/Usuarios/Perfil/EditarPerfilModal.vue';
 import CursosInscritos from '@/components/Usuarios/Perfil/CursosInscritos.vue';
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
@@ -48,7 +47,7 @@ const rolInfo = computed(() => {
 });
 
 // --------------------------- Es estudiante para mostrar cursos inscritos ---------------------------
-const esEstudiante = computed(() => usuarioActual.value?.idRol === 3);
+const esEstudiante = computed(() => true);
 
 // --------------------------- Métodos ---------------------------
 const abrirModalEdicion = () => {
@@ -92,11 +91,6 @@ onMounted(() => {
   <v-app>
     <Header @toggle-sidebar="drawer = !drawer" />
     
-    <v-breadcrumbs class="PerfilPage__Breadcrumb" :items="items">
-      <template v-slot:prepend>
-        <v-icon icon="mdi-home" size="small"></v-icon>
-      </template>
-    </v-breadcrumbs>
 
     <v-main class="PerfilPage">
       <Sidebar v-model="drawer" />
@@ -164,16 +158,11 @@ onMounted(() => {
         
         <!-- Cursos inscritos (solo para estudiantes) -->
         <CursosInscritos 
-          v-if="esEstudiante" 
           :usuario-id="usuarioActual?.idUsuario"
           class="mb-6"
         />
-        
-        <v-card class="PerfilPage__UserTabCard" elevation="2" rounded="lg">
-          <v-card-text class="PerfilPage__UserTabContent">
-            <UserTab />
-          </v-card-text>
-        </v-card>
+                
+
       </v-container>
     </v-main>
     
