@@ -40,7 +40,7 @@ const chartOptions = {
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:5190/api/curso/top-cursos-videos')
+    const response = await fetch('http://34.198.50.70:3000/api/curso/top-cursos-videos')
     if (!response.ok) throw new Error('Error al obtener los datos de cursos')
 
     const datos: CursoVideosDTO[] = await response.json()

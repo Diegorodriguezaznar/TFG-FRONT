@@ -24,7 +24,7 @@ export const useVideoStore = defineStore("video", () => {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(
-        `http://localhost:5190/api/Video/paged?page=${page}&pageSize=${pageSize}`,
+        `http://34.198.50.70:3000/api/Video/paged?page=${page}&pageSize=${pageSize}`,
         {
           signal: controller.signal,
           headers: {
@@ -86,7 +86,7 @@ export const useVideoStore = defineStore("video", () => {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(
-        `http://localhost:5190/api/Video/curso/${idCurso}/paged?page=${page}&pageSize=${pageSize}`,
+        `http://34.198.50.70:3000/api/Video/curso/${idCurso}/paged?page=${page}&pageSize=${pageSize}`,
         {
           signal: controller.signal,
           headers: {
@@ -175,7 +175,7 @@ export const useVideoStore = defineStore("video", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      const response = await fetch("http://localhost:5190/api/Video", {
+      const response = await fetch("http://34.198.50.70:3000/api/Video", {
         signal: controller.signal,
         headers: {
           Accept: "application/json",
@@ -212,7 +212,7 @@ export const useVideoStore = defineStore("video", () => {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(
-        `http://localhost:5190/api/Video/curso/${idCurso}`,
+        `http://34.198.50.70:3000/api/Video/curso/${idCurso}`,
         {
           signal: controller.signal,
           headers: {
@@ -250,7 +250,7 @@ export const useVideoStore = defineStore("video", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      const response = await fetch(`http://localhost:5190/api/Video/${idVideo}`, {
+      const response = await fetch(`http://34.198.50.70:3000/api/Video/${idVideo}`, {
         signal: controller.signal,
         headers: {
           Accept: "application/json",
@@ -287,7 +287,7 @@ export const useVideoStore = defineStore("video", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      const response = await fetch(`http://localhost:5190/api/Video/reportados`, {
+      const response = await fetch(`http://34.198.50.70:3000/api/Video/reportados`, {
         signal: controller.signal,
         headers: {
           Accept: "application/json",
@@ -324,7 +324,7 @@ export const useVideoStore = defineStore("video", () => {
   async function aprobarVideo(idVideo: number) {
     loading.value = true;
     try {
-      const response = await fetch(`http://localhost:5190/api/ReporteVideo/aprobar/${idVideo}`, {
+      const response = await fetch(`http://34.198.50.70:3000/api/ReporteVideo/aprobar/${idVideo}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -353,7 +353,7 @@ export const useVideoStore = defineStore("video", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
-      const response = await fetch(`http://localhost:5190/api/Video/${idVideo}`, {
+      const response = await fetch(`http://34.198.50.70:3000/api/Video/${idVideo}`, {
         method: "DELETE",
         headers: {
           Accept: "application/json"
@@ -390,7 +390,7 @@ export const useVideoStore = defineStore("video", () => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5190/api/Video/borrar-propio/${idVideo}`, {
+      const response = await fetch(`http://34.198.50.70:3000/api/Video/borrar-propio/${idVideo}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`

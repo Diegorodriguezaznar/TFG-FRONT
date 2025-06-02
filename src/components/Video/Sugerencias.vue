@@ -114,7 +114,7 @@ const cargarInfoAutores = async () => {
     // Cargar nombres individualmente - método simple pero funcional
     const promesas = idsUsuarios.map(async (idUsuario) => {
       try {
-        const response = await axios.get(`http://localhost:5190/api/Usuario/${idUsuario}`);
+        const response = await axios.get(`http://34.198.50.70:3000/api/Usuario/${idUsuario}`);
         if (response.data && response.data.nombre) {
           nombresUsuarios.set(idUsuario, {
             nombre: response.data.nombre,
