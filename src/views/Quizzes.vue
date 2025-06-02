@@ -9,7 +9,7 @@ import { useRouter } from 'vue-router';
 import { useQuizStore } from '../stores/Quiz';
 import { useAsignaturaStore } from '../stores/Asignaturas';
 import Header from '../components/Layout/Header.vue';
-import Sidebar from '../components/Layout/Sidebar.vue';
+import Sidebar from '@/components/Layout/Sidebar.vue'
 import Filtros from '../components/Video/Home/Filtros.vue'; // Componente para asignaturas
 import FiltrosOrden from '../components/FiltrosOrden.vue'; // Nuevo componente para ordenamiento
 import SugerenciasQuizzes from '../components/Quizz/SugerenciasQuizzes.vue';

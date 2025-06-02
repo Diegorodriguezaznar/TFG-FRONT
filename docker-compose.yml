@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  car-web:
+    build: .
+    ports:
+      - "80:80"
+    container_name: academiq-web

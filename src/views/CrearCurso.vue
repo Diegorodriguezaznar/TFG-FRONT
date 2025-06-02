@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { useCursoStore } from '@/stores/Curso';
 import HeaderCrearCursos from '@/components/Layout/HeaderCreacionCurso.vue';
-import SideBar from '@/components/Layout/SideBar.vue';
+import SideBar from '@/components/Layout/Sidebar.vue';
 import CursoDatos from '@/components/Cursos/CrearCursos/CursoDatos.vue';
 import CursoResumen from '@/components/Cursos/CrearCursos/CursoResumen.vue';
 
