@@ -43,7 +43,7 @@ export const useResultadoQuizStore = defineStore("resultadoQuiz", () => {
       let servidorFunciono = false;
       
       try {
-        const response = await fetch('http://localhost:5000/api/resultadoquiz', {
+        const response = await fetch('http://34.198.50.70:5000/api/resultadoquiz', {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",

@@ -19,7 +19,7 @@ async function cargarReportes() {
   
   try {
     cargando.value = true
-    const res = await fetch(`http://localhost:5000/api/ReporteVideo/video/${props.idVideo}`)
+    const res = await fetch(`http://34.198.50.70:5000/api/ReporteVideo/video/${props.idVideo}`)
     
     if (!res.ok) throw new Error('Error al obtener los reportes')
     

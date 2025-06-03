@@ -21,7 +21,7 @@ export const useFavoritoStore = defineStore('favorito', {
 
       this.loading = true
       try {
-        const res = await axios.get(`http://localhost:5000/api/favorito/usuario/${usuarioLogeadoStore.usuarioActual.idUsuario}`, {
+        const res = await axios.get(`http://34.198.50.70:5000/api/favorito/usuario/${usuarioLogeadoStore.usuarioActual.idUsuario}`, {
           headers: {
             'Authorization': `Bearer ${usuarioLogeadoStore.token}`
           }
@@ -66,7 +66,7 @@ export const useFavoritoStore = defineStore('favorito', {
 
       try {
         const res = await axios.post(
-          `http://localhost:5000/api/favorito/toggle/${idVideoNum}`, 
+          `http://34.198.50.70:5000/api/favorito/toggle/${idVideoNum}`, 
           {}, 
           {
             headers: {
@@ -81,7 +81,7 @@ export const useFavoritoStore = defineStore('favorito', {
         if (añadido) {
           if (!this.esFavorito(idVideoNum)) {
             try {
-              const videoRes = await axios.get(`http://localhost:5000/api/video/${idVideoNum}`, {
+              const videoRes = await axios.get(`http://34.198.50.70:5000/api/video/${idVideoNum}`, {
                 headers: {
                   'Authorization': `Bearer ${usuarioLogeadoStore.token}`
                 }

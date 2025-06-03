@@ -22,7 +22,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     clearMessages();
     
     try {
-      const response = await fetch("http://localhost:5000/api/Asignatura");
+      const response = await fetch("http://34.198.50.70:5000/api/Asignatura");
       if (!response.ok) throw new Error("Error al obtener todas las asignaturas");
       asignaturas.value = await response.json();
     } catch (error: any) {
@@ -38,7 +38,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     clearMessages();
     
     try {
-      const response = await fetch(`http://localhost:5000/api/Asignatura/curso/${idCurso}`);
+      const response = await fetch(`http://34.198.50.70:5000/api/Asignatura/curso/${idCurso}`);
       if (!response.ok) throw new Error("Error al obtener las asignaturas del curso");
       asignaturas.value = await response.json();
     } catch (error: any) {
@@ -54,7 +54,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     clearMessages();
     
     try {
-      const response = await fetch(`http://localhost:5000/api/Asignatura/${idAsignatura}`);
+      const response = await fetch(`http://34.198.50.70:5000/api/Asignatura/${idAsignatura}`);
       if (!response.ok) throw new Error("Error al obtener la asignatura");
       return await response.json();
     } catch (error: any) {
@@ -73,7 +73,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     try {
       const { token } = useUsuarioLogeadoStore();
 
-      const response = await fetch("http://localhost:5000/api/Asignatura", {
+      const response = await fetch("http://34.198.50.70:5000/api/Asignatura", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -109,7 +109,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     clearMessages();
     
     try {
-      const response = await fetch(`http://localhost:5000/api/Asignatura/${asignatura.idAsignatura}`, {
+      const response = await fetch(`http://34.198.50.70:5000/api/Asignatura/${asignatura.idAsignatura}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +140,7 @@ export const useAsignaturaStore = defineStore("asignatura", () => {
     clearMessages();
     
     try {
-      const response = await fetch(`http://localhost:5000/api/Asignatura/${idAsignatura}`, {
+      const response = await fetch(`http://34.198.50.70:5000/api/Asignatura/${idAsignatura}`, {
         method: "DELETE",
       });
 

@@ -292,7 +292,7 @@ const uploadFile = async (file: File): Promise<void> => {
   formData.append('Texto', motivacion.value)
   formData.append('Documentacion', file) // La imagen
 
-  const response = await axios.post('http://localhost:5000/api/PeticionProfesor', formData, {
+  const response = await axios.post('http://34.198.50.70:5000/api/PeticionProfesor', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
@@ -318,7 +318,7 @@ const submitForm = async () => {
     formData.append('Texto', motivacion.value)
     formData.append('Documentacion', selectedFile.value)
 
-    const response = await axios.post('http://localhost:5000/api/PeticionProfesor', formData, {
+    const response = await axios.post('http://34.198.50.70:5000/api/PeticionProfesor', formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
