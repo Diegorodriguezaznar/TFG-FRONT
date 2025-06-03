@@ -7,7 +7,7 @@
           <div class="EstadisticasSection__ProfileCard">
             <div class="EstadisticasSection__Avatar">
               <v-img
-                src="../../images/Fran.PNG"
+                src="./"
                 alt="Francisco Rebollo"
                 class="EstadisticasSection__ProfileImage"
               ></v-img>

@@ -126,10 +126,6 @@ const formatearDuracion = (duracion: string) => {
               <!-- Información del video -->
               <v-card-item class="VideosUsuario__VideoInfo">
                 <div class="d-flex">
-                  <!-- Avatar pequeño -->
-                  <v-avatar size="36" class="mr-3 mt-1">
-                    <v-img :src="`https://picsum.photos/seed/user${video.idUsuario}/36/36`"></v-img>
-                  </v-avatar>
                   
                   <div class="flex-grow-1">
                     <v-card-title class="VideosUsuario__VideoTitulo">
