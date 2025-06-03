@@ -16,7 +16,7 @@ export const usePreguntaStore = defineStore("pregunta", () => {
 
       let response;
       try {
-        response = await fetch(`http://34.198.50.70:3000/api/pregunta/quiz/${idQuiz}`, {
+        response = await fetch(`http://localhost:5000/api/pregunta/quiz/${idQuiz}`, {
           signal: controller.signal,
           headers: {
             'Accept': 'application/json',
@@ -24,7 +24,7 @@ export const usePreguntaStore = defineStore("pregunta", () => {
           }
         });
       } catch (error) {
-        response = await fetch(`http://34.198.50.70:3000/api/Pregunta/quiz/${idQuiz}`, {
+        response = await fetch(`http://localhost:5000/api/Pregunta/quiz/${idQuiz}`, {
           signal: controller.signal,
           headers: {
             'Accept': 'application/json',
@@ -77,7 +77,7 @@ export const usePreguntaStore = defineStore("pregunta", () => {
 
       let response;
       try {
-        response = await fetch("http://34.198.50.70:3000/api/pregunta", {
+        response = await fetch("http://localhost:5000/api/pregunta", {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export const usePreguntaStore = defineStore("pregunta", () => {
           signal: controller.signal
         });
       } catch (error) {
-        response = await fetch("http://34.198.50.70:3000/api/Pregunta", {
+        response = await fetch("http://localhost:5000/api/Pregunta", {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
@@ -136,7 +136,7 @@ export const usePreguntaStore = defineStore("pregunta", () => {
 
       let response;
       try {
-        response = await fetch(`http://34.198.50.70:3000/api/pregunta/${idPregunta}`, {
+        response = await fetch(`http://localhost:5000/api/pregunta/${idPregunta}`, {
           method: "PUT",
           headers: { 
             "Content-Type": "application/json",
@@ -146,7 +146,7 @@ export const usePreguntaStore = defineStore("pregunta", () => {
           signal: controller.signal
         });
       } catch (error) {
-        response = await fetch(`http://34.198.50.70:3000/api/Pregunta/${idPregunta}`, {
+        response = await fetch(`http://localhost:5000/api/Pregunta/${idPregunta}`, {
           method: "PUT",
           headers: { 
             "Content-Type": "application/json",
@@ -179,13 +179,13 @@ export const usePreguntaStore = defineStore("pregunta", () => {
 
       let response;
       try {
-        response = await fetch(`http://34.198.50.70:3000/api/pregunta/${idPregunta}`, {
+        response = await fetch(`http://localhost:5000/api/pregunta/${idPregunta}`, {
           method: "DELETE",
           headers: { "Accept": "application/json" },
           signal: controller.signal
         });
       } catch (error) {
-        response = await fetch(`http://34.198.50.70:3000/api/Pregunta/${idPregunta}`, {
+        response = await fetch(`http://localhost:5000/api/Pregunta/${idPregunta}`, {
           method: "DELETE",
           headers: { "Accept": "application/json" },
           signal: controller.signal

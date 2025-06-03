@@ -19,7 +19,7 @@ export const useReporteStore = defineStore('reporte', () => {
     try {
       const usuarioStore = useUsuarioLogeadoStore()
       
-      const response = await fetch('http://34.198.50.70:3000/api/ReporteVideo', {
+      const response = await fetch('http://localhost:5000/api/ReporteVideo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ export const useReporteStore = defineStore('reporte', () => {
     errorMessage.value = ''
     
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/ReporteVideo/video/${idVideo}`)
+      const response = await fetch(`http://localhost:5000/api/ReporteVideo/video/${idVideo}`)
       
       if (!response.ok) {
         throw new Error(`No se pudieron obtener los reportes: ${response.status}`)
@@ -80,7 +80,7 @@ export const useReporteStore = defineStore('reporte', () => {
     if (!idUsuario || !idVideo) return false
     
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/ReporteVideo/check?idUsuario=${idUsuario}&idVideo=${idVideo}`)
+      const response = await fetch(`http://localhost:5000/api/ReporteVideo/check?idUsuario=${idUsuario}&idVideo=${idVideo}`)
       
       if (!response.ok) return false
       

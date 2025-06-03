@@ -374,7 +374,7 @@ export default {
       this.loading = true;
             
       try {
-        const response = await fetch("http://34.198.50.70:3000/api/Auth/login", {
+        const response = await fetch("http://localhost:5000/api/Auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -445,7 +445,7 @@ export default {
           contraseña: "[OCULTA]"
         });
 
-        const response = await fetch("http://34.198.50.70:3000/api/Auth/registro", {
+        const response = await fetch("http://localhost:5000/api/Auth/registro", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nuevoUsuario)

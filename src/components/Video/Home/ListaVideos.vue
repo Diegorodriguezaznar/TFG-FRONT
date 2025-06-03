@@ -80,7 +80,7 @@ const cargarInfoAutores = async () => {
     
     const promesas = idsUsuarios.map(async (idUsuario) => {
       try {
-        const response = await axios.get(`http://34.198.50.70:3000/api/Usuario/${idUsuario}`);
+        const response = await axios.get(`http://localhost:5000/api/Usuario/${idUsuario}`);
         if (response.data?.nombre) {
           nombresUsuarios.set(idUsuario, response.data.nombre);
         }

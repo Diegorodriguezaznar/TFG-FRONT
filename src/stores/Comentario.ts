@@ -17,7 +17,7 @@ export const useComentarioStore = defineStore("comentario", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
-      const response = await fetch(`http://34.198.50.70:3000/api/ComentarioVideo/video/${idVideo}`, {
+      const response = await fetch(`http://localhost:5000/api/ComentarioVideo/video/${idVideo}`, {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
@@ -61,7 +61,7 @@ export const useComentarioStore = defineStore("comentario", () => {
     errorMessage.value = "";
 
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/ComentarioVideo/reportados`, {
+      const response = await fetch(`http://localhost:5000/api/ComentarioVideo/reportados`, {
         headers: {
           "Accept": "application/json"
         }
@@ -102,7 +102,7 @@ export const useComentarioStore = defineStore("comentario", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
-      const response = await fetch("http://34.198.50.70:3000/api/ComentarioVideo", {
+      const response = await fetch("http://localhost:5000/api/ComentarioVideo", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -145,7 +145,7 @@ export const useComentarioStore = defineStore("comentario", () => {
     errorMessage.value = "";
 
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/ComentarioVideo/reportar/${idComentario}`, {
+      const response = await fetch(`http://localhost:5000/api/ComentarioVideo/reportar/${idComentario}`, {
         method: "PUT",
         headers: {
           "Accept": "application/json"
@@ -171,7 +171,7 @@ export const useComentarioStore = defineStore("comentario", () => {
     errorMessage.value = "";
 
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/ComentarioVideo/quitar-reportes/${idComentario}`, {
+      const response = await fetch(`http://localhost:5000/api/ComentarioVideo/quitar-reportes/${idComentario}`, {
         method: "PUT",
         headers: {
           "Accept": "application/json"
@@ -197,7 +197,7 @@ export const useComentarioStore = defineStore("comentario", () => {
     errorMessage.value = "";
 
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/ComentarioVideo/${idComentario}`, {
+      const response = await fetch(`http://localhost:5000/api/ComentarioVideo/${idComentario}`, {
         method: "DELETE",
       });
 
@@ -222,7 +222,7 @@ export const useComentarioStore = defineStore("comentario", () => {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token no disponible");
 
-      const response = await fetch(`http://34.198.50.70:3000/api/ComentarioVideo/borrar-propio/${idComentario}`, {
+      const response = await fetch(`http://localhost:5000/api/ComentarioVideo/borrar-propio/${idComentario}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`

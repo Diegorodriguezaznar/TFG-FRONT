@@ -23,7 +23,7 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
     loading.value = true;
     try {
       // Primero intentamos usar el endpoint consolidado
-      const response = await fetch(`http://34.198.50.70:3000/api/Estadisticas/usuario/${idUsuario}`);
+      const response = await fetch(`http://localhost:5000/api/Estadisticas/usuario/${idUsuario}`);
       
       if (response.ok) {
         const stats = await response.json();
@@ -123,7 +123,7 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
   // Métodos auxiliares para obtener datos específicos del backend
   async function fetchCursosPorUsuario(idUsuario: number): Promise<number> {
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/Curso/usuario/${idUsuario}`);
+      const response = await fetch(`http://localhost:5000/api/Curso/usuario/${idUsuario}`);
       
       if (!response.ok) {
         console.warn(`API Curso no disponible (${response.status}), devolviendo 0`);
@@ -140,7 +140,7 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
 
   async function fetchVideosPorUsuario(idUsuario: number): Promise<number> {
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/Video/usuario/${idUsuario}`);
+      const response = await fetch(`http://localhost:5000/api/Video/usuario/${idUsuario}`);
       
       if (!response.ok) {
         console.warn(`API Video no disponible (${response.status}), devolviendo 0`);
@@ -157,7 +157,7 @@ export const useUsuarioEstadisticasStore = defineStore("usuarioEstadisticas", ()
 
   async function fetchQuizzesPorUsuario(idUsuario: number): Promise<number> {
     try {
-      const response = await fetch(`http://34.198.50.70:3000/api/Quiz/usuario/${idUsuario}`);
+      const response = await fetch(`http://localhost:5000/api/Quiz/usuario/${idUsuario}`);
       
       if (!response.ok) {
         console.warn(`API Quiz no disponible (${response.status}), devolviendo 0`);

@@ -17,7 +17,7 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(
-        `http://34.198.50.70:3000/api/MarcadorVideo/video/${idVideo}`,
+        `http://localhost:5000/api/MarcadorVideo/video/${idVideo}`,
         {
           signal: controller.signal,
           headers: {
@@ -65,7 +65,7 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(
-        `http://34.198.50.70:3000/api/MarcadorVideo`,
+        `http://localhost:5000/api/MarcadorVideo`,
         {
           method: "POST",
           signal: controller.signal,
@@ -113,7 +113,7 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
       }));
 
       const response = await fetch(
-        `http://34.198.50.70:3000/api/MarcadorVideo/video/${idVideo}/bulk`,
+        `http://localhost:5000/api/MarcadorVideo/video/${idVideo}/bulk`,
         {
           method: "POST",
           signal: controller.signal,
@@ -153,7 +153,7 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(
-        `http://34.198.50.70:3000/api/MarcadorVideo/${idMarcador}`,
+        `http://localhost:5000/api/MarcadorVideo/${idMarcador}`,
         {
           method: "PUT",
           signal: controller.signal,
@@ -198,7 +198,7 @@ export const useMarcadorVideoStore = defineStore("marcadorVideo", () => {
       const timeoutId = setTimeout(() => controller.abort(), 10000);
 
       const response = await fetch(
-        `http://34.198.50.70:3000/api/MarcadorVideo/${idMarcador}`,
+        `http://localhost:5000/api/MarcadorVideo/${idMarcador}`,
         {
           method: "DELETE",
           signal: controller.signal,

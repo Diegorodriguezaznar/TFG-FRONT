@@ -19,8 +19,8 @@ export default defineConfig({
       protocol: 'ws'
     },
     proxy: {
-      'https://localhost:5190/api': {
-        target: 'http://localhost:5190', 
+      'https://localhost:5000/api': {
+        target: 'http://localhost:5000', 
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {

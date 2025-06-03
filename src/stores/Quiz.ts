@@ -36,7 +36,7 @@ export const useQuizStore = defineStore("quiz", () => {
     loading.value = true;
     try {
       console.log('FETCH ALL QUIZZES');
-      const response = await fetch("http://34.198.50.70:3000/api/quiz");
+      const response = await fetch("http://localhost:5000/api/quiz");
       if (!response.ok) throw new Error("Error al obtener todos los quizzes");
 
       const quizzesData = await response.json();
@@ -86,7 +86,7 @@ export const useQuizStore = defineStore("quiz", () => {
       console.log('ID solicitado:', idQuiz);
       console.log('Tipo del ID:', typeof idQuiz);
       
-      const url = `http://34.198.50.70:3000/api/quiz/${idQuiz}`;
+      const url = `http://localhost:5000/api/quiz/${idQuiz}`;
       console.log('URL completa:', url);
       
       console.log('Realizando fetch...');
@@ -196,7 +196,7 @@ export const useQuizStore = defineStore("quiz", () => {
   async function fetchQuizzesByUsuario(idUsuario: number): Promise<QuizCompletaDTO[]> {
     try {
       console.log(`FETCH QUIZZES BY USUARIO ${idUsuario}`);
-      const response = await fetch(`http://34.198.50.70:3000/api/quiz/usuario/${idUsuario}`);
+      const response = await fetch(`http://localhost:5000/api/quiz/usuario/${idUsuario}`);
       if (!response.ok) throw new Error("Error al obtener los quizzes del usuario");
 
       const quizzesData = await response.json();
@@ -228,7 +228,7 @@ export const useQuizStore = defineStore("quiz", () => {
     loading.value = true;
     try {
       console.log(`FETCH QUIZZES BY CURSO ${idCurso}`);
-      const response = await fetch(`http://34.198.50.70:3000/api/quiz/curso/${idCurso}`);
+      const response = await fetch(`http://localhost:5000/api/quiz/curso/${idCurso}`);
       if (!response.ok) throw new Error("Error al obtener los quizzes del curso");
 
       const quizzesData = await response.json();
@@ -275,7 +275,7 @@ export const useQuizStore = defineStore("quiz", () => {
       console.log('CREAR QUIZ');
       console.log('Datos del quiz:', quiz);
       
-      const response = await fetch("http://34.198.50.70:3000/api/quiz", {
+      const response = await fetch("http://localhost:5000/api/quiz", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -307,7 +307,7 @@ export const useQuizStore = defineStore("quiz", () => {
       console.log(`ACTUALIZAR QUIZ ${idQuiz}`);
       console.log('Datos a actualizar:', updatedData);
       
-      const response = await fetch(`http://34.198.50.70:3000/api/quiz/${idQuiz}`, {
+      const response = await fetch(`http://localhost:5000/api/quiz/${idQuiz}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"
@@ -345,7 +345,7 @@ export const useQuizStore = defineStore("quiz", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-      let url = `http://34.198.50.70:3000/api/Quiz/${idQuiz}`;
+      let url = `http://localhost:5000/api/Quiz/${idQuiz}`;
       if (idUsuario) {
         url += `?idUsuario=${idUsuario}`;
       }
@@ -363,7 +363,7 @@ export const useQuizStore = defineStore("quiz", () => {
           }
         });
       } catch (error) {
-        const fallbackUrl = `http://34.198.50.70:3000/api/quiz/${idQuiz}${idUsuario ? `?idUsuario=${idUsuario}` : ''}`;
+        const fallbackUrl = `http://localhost:5000/api/quiz/${idQuiz}${idUsuario ? `?idUsuario=${idUsuario}` : ''}`;
         console.log('Intentando URL alternativa:', fallbackUrl);
         response = await fetch(fallbackUrl, {
           method: "DELETE",
