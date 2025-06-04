@@ -11,7 +11,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
   // GET - Obtener todos los usuarios
   async function fetchAllUsuarios() {
     try {
-      const response = await fetch("http://34.198.50.70:5000/api/Usuario");
+      const response = await fetch("https://academiqapi.retocsv.es/api/Usuario");
       if (!response.ok) throw new Error("Error al obtener los usuarios");
 
       usuarios.value = await response.json();
@@ -23,7 +23,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
   // GET - Obtener usuario por ID
   async function fetchUsuarioById(idUsuario: number) {
     try {
-      const response = await fetch(`http://34.198.50.70:5000/api/Usuario/${idUsuario}`);
+      const response = await fetch(`https://academiqapi.retocsv.es/api/Usuario/${idUsuario}`);
       if (!response.ok) throw new Error("Error al obtener el usuario");
 
       usuario.value = await response.json();
@@ -35,7 +35,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
   // POST - Registrar usuario (registro público)
   async function registrarUsuario(newUser: UsuarioDTO) {
     try {
-      const response = await fetch("http://34.198.50.70:5000/api/Auth/registro", {
+      const response = await fetch("https://academiqapi.retocsv.es/api/Auth/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
@@ -70,7 +70,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
   // POST - Crear usuario (zona privada)
   async function createUsuario(newUser: UsuarioDTO) {
     try {
-      const response = await fetch("http://34.198.50.70:5000/api/Usuario", {
+      const response = await fetch("https://academiqapi.retocsv.es/api/Usuario", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
@@ -105,7 +105,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
   // PUT - Actualizar usuario
   async function updateUsuario(updatedUser: UsuarioDTO) {
     try {
-      const response = await fetch(`http://34.198.50.70:5000/api/Usuario/${updatedUser.idUsuario}`, {
+      const response = await fetch(`https://academiqapi.retocsv.es/api/Usuario/${updatedUser.idUsuario}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedUser),
@@ -159,7 +159,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
   // DELETE - Eliminar usuario
   async function deleteUsuario(idUsuario: number) {
     try {
-      const response = await fetch(`http://34.198.50.70:5000/api/Usuario/${idUsuario}`, {
+      const response = await fetch(`https://academiqapi.retocsv.es/api/Usuario/${idUsuario}`, {
         method: "DELETE",
       });
 
@@ -175,7 +175,7 @@ export const useUsuarioStore = defineStore("usuario", () => {
   // PUT - Aceptar usuario como profesor
   async function aceptarUsuarioComoProfesor(idUsuario: number): Promise<boolean> {
     try {
-      const response = await fetch(`http://34.198.50.70:5000/api/Usuario/${idUsuario}/aceptar-profesor`, {
+      const response = await fetch(`https://academiqapi.retocsv.es/api/Usuario/${idUsuario}/aceptar-profesor`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json"

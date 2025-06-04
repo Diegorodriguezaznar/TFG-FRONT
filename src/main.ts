@@ -14,7 +14,7 @@ import * as directives from "vuetify/directives";
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 // --------------------------- Configurar Axios ---------------------------
-axios.defaults.baseURL = "http://34.198.50.70:5000/api";
+axios.defaults.baseURL = "https://academiqapi.retocsv.es/api";
 
 axios.interceptors.response.use(
   response => response,

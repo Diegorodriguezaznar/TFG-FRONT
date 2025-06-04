@@ -20,7 +20,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://34.198.50.70:5000',
+        target: 'https://academiqapi.retocsv.es',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/api')

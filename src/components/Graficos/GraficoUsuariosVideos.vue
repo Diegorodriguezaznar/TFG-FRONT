@@ -50,7 +50,7 @@ const chartOptions = {
 
 onMounted(async () => {
   try {
-    const response = await fetch('http://34.198.50.70:5000/api/usuario/top-usuarios-videos')
+    const response = await fetch('https://academiqapi.retocsv.es/api/usuario/top-usuarios-videos')
     if (!response.ok) throw new Error('Error al obtener los datos')
 
     const datos: UsuarioVideosDTO[] = await response.json()
