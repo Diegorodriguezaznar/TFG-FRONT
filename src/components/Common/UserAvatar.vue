@@ -1,126 +1,91 @@
-<!-- src/components/UserAvatar.vue -->
-<template>
-  <v-avatar 
-    :size="size" 
-    :class="[avatarClasses, { 'light-bg': lightBackground }]"
-    class="UserAvatar"
-  >
-    <span class="UserAvatar__Letter">{{ primeraLetra }}</span>
-  </v-avatar>
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue';
 
 interface Props {
-  usuario?: {
-    nombre?: string;
-    idRol?: number;
-  } | null;
-  size?: string | number;
   nombre?: string;
-  idRol?: number;
-  lightBackground?: boolean;
+  usuario?: {
+    nombre: string;
+    apellidos?: string;
+    idRol?: number;
+    idUsuario?: number;
+    id?: number;
+  };
+  size?: number | string;
+  idRol?: number; 
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  nombre: 'Usuario',
   size: 40,
-  nombre: '',
-  idRol: 1,
-  lightBackground: false
+  idRol: 1
 });
 
-// Computed para obtener los datos del usuario
-const datosUsuario = computed(() => {
+// Obtener las iniciales del nombre
+const iniciales = computed(() => {
+  let nombreCompleto = '';
+
   if (props.usuario) {
-    return {
-      nombre: props.usuario.nombre || 'U',
-      idRol: props.usuario.idRol || 1
-    };
+    nombreCompleto = `${props.usuario.nombre} ${props.usuario.apellidos || ''}`.trim();
+  } else if (props.nombre) {
+    nombreCompleto = props.nombre;
   }
-  return {
-    nombre: props.nombre || 'U',
-    idRol: props.idRol || 1
-  };
+
+  if (!nombreCompleto) return 'U';
+
+  const palabras = nombreCompleto.split(' ').filter(palabra => palabra.length > 0);
+
+  if (palabras.length === 1) {
+    return palabras[0].charAt(0).toUpperCase();
+  } else {
+    return palabras.slice(0, 2).map(palabra => palabra.charAt(0).toUpperCase()).join('');
+  }
 });
 
-// Primera letra del nombre
-const primeraLetra = computed(() => {
-  const nombre = datosUsuario.value.nombre;
-  return nombre ? nombre.charAt(0).toUpperCase() : 'U';
-});
-
-// Clases CSS según el rol
-const avatarClasses = computed(() => {
-  const idRol = datosUsuario.value.idRol;
-  
-  switch (idRol) {
-    case 1: // Estudiante
-      return 'UserAvatar--estudiante';
-    case 2: // Profesor
-      return 'UserAvatar--profesor';
-    case 3: // Administrador
-      return 'UserAvatar--admin';
-    default:
-      return 'UserAvatar--estudiante';
+// Nombre completo para el título
+const nombreCompleto = computed(() => {
+  if (props.usuario) {
+    return `${props.usuario.nombre} ${props.usuario.apellidos || ''}`.trim();
   }
+  return props.nombre || 'Usuario';
 });
 </script>
+<template>
+  <v-avatar 
+    :size="size" 
+    color="orange"
+    class="UserAvatar"
+  >
+    <span 
+      class="UserAvatartext" 
+      :style="{ fontSize: `${Number(size) * 0.4}px` }"
+    >
+      {{ iniciales }}
+    </span>
+
+    <v-tooltip 
+      activator="parent" 
+      location="bottom"
+      :text="nombreCompleto"
+    />
+  </v-avatar>
+</template>
 
 <style scoped>
 .UserAvatar {
-  font-weight: 700;
-  transition: all 0.3s ease;
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%) !important;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+  transition: all 0.2s ease;
 }
 
 .UserAvatar:hover {
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
 }
 
-.UserAvatar__Letter {
-  font-size: inherit;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-}
-
-/* Estilos por rol */
-.UserAvatar--estudiante {
-  background: linear-gradient(135deg, #4CAF50 0%, #66BB6A 100%);
-}
-
-.UserAvatar--profesor {
-  background: linear-gradient(135deg, #2196F3 0%, #42A5F5 100%);
-}
-
-.UserAvatar--admin {
-  background: linear-gradient(135deg, #F44336 0%, #EF5350 100%);
-}
-
-/* Variantes con fondo claro para contextos específicos */
-.UserAvatar--estudiante.light-bg {
-  background: linear-gradient(135deg, #C8E6C9 0%, #A5D6A7 100%);
-  color: #2E7D32;
-  border-color: #4CAF50;
-}
-
-.UserAvatar--profesor.light-bg {
-  background: linear-gradient(135deg, #BBDEFB 0%, #90CAF9 100%);
-  color: #1565C0;
-  border-color: #2196F3;
-}
-
-.UserAvatar--admin.light-bg {
-  background: linear-gradient(135deg, #FFCDD2 0%, #EF9A9A 100%);
-  color: #C62828;
-  border-color: #F44336;
-}
-
-.UserAvatar--estudiante.light-bg .UserAvatar__Letter,
-.UserAvatar--profesor.light-bg .UserAvatar__Letter,
-.UserAvatar--admin.light-bg .UserAvatar__Letter {
-  text-shadow: none;
+.UserAvatartext {
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 </style>
