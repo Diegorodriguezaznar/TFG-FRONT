@@ -160,30 +160,7 @@ onMounted(() => {
       </div>
     </v-card-text>
     
-    <!-- Acciones -->
-    <v-card-actions class="CardUsuario__Actions">
-      <v-btn
-        color="orange"
-        size="small"
-        prepend-icon="mdi-account"
-        @click.stop="verPerfil"
-        variant="elevated"
-        class="flex-grow-1 mr-1"
-      >
-        Ver Perfil
-      </v-btn>
-      
-      <v-btn
-        color="blue"
-        size="small"
-        prepend-icon="mdi-school"
-        @click.stop="verCursos"
-        variant="outlined"
-        class="flex-grow-1 ml-1"
-      >
-        Cursos
-      </v-btn>
-    </v-card-actions>
+    
   </v-card>
 </template>
 

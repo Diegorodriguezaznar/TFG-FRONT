@@ -1,49 +1,41 @@
 <template>
-  <section class="EstadisticasSection">
+  <section class="banner-section">
     <v-container>
-      <v-row class="align-center justify-center">
-        <!-- Imagen circular izquierda -->
-        <v-col cols="10" md="2" class="text-center">
-          <div class="EstadisticasSection__ProfileCard">
-            <div class="EstadisticasSection__Avatar">
-              <v-img
-                src="../../images/Fran.PNG"
-                alt="Francisco Rebollo"
-                class="EstadisticasSection__ProfileImage"
-              ></v-img>
+      <v-row class="align-center justify-center banner-container">
+        <div class="images-row">
+          <!-- Imagen circular izquierda -->
+          <v-col cols="12" md="3" class="text-center">
+            <div class="circular-image left">
+              <div class="image-bg fran-image"></div>
+              <p class="image-text">Fran Rebollo</p>
             </div>
-            <p class="EstadisticasSection__ProfileName">Francisco Rebollo</p>
-          </div>
-        </v-col>
+          </v-col>
 
-        <!-- Imagen rectangular central -->
-        <v-col cols="12" md="6" class="text-center">
-          <div class="EstadisticasSection__CentralImage">
-            <v-img
-              src="@/assets/images/imagen-central.jpg"
-              alt="Imagen Central"
-              class="EstadisticasSection__MainImage"
-            ></v-img>
-          </div>
-        </v-col>
-
-        <!-- Imagen circular derecha -->
-        <v-col cols="10" md="2" class="text-center">
-          <div class="EstadisticasSection__ProfileCard">
-            <div class="EstadisticasSection__Avatar">
-              <v-img
-                src="../../images/Diego.PNG"
-                alt="Diego Rodríguez"
-                class="EstadisticasSection__ProfileImage"
-              ></v-img>
+          <!-- Imagen rectangular central -->
+          <v-col cols="12" md="6" class="text-center">
+            <div class="rectangular-image center">
+              <div class="image-bg banner-image"></div>
             </div>
-            <p class="EstadisticasSection__ProfileName">Diego Rodríguez</p>
-          </div>
-        </v-col>
+          </v-col>
+
+          <!-- Imagen circular derecha -->
+          <v-col cols="12" md="3" class="text-center">
+            <div class="circular-image right">
+              <div class="image-bg diego-image"></div>
+              <p class="image-text">Diego Rodriguez</p>
+            </div>
+          </v-col>
+        </div>
       </v-row>
     </v-container>
   </section>
 </template>
+
+<script>
+export default {
+  name: 'EstadisticasSection'
+}
+</script>
 
 <style scoped lang="scss">
 @import "@/assets/sass/components/HomePage/EstadisticasSection";

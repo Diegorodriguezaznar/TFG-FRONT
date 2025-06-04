@@ -181,7 +181,7 @@ watch(() => props.videos, async (newVideos) => {
           
           <div class="VideoCard__contenido">
             <div class="VideoCard__info">
-              <v-avatar size="32" color="red" class="VideoCard__avatar">
+              <v-avatar size="32" color="orange" class="VideoCard__avatar">
                 {{ video.autor ? video.autor.charAt(0).toUpperCase() : 'U' }}
               </v-avatar>
 
