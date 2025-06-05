@@ -170,7 +170,7 @@ class VideoService {
       }
       
       // Enviar la solicitud al backend
-      const response = await axios.post('http://localhost:5190/api/Video/registrar', formData, {
+      const response = await axios.post('http://localhost:5000/api/Video/registrar', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
@@ -205,7 +205,7 @@ class VideoService {
    */
   async getVideos(): Promise<any[]> {
     try {
-      const response = await axios.get('http://localhost:5190/api/Video');
+      const response = await axios.get('http://localhost:5000/api/Video');
       return response.data;
     } catch (error: any) {
       console.error('Error al obtener los videos:', error);
@@ -218,7 +218,7 @@ class VideoService {
    */
   async getVideoById(videoId: number): Promise<any> {
     try {
-      const response = await axios.get(`http://localhost:5190/api/Video/${videoId}`);
+      const response = await axios.get(`http://localhost:5000/api/Video/${videoId}`);
       return response.data;
     } catch (error: any) {
       console.error(`Error al obtener el video ${videoId}:`, error);
@@ -231,7 +231,7 @@ class VideoService {
    */
   async getVideosByCourse(courseId: number): Promise<any[]> {
     try {
-      const response = await axios.get(`http://localhost:5190/api/Video/curso/${courseId}`);
+      const response = await axios.get(`http://localhost:5000/api/Video/curso/${courseId}`);
       return response.data;
     } catch (error: any) {
       console.error(`Error al obtener los videos del curso ${courseId}:`, error);

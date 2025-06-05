@@ -16,7 +16,7 @@ export const useCursoStore = defineStore("curso", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
-      const response = await fetch("http://localhost:5190/api/Curso", {
+      const response = await fetch("http://localhost:5000/api/Curso", {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
@@ -48,7 +48,7 @@ export const useCursoStore = defineStore("curso", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000); 
       
-      const response = await fetch(`http://localhost:5190/api/Curso/${idCurso}`, {
+      const response = await fetch(`http://localhost:5000/api/Curso/${idCurso}`, {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
@@ -94,7 +94,7 @@ export const useCursoStore = defineStore("curso", () => {
         formData.append('Imagen', imagenFile);
       }
 
-      const response = await fetch("http://localhost:5190/api/Curso/crear", {
+      const response = await fetch("http://localhost:5000/api/Curso/crear", {
         method: "POST",
         headers: {
           "Accept": "application/json",
@@ -129,7 +129,7 @@ export const useCursoStore = defineStore("curso", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
-      const response = await fetch(`http://localhost:5190/api/Curso/${updatedCurso.idCurso}`, {
+      const response = await fetch(`http://localhost:5000/api/Curso/${updatedCurso.idCurso}`, {
         method: "PUT",
         headers: { 
           "Content-Type": "application/json",
@@ -170,7 +170,7 @@ export const useCursoStore = defineStore("curso", () => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 10000);
       
-      const response = await fetch(`http://localhost:5190/api/Curso/${idCurso}`, {
+      const response = await fetch(`http://localhost:5000/api/Curso/${idCurso}`, {
         method: "DELETE",
         headers: { 
           "Accept": "application/json"

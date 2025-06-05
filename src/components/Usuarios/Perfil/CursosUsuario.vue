@@ -48,7 +48,7 @@ const formatearFecha = (fecha: string) => {
   <v-card class="CursosUsuario" elevation="2">
     <v-card-title class="CursosUsuario__Header">
       <div class="d-flex align-center">
-        <v-icon color="orange" size="large" class="mr-3">mdi-book-education</v-icon>
+        <v-icon color="blue" size="large" class="mr-3">mdi-book-education</v-icon>
         <div>
           <h2 class="text-h5 font-weight-bold">Cursos Creados</h2>
           <p class="text-subtitle-2 text-grey mb-0">
@@ -91,7 +91,7 @@ const formatearFecha = (fecha: string) => {
               >
                 <template v-slot:placeholder>
                   <v-row class="fill-height ma-0" align="center" justify="center">
-                    <v-progress-circular indeterminate color="orange"></v-progress-circular>
+                    <v-progress-circular indeterminate color="blue"></v-progress-circular>
                   </v-row>
                 </template>
               </v-img>
@@ -114,7 +114,7 @@ const formatearFecha = (fecha: string) => {
               <!-- Acciones -->
               <v-card-actions class="CursosUsuario__CursoAcciones">
                 <v-btn 
-                  color="orange" 
+                  color="blue" 
                   variant="elevated" 
                   size="small"
                   @click.stop="verCurso(curso)"
@@ -132,7 +132,7 @@ const formatearFecha = (fecha: string) => {
         <div v-if="hayMasCursos" class="CursosUsuario__ToggleContainer">
           <v-btn 
             @click="toggleMostrarTodos"
-            color="orange"
+            color="blue"
             variant="outlined"
             size="large"
             block

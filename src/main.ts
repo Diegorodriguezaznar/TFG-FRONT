@@ -14,7 +14,7 @@ import * as directives from "vuetify/directives";
 import { useUsuarioLogeadoStore } from "@/stores/UsuarioLogeado";
 
 // --------------------------- Configurar Axios ---------------------------
-axios.defaults.baseURL = "http://localhost:5190/api";
+axios.defaults.baseURL = "http://localhost:5000/api";
 
 axios.interceptors.response.use(
   response => response,

@@ -53,13 +53,9 @@ const mostrarListadoReportes = ref(false)
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="primary" @click="emit('aprobar', video.idVideo)">
+        <v-btn color="success" @click="emit('aprobar', video.idVideo)">
           <v-icon class="me-2">mdi-check</v-icon>
           Aprobar Video
-        </v-btn>
-        <v-btn color="error" @click="emit('eliminar', video.idVideo)">
-          <v-icon class="me-2">mdi-delete</v-icon>
-          Eliminar Video
         </v-btn>
         <v-btn color="info" variant="tonal" @click="verVideo">
           <v-icon class="me-2">mdi-play-circle</v-icon>

@@ -10,7 +10,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const mostrarTodos = ref(false);
-const itemsPorDefecto = 5;
+const itemsPorDefecto = 6; // Cambiado de 5 a 6 para coincidir
 
 const quizzesVisibles = computed(() => {
   if (mostrarTodos.value) {
@@ -27,11 +27,21 @@ const toggleMostrarTodos = () => {
   mostrarTodos.value = !mostrarTodos.value;
 };
 
-const verQuiz = (quiz: QuizDTO) => {
-  router.push({
-    path: '/quizz-detail',
-    query: { id: quiz.idQuiz }
-  });
+const verQuiz = (quiz: QuizCompletaDTO) => {
+  router.push(`/quiz/${quiz.idQuiz}`);
+};
+
+const formatearFecha = (fecha: string) => {
+  if (!fecha) return 'Sin fecha';
+  try {
+    return new Date(fecha).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  } catch (error) {
+    return 'Fecha inválida';
+  }
 };
 </script>
 
@@ -72,11 +82,24 @@ const verQuiz = (quiz: QuizDTO) => {
               @click="verQuiz(quiz)"
               rounded="xl"
             >
-              <!-- Header compacto con degradado morado -->
+              <!-- Header con degradado morado (igual que QuizzesCurso) -->
               <div class="QuizzesUsuario__QuizHeader">
                 <!-- Icono de play centrado -->
                 <div class="QuizzesUsuario__PlayIcon">
                   <v-icon color="white" size="large">mdi-play-circle</v-icon>
+                </div>
+                
+                <!-- Información básica en la esquina -->
+                <div class="QuizzesUsuario__BasicInfo">
+                  <v-chip 
+                    size="small" 
+                    color="white" 
+                    variant="elevated"
+                    class="QuizzesUsuario__DifficultyChip"
+                  >
+                    <v-icon start size="small">mdi-target</v-icon>
+                    Quiz
+                  </v-chip>
                 </div>
               </div>
               
@@ -90,19 +113,27 @@ const verQuiz = (quiz: QuizDTO) => {
                   {{ quiz.descripcion || 'Sin descripción disponible' }}
                 </v-card-text>
                 
-
+                <!-- Meta información -->
+                <div class="QuizzesUsuario__Meta">
+                  <div class="d-flex align-center text-caption text-grey">
+                    <v-icon size="small" class="mr-1">mdi-calendar</v-icon>
+                    <span>Creado el {{ formatearFecha(quiz.fechaCreacion) }}</span>
+                  </div>
+                </div>
               </v-card-item>
               
+              <!-- Acciones (igual que QuizzesCurso) -->
               <v-card-actions class="QuizzesUsuario__QuizAcciones">
+                
                 <v-btn 
                   color="purple" 
                   variant="elevated" 
                   size="small"
                   @click.stop="verQuiz(quiz)"
-                  block
                   rounded="lg"
+                  class="flex-grow-1"
                 >
-                  <v-icon start>mdi-play-circle</v-icon>
+                  <v-icon start size="small">mdi-play-circle</v-icon>
                   Hacer Quiz
                 </v-btn>
               </v-card-actions>

@@ -9,7 +9,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
   // Método GET obtener todas las inscripciones
   async function fetchAllInscripciones() {
     try {
-      const response = await fetch("http://localhost:5190/api/UsuarioCurso");
+      const response = await fetch("http://localhost:5000/api/UsuarioCurso");
       if (!response.ok) throw new Error("Error al obtener las inscripciones");
 
       inscripciones.value = await response.json();
@@ -22,7 +22,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
   // Método GET obtener inscripciones por ID de usuario
   async function fetchInscripcionesByUsuarioId(idUsuario: number) {
     try {
-      const response = await fetch(`http://localhost:5190/api/UsuarioCurso/usuario/${idUsuario}`);
+      const response = await fetch(`http://localhost:5000/api/UsuarioCurso/usuario/${idUsuario}`);
       if (!response.ok) throw new Error("Error al obtener las inscripciones del usuario");
 
       return await response.json();
@@ -36,7 +36,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
   // Método GET obtener inscripciones por ID de curso
   async function fetchInscripcionesByCursoId(idCurso: number) {
     try {
-      const response = await fetch(`http://localhost:5190/api/UsuarioCurso/curso/${idCurso}`);
+      const response = await fetch(`http://localhost:5000/api/UsuarioCurso/curso/${idCurso}`);
       if (!response.ok) throw new Error("Error al obtener las inscripciones del curso");
 
       return await response.json();
@@ -50,9 +50,9 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
   // Método POST crear una nueva inscripción
   async function createInscripcion(nuevaInscripcion: UsuarioCursoDTO) {
     try {
-      console.log("Enviando POST a http://localhost:5190/api/UsuarioCurso:", nuevaInscripcion);
+      console.log("Enviando POST a http://localhost:5000/api/UsuarioCurso:", nuevaInscripcion);
       
-      const response = await fetch("http://localhost:5190/api/UsuarioCurso", {
+      const response = await fetch("http://localhost:5000/api/UsuarioCurso", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nuevaInscripcion)
@@ -85,7 +85,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
       console.log(`Eliminando relación Usuario-Curso: Usuario ${idUsuario}, Curso ${idCurso}`);
       
       console.log("Intentando DELETE con parámetros en la URL");
-      const response1 = await fetch(`http://localhost:5190/api/UsuarioCurso/${idUsuario}/${idCurso}`, {
+      const response1 = await fetch(`http://localhost:5000/api/UsuarioCurso/${idUsuario}/${idCurso}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       });
@@ -99,7 +99,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
       }
       
       console.log("Intentando DELETE con query parameters");
-      const response2 = await fetch(`http://localhost:5190/api/UsuarioCurso?idUsuario=${idUsuario}&idCurso=${idCurso}`, {
+      const response2 = await fetch(`http://localhost:5000/api/UsuarioCurso?idUsuario=${idUsuario}&idCurso=${idCurso}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
       });
@@ -113,7 +113,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
       }
       
       console.log("Intentando POST a endpoint /delete o /remove");
-      const response3 = await fetch("http://localhost:5190/api/UsuarioCurso/delete", {
+      const response3 = await fetch("http://localhost:5000/api/UsuarioCurso/delete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -144,7 +144,7 @@ export const useUsuarioCursoStore = defineStore("usuarioCurso", () => {
         
         if (posibleId) {
           console.log(`Intentando DELETE con ID específico: ${posibleId}`);
-          const response4 = await fetch(`http://localhost:5190/api/UsuarioCurso/${posibleId}`, {
+          const response4 = await fetch(`http://localhost:5000/api/UsuarioCurso/${posibleId}`, {
             method: "DELETE"
           });
           

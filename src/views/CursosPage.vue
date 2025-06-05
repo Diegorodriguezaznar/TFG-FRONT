@@ -4,7 +4,7 @@ import { useUsuarioLogeadoStore } from '@/stores/UsuarioLogeado';
 import { useCursoStore } from '@/stores/Curso';
 import HeaderCursos from '@/components/Layout/HeaderCursos.vue';
 import Footer from '@/components/Layout/Footer.vue';
-import SideBar from '@/components/Layout/SideBar.vue';
+import SideBar from '@/components/Layout/Sidebar.vue';
 import CursosHeroSection from '@/components/Cursos/CursosHeroSection.vue';
 import CursosListSection from '@/components/Cursos/CursosListSection.vue';
 

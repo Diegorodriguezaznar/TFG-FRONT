@@ -1,4 +1,4 @@
-<!-- src/views/CrearQuizPage.vue - Refactorizado con componentes -->
+<!-- src/views/CrearQuizPage.vue - Con Modal de Éxito -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
@@ -13,6 +13,7 @@ import QuizStepper from '@/components/Quizz/CrearQuiz/QuizStepper.vue';
 import QuizInfo from '@/components/Quizz/CrearQuiz/QuizInfo.vue';
 import PreguntasQuiz from '@/components/Quizz/CrearQuiz/PreguntasQuiz.vue';
 import VistaPrevia from '@/components/Quizz/CrearQuiz/VistaPrevia.vue';
+import ModalExitoQuiz from '@/components/Quizz/CrearQuiz/ModalExitoQuiz.vue';
 
 // Stores y router
 const router = useRouter();
@@ -26,6 +27,7 @@ const usuarioStore = useUsuarioLogeadoStore();
 // Variables reactivas
 const loading = ref(false);
 const currentStep = ref(0);
+const showModalExito = ref(false);
 
 // Detectar curso actual
 const cursoActual = computed(() => {
@@ -102,6 +104,10 @@ const puedeGuardar = computed(() => {
   return validarPaso1() && preguntasValidas.value.length >= 1;
 });
 
+const totalRespuestas = computed(() => {
+  return preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0);
+});
+
 // Métodos de validación
 function validarPaso1(): boolean {
   return !!(quizData.value.nombre.trim() && quizData.value.idAsignatura);
@@ -169,7 +175,7 @@ function agregarPregunta() {
 // Guardar quiz
 async function guardarQuiz() {
   if (!usuarioActual.value || !puedeGuardar.value) {
-    alert('No se puede guardar el quiz. Verifica que hayas completado todos los campos.');
+    // Mostrar mensaje de error más elegante si es necesario
     return;
   }
 
@@ -177,8 +183,6 @@ async function guardarQuiz() {
   let quizCreado = null;
   
   try {
-    console.log('=== INICIANDO CREACIÓN DE QUIZ ===');
-    
     // 1. Crear el quiz
     const datosNuevoQuiz = {
       nombre: quizData.value.nombre,
@@ -239,28 +243,25 @@ async function guardarQuiz() {
       }
     }
 
-    console.log(' === QUIZ CREADO EXITOSAMENTE ===');
-    
-    const mensaje = cursoActual.value 
-      ? `¡Quiz "${quizData.value.nombre}" creado exitosamente para el curso ${cursoActual.value}!`
-      : `¡Quiz "${quizData.value.nombre}" creado exitosamente!`;
-    
-    alert(` ${mensaje}\n\n Resumen:\n• ${preguntasCreadas.length} preguntas creadas\n• ${preguntasValidas.value.reduce((total, p) => total + p.respuestas.length, 0)} respuestas añadidas`);
-    
-    // Limpiar y redirigir
-    resetForm();
-    
-    if (cursoActual.value) {
-      router.push(`/curso/${cursoActual.value}`);
-    } else {
-      router.push('/cursos');
-    }
+    // Mostrar modal de éxito en lugar de alert
+    showModalExito.value = true;
 
   } catch (error: any) {
-    console.error(' === ERROR AL CREAR QUIZ ===', error);
-    alert(` Error al crear el quiz: ${error.message}`);
+    // Aquí podrías crear también un modal de error si quieres
+    alert(`Error al crear el quiz: ${error.message}`);
   } finally {
     loading.value = false;
+  }
+}
+
+// Manejar continuación después del éxito
+function handleContinuarDespuesDelExito() {
+  resetForm();
+  
+  if (cursoActual.value) {
+    router.push(`/curso/${cursoActual.value}`);
+  } else {
+    router.push('/cursos');
   }
 }
 
@@ -293,7 +294,7 @@ function cancelarCreacion() {
 onMounted(async () => {
   // Verificar permisos
   if (!puedeCrearQuiz.value) {
-    alert('No tienes permisos para crear quizzes');
+    // En lugar de alert, usa el router directamente o crea un modal de error
     router.push('/cursos');
     return;
   }
@@ -308,14 +309,15 @@ onMounted(async () => {
 
   // Verificar si hay asignaturas para el curso
   if (cursoActual.value && asignaturas.value.length === 0) {
-    alert(`No hay asignaturas disponibles para este curso (${cursoActual.value}). Contacta al administrador.`);
+    // En lugar de alert, redirige directamente
     router.push(`/curso/${cursoActual.value}`);
     return;
   }
 
-  // Agregar primera pregunta
   agregarPregunta();
 });
+
+
 </script>
 
 <template>
@@ -411,6 +413,16 @@ onMounted(async () => {
         </v-card>
       </v-container>
     </v-main>
+
+    <!-- Modal de Éxito -->
+    <ModalExitoQuiz
+      v-model="showModalExito"
+      :nombre-quiz="quizData.nombre"
+      :curso-actual="cursoActual"
+      :total-preguntas="preguntasValidas.length"
+      :total-respuestas="totalRespuestas"
+      @continuar="handleContinuarDespuesDelExito"
+    />
   </v-app>
 </template>
 

@@ -59,7 +59,7 @@
               color="indigo"
               titulo="Hazte Profesor"
               descripcion="¿Tienes conocimientos que compartir? Solicita convertirte en profesor y crea tu propio contenido."
-              ruta="/peticion-profesor"
+              ruta="#"
               @navegar="$emit('navegar', $event)"
             />
           </div>

@@ -47,7 +47,7 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
         estado: 'Pendiente'
       };
 
-      const response = await fetch("http://localhost:5190/api/PeticionProfesor", {
+      const response = await fetch("http://localhost:5000/api/PeticionProfesor", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
     error.value = null;
 
     try {
-      const response = await fetch("http://localhost:5190/api/PeticionProfesor", {
+      const response = await fetch("http://localhost:5000/api/PeticionProfesor", {
         headers: {
           'Authorization': `Bearer ${usuarioLogeadoStore.token}`
         }
@@ -141,7 +141,7 @@ export const usePeticionProfesorStore = defineStore("peticionProfesor", () => {
   // DELETE - Rechazar petición
   async function rechazarPeticion(idPeticion: number): Promise<boolean> {
     try {
-      const response = await fetch(`http://localhost:5190/api/PeticionProfesor/rechazar/${idPeticion}`, {
+      const response = await fetch(`http://localhost:5000/api/PeticionProfesor/rechazar/${idPeticion}`, {
         method: "DELETE"
       });
 

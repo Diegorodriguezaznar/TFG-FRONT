@@ -80,7 +80,7 @@ const cargarInfoAutores = async () => {
     
     const promesas = idsUsuarios.map(async (idUsuario) => {
       try {
-        const response = await axios.get(`http://localhost:5190/api/Usuario/${idUsuario}`);
+        const response = await axios.get(`http://localhost:5000/api/Usuario/${idUsuario}`);
         if (response.data?.nombre) {
           nombresUsuarios.set(idUsuario, response.data.nombre);
         }
@@ -181,7 +181,7 @@ watch(() => props.videos, async (newVideos) => {
           
           <div class="VideoCard__contenido">
             <div class="VideoCard__info">
-              <v-avatar size="32" color="red" class="VideoCard__avatar">
+              <v-avatar size="32" color="orange" class="VideoCard__avatar">
                 {{ video.autor ? video.autor.charAt(0).toUpperCase() : 'U' }}
               </v-avatar>
 
